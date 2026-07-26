@@ -1,0 +1,123 @@
+{
+  "serie": [
+    {
+      "fecha": "2026-07-26",
+      "ts": 1785094490.839206,
+      "dias": 7,
+      "contexto": {
+        "llamadas": 1247,
+        "tokens": 76093997,
+        "tareas_hechas": 19,
+        "llamadas_router": 508
+      },
+      "kpis": {
+        "entrada_por_llamada": 60596.123,
+        "pct_cache": 68.953,
+        "ratio_salida_entrada": 0.702,
+        "pct_local": 0.063,
+        "pct_metered": 0.0,
+        "pct_tokens_en_fallo": 3.568,
+        "latencia_p50": 4.78,
+        "tokens_motor_por_tarea": 828978.531,
+        "pct_llamadas_ok": 97.047,
+        "tareas_dia": 2.714,
+        "reintentos_por_tarea": 1.296,
+        "pct_propuestas_atendidas": 100.0,
+        "cobertura_medida": 56.856
+      }
+    }
+  ],
+  "linea_base": {
+    "congelada": "2026-07-26",
+    "ts": 1785017462.318348,
+    "dias": 7,
+    "contexto": {
+      "llamadas": 2004,
+      "tokens": 126253894.8572067,
+      "tareas_hechas": 20,
+      "llamadas_router": 749
+    },
+    "kpis": {
+      "entrada_por_llamada": {
+        "valor": 62577.835,
+        "soporte": 2004,
+        "nota": ""
+      },
+      "pct_cache": {
+        "valor": 70.282,
+        "soporte": 2004,
+        "nota": ""
+      },
+      "ratio_salida_entrada": {
+        "valor": 0.676,
+        "soporte": 2004,
+        "nota": ""
+      },
+      "pct_local": {
+        "valor": 0.089,
+        "soporte": 2004,
+        "nota": ""
+      },
+      "pct_metered": {
+        "valor": 0.0,
+        "soporte": 2004,
+        "nota": ""
+      },
+      "pct_tokens_en_fallo": {
+        "valor": 4.032,
+        "soporte": 749,
+        "nota": "solo router: Hermes no marca resultado"
+      },
+      "latencia_p50": {
+        "valor": 4.2,
+        "soporte": 749,
+        "nota": "solo router"
+      },
+      "tokens_motor_por_tarea": {
+        "valor": 1063907.605,
+        "soporte": 20,
+        "nota": ""
+      },
+      "pct_llamadas_ok": {
+        "valor": 96.529,
+        "soporte": 749,
+        "nota": "solo router"
+      },
+      "tareas_dia": {
+        "valor": 2.857,
+        "soporte": 20,
+        "nota": ""
+      },
+      "reintentos_por_tarea": {
+        "valor": 1.2,
+        "soporte": 30,
+        "nota": ""
+      },
+      "pct_propuestas_atendidas": {
+        "valor": 100.0,
+        "soporte": 3,
+        "nota": "propuestas ya resueltas de los dos lazos"
+      },
+      "cobertura_medida": {
+        "valor": 59.331,
+        "soporte": 2004,
+        "nota": ""
+      }
+    },
+    "nota": "Foto del clon en el momento de instalar la medida. Todo lo que venga después se compara contra esto. No se edita a mano: para recongelar, `eficiencia.py --rebasar` (queda registrado abajo).",
+    "rebases": []
+  },
+  "intervenciones_raw": [
+    {
+      "id": "int-20260726-001933",
+      "fecha": "2026-07-26",
+      "ts": 1785017973.126751,
+      "que": "Instrumentado el router para que registre tokens por llamada (TokenScope F1) y reiniciado el shim",
+      "kpi": "cobertura_medida",
+      "kpi_pedido": "cobertura_medida",
+      "funcion": "motor",
+      "propuesta": "handoff-v6.49",
+      "notas": ""
+    }
+  ]
+}

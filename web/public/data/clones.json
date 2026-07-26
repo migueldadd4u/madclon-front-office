@@ -1,0 +1,147 @@
+{
+  "clones": [
+    {
+      "perfil": "clon",
+      "rol": "Clon / Router principal",
+      "canales": [
+        "Telegram",
+        "WhatsApp",
+        "Email"
+      ],
+      "correo": "Correo Add4u M365",
+      "calendarios": [
+        "Agenda Add4u M365",
+        "Agenda Alastria Google",
+        "Agenda Familia iCloud"
+      ],
+      "mision": "Actuar como el director de orquesta del sistema MADClon. Supervisa la salud del sistema, coordina la comunicación entre agentes y realiza el triaje inicial del Inbox (¿Qué Necesito?)."
+    },
+    {
+      "perfil": "ceo",
+      "rol": "CEO / Add4u + Alastria",
+      "canales": [
+        "Telegram",
+        "Email"
+      ],
+      "correo": "Correo Alastria Gmail",
+      "calendarios": [
+        "Agenda Alastria Google",
+        "Agenda Add4u M365"
+      ],
+      "mision": "Mantener la visión estratégica a largo plazo, cultivar y monitorizar relaciones de alto nivel (VIPs) y tomar decisiones críticas que afecten al rumbo global."
+    },
+    {
+      "perfil": "patrimonio",
+      "rol": "Patrimonio",
+      "canales": [
+        "Telegram",
+        "Email"
+      ],
+      "correo": "Correo Patrimonio Gmail",
+      "calendarios": [
+        "Agenda Add4u M365"
+      ],
+      "mision": "Administrar activos financieros, operaciones inmobiliarias, fiscalidad, relación con bancos y el plan 99 Secons."
+    },
+    {
+      "perfil": "padre",
+      "rol": "Padre / Familiar",
+      "canales": [
+        "Telegram",
+        "Email"
+      ],
+      "correo": "Correo Padre iCloud",
+      "calendarios": [
+        "Agenda Familia iCloud"
+      ],
+      "mision": "Gestionar y proteger la esfera personal y familiar: vacaciones, salud, colegios, rutinas y tiempo libre."
+    },
+    {
+      "perfil": "licitador",
+      "rol": "Licitador",
+      "canales": [
+        "Telegram"
+      ],
+      "correo": null,
+      "calendarios": [
+        "Agenda Add4u M365"
+      ],
+      "mision": "Gestionar concursos públicos, elaborar propuestas técnicas (ej. Add4u, GestDoc), y monitorizar oportunidades de negocio B2B/B2G."
+    },
+    {
+      "perfil": "tecnico",
+      "rol": "Técnico",
+      "canales": [
+        "Telegram"
+      ],
+      "correo": null,
+      "calendarios": [
+        "Agenda Add4u M365"
+      ],
+      "mision": "Mantener, expandir y auditar la arquitectura técnica del sistema MADClon (Hermes, agentes, integraciones M365/Google, promts, scripts)."
+    },
+    {
+      "perfil": "ideas",
+      "rol": "Ideas / Ventures",
+      "canales": [
+        "Telegram"
+      ],
+      "correo": null,
+      "calendarios": [],
+      "mision": "Funcionar como incubadora de nuevos proyectos, zona de brainstorming sin restricciones, y experimentación creativa."
+    }
+  ],
+  "integraciones": [
+    {
+      "nombre": "Correo Add4u M365",
+      "estado": "🟢 OK",
+      "ultimo_ok": "2026-07-26T17:46:09.247396Z",
+      "ultimo_fallo": "2026-07-26T15:43:54.869456Z",
+      "detalle": "lectura / autenticación OK"
+    },
+    {
+      "nombre": "Correo Alastria Gmail",
+      "estado": "🟢 OK",
+      "ultimo_ok": "2026-07-26T17:46:09.247396Z",
+      "ultimo_fallo": null,
+      "detalle": "lectura / autenticación OK"
+    },
+    {
+      "nombre": "Correo Patrimonio Gmail",
+      "estado": "🟢 OK",
+      "ultimo_ok": "2026-07-26T17:46:09.247396Z",
+      "ultimo_fallo": null,
+      "detalle": "lectura / autenticación OK"
+    },
+    {
+      "nombre": "Correo Padre iCloud",
+      "estado": "🟢 OK",
+      "ultimo_ok": "2026-07-26T17:46:09.247396Z",
+      "ultimo_fallo": null,
+      "detalle": "lectura / autenticación OK"
+    },
+    {
+      "nombre": "Agenda Add4u M365",
+      "estado": "🟢 OK",
+      "ultimo_ok": "2026-07-26T17:46:09.247396Z",
+      "ultimo_fallo": null,
+      "detalle": "listado / acceso OK"
+    },
+    {
+      "nombre": "Agenda Alastria Google",
+      "estado": "🟢 OK",
+      "ultimo_ok": "2026-07-26T17:46:09.247396Z",
+      "ultimo_fallo": null,
+      "detalle": "listado / acceso OK"
+    },
+    {
+      "nombre": "Agenda Familia iCloud",
+      "estado": "🟢 OK",
+      "ultimo_ok": "2026-07-26T17:46:09.247396Z",
+      "ultimo_fallo": null,
+      "detalle": "listado / acceso OK"
+    }
+  ],
+  "salud_global": "🟢 Todo OK",
+  "watchdog_ts": "2026-07-26T17:46:09.248481Z"
+}
