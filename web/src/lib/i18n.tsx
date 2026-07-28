@@ -61,6 +61,21 @@ const STR = {
   },
   home_pulso_tooltip_tokens: { es: 'trabajo de IA', en: 'AI work' },
   home_pulso_tooltip_tareas: { es: 'tareas hechas', en: 'tasks done' },
+
+  // 404 con personalidad
+  nf_titulo: {
+    es: 'Esta página no existe… pero el clon sigue trabajando',
+    en: "This page doesn't exist… but the clone keeps working"
+  },
+  nf_sub: {
+    es: 'Puede que el enlace esté mal escrito o que la página se moviera. Mientras tanto, el sistema ha seguido con sus rutinas: leyendo, clasificando y preparando el día.',
+    en: 'The link may be misspelled or the page may have moved. Meanwhile, the system kept to its routines: reading, sorting and preparing the day.'
+  },
+  nf_boton: { es: 'Volver al panel', en: 'Back to the dashboard' },
+  nf_pie: {
+    es: 'MAD Clon · front office — solo cifras agregadas, sin datos personales',
+    en: 'MAD Clon · front office — aggregated figures only, no personal data'
+  },
   home_pulso_leyenda_tokens: {
     es: 'trabajo de IA (lo que piensa cada día)',
     en: 'AI work (how much it thinks each day)'
