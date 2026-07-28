@@ -1,0 +1,16 @@
+{
+  "name": "MAD Clon — Front Office",
+  "short_name": "MAD Clon",
+  "description": "Cuadro de mando público del Clon de MAD: los números del sistema, explicados para personas.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#28243D",
+  "theme_color": "#666CFF",
+  "lang": "es",
+  "icons": [
+    { "src": "images/logo-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "images/logo-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "images/logo-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -53,7 +53,7 @@ const themeConfig: Config = {
   templateName: 'MAD Clon',
   homePageUrl: '/',
   settingsCookieName: 'madclon-front-office',
-  mode: 'system', // 'system', 'light', 'dark'
+  mode: 'dark', // 'system', 'light', 'dark' — MAD Clon luce mejor en oscuro; el toggle del navbar sigue disponible
   skin: 'default', // 'default', 'bordered'
   semiDark: false, // true, false
   layout: 'vertical', // 'vertical', 'collapsed', 'horizontal'

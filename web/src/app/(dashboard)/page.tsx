@@ -6,6 +6,7 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import Chip from '@mui/material/Chip'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
 // Component Imports
 import DataGate from '@/components/dashboard/DataGate'
@@ -162,6 +163,56 @@ const InicioPage = () => (
               </Card>
             </Grid>
           ))}
+
+          {/* Tendencia reciente */}
+          <Grid size={12}>
+            <Card>
+              <CardContent className='flex flex-col gap-2'>
+                <div className='flex flex-wrap items-baseline justify-between gap-2'>
+                  <Typography variant='h6'>El pulso de los últimos días</Typography>
+                  <Typography variant='caption' color='text.disabled'>
+                    trabajo de IA por día · la serie crece sola cada noche
+                  </Typography>
+                </div>
+                <div className='bs-[220px]'>
+                  <ResponsiveContainer width='100%' height='100%'>
+                    <BarChart
+                      data={data.serie.serie.map(p => ({
+                        fecha: new Date(p.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }),
+                        tokens: p.contexto?.tokens ?? 0,
+                        tareas: p.contexto?.tareas_hechas ?? 0
+                      }))}
+                      margin={{ left: 0, right: 8, top: 8 }}
+                    >
+                      <XAxis
+                        dataKey='fecha'
+                        tick={{ fill: 'var(--mui-palette-text-secondary)', fontSize: 11 }}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+                      <YAxis
+                        hide
+                        domain={[0, (dataMax: number) => dataMax * 1.15]}
+                      />
+                      <Tooltip
+                        cursor={{ fill: 'var(--mui-palette-action-hover)' }}
+                        contentStyle={{
+                          background: 'var(--mui-palette-background-paper)',
+                          border: '1px solid var(--mui-palette-divider)',
+                          borderRadius: 8
+                        }}
+                        formatter={(v: number, name: string) => [
+                          name === 'tokens' ? fmtCorto(v) : fmt(v),
+                          name === 'tokens' ? 'trabajo de IA' : 'tareas hechas'
+                        ]}
+                      />
+                      <Bar dataKey='tokens' fill='var(--mui-palette-primary-main)' radius={[6, 6, 0, 0]} maxBarSize={56} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </Grid>
         </Grid>
       )
     }}

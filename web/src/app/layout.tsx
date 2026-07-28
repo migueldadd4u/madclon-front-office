@@ -21,6 +21,8 @@ export const metadata = {
   title: 'MAD Clon — Front Office',
   description:
     'Cuadro de mando público del Clon de MAD: salud del sistema, flota de clones, consumo y eficiencia de la IA, explicados para personas.',
+  applicationName: 'MAD Clon',
+  manifest: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/manifest.webmanifest`,
   openGraph: {
     title: 'MAD Clon — Front Office',
     description: 'Un equipo de IA que trabaja mientras Miguel vive su vida — los números del clon, explicados para personas.',
