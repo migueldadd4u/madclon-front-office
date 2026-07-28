@@ -90,6 +90,19 @@ const STR = {
   },
   ins_ok: { es: 'desbloqueada', en: 'unlocked' },
 
+  // easter egg consola
+  consola_titulo: { es: 'consola · pulso del sistema', en: 'console · system pulse' },
+  consola_logo_alt: { es: 'logotipo MAD Clon', en: 'MAD Clon logo' },
+  consola_dias: { es: 'días de vida', en: 'days alive' },
+  consola_trabajo: { es: 'trabajo de IA (30 d)', en: 'AI work (30 d)' },
+  consola_rutinas: { es: 'rutinas', en: 'routines' },
+  consola_verde: { es: 'en verde', en: 'in green' },
+  consola_gateways: { es: 'gateways vivos', en: 'live gateways' },
+  consola_cobertura: { es: 'cobertura medida', en: 'measured coverage' },
+  consola_propuestas: { es: 'propuestas esperando a Miguel', en: 'proposals waiting for Miguel' },
+  consola_salud: { es: 'salud', en: 'health' },
+  consola_cierra: { es: '$ pulsa Esc o toca fuera para cerrar', en: '$ press Esc or tap outside to close' },
+
   // frase de estado (plantillas)
   frase_tranquilo: { es: 'Hoy el sistema respira tranquilo', en: 'Today the system breathes easy' },
   frase_bien: { es: 'Hoy el sistema va bien, con un deber pendiente', en: 'Today the system is doing well, with one pending chore' },
