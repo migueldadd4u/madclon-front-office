@@ -13,6 +13,7 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 
 // Component Imports
 import DataGate from '@/components/dashboard/DataGate'
+import AntesDespues from '@/components/dashboard/AntesDespues'
 
 // Hook Imports
 import { useLang } from '@/lib/i18n'
@@ -51,6 +52,11 @@ const EficienciaPage = () => {
                 {t('ef_soporte')}: {tokens.soporte}
               </Typography>
             )}
+          </Grid>
+
+          {/* Comparador antes/después contra la línea base */}
+          <Grid size={12}>
+            <AntesDespues serie={serie} />
           </Grid>
 
           {GRUPOS.map(g => (

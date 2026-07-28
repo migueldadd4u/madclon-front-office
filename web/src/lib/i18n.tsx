@@ -103,6 +103,15 @@ const STR = {
   consola_salud: { es: 'salud', en: 'health' },
   consola_cierra: { es: '$ pulsa Esc o toca fuera para cerrar', en: '$ press Esc or tap outside to close' },
 
+  // comparador antes/después
+  ab_titulo: { es: 'El clon de antes vs el clon de hoy', en: 'The clone before vs the clone today' },
+  ab_caption: {
+    es: 'la línea base congelada frente al dato de hoy, en la misma escala',
+    en: 'the frozen baseline against today’s figure, on the same scale'
+  },
+  ab_antes: { es: 'antes', en: 'before' },
+  ab_hoy: { es: 'hoy', en: 'today' },
+
   // frase de estado (plantillas)
   frase_tranquilo: { es: 'Hoy el sistema respira tranquilo', en: 'Today the system breathes easy' },
   frase_bien: { es: 'Hoy el sistema va bien, con un deber pendiente', en: 'Today the system is doing well, with one pending chore' },
