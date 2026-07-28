@@ -15,6 +15,7 @@ import ClonOpina from '@/components/dashboard/ClonOpina'
 import EstaNoche from '@/components/dashboard/EstaNoche'
 import Latido from '@/components/dashboard/Latido'
 import DiaEnLaVida from '@/components/dashboard/DiaEnLaVida'
+import ProgresoDia from '@/components/dashboard/ProgresoDia'
 import ConsolaClon from '@/components/dashboard/ConsolaClon'
 
 // Hook Imports
@@ -288,6 +289,7 @@ const InicioPage = () => {
                       <Typography variant='caption' color='text.secondary'>{t('home_pulso_leyenda_tareas')}</Typography>
                     </span>
                   </div>
+                  <ProgresoDia data={data} />
                 </CardContent>
               </Card>
             </Grid>

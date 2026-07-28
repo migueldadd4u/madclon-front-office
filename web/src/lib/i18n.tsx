@@ -96,6 +96,16 @@ const STR = {
   noche_salud_verde: { es: 'en verde', en: 'in the green' },
   noche_salud_ambar: { es: 'en amarillo, con algún aviso', en: 'in amber, with a warning or two' },
   noche_salud_rojo: { es: 'en rojo, pidiendo atención', en: 'in the red, asking for attention' },
+
+  // barra de progreso del día
+  pd_frase: {
+    es: 'El último día medido fue un {pct} % de un día normal: {tokens} tokens frente a un ritmo habitual de {media}.',
+    en: 'The last measured day was {pct}% of a normal day: {tokens} tokens against a usual pace of {media}.'
+  },
+  pd_aria: {
+    es: 'Progreso del último día medido frente a un día normal',
+    en: 'Progress of the last measured day against a normal day'
+  },
   home_pulso_leyenda_tokens: {
     es: 'trabajo de IA (lo que piensa cada día)',
     en: 'AI work (how much it thinks each day)'
