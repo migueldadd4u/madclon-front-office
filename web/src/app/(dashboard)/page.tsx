@@ -143,11 +143,13 @@ const InicioPage = () => {
               <ClonOpina data={data} />
             </Grid>
 
-            {/* Cifras de cabecera */}
+            {/* Cifras de cabecera — count-up animado al cargar */}
             <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
               <StatCard
                 icon='ri-token-swap-line'
                 valor={fmtCorto(tokens.contador.ventana_30d)}
+                countTo={tokens.contador.ventana_30d}
+                countFormat={fmtCorto}
                 label={t('home_stat_tokens')}
                 detalle={`${fmt(tokens.contador.ventana_30d)} tokens`}
                 color='primary'
@@ -157,6 +159,7 @@ const InicioPage = () => {
               <StatCard
                 icon='ri-robot-2-line'
                 valor={String(clones.clones.length)}
+                countTo={clones.clones.length}
                 label={t('home_stat_clones')}
                 detalle={t('home_stat_clones_det')}
                 color='success'
@@ -166,6 +169,7 @@ const InicioPage = () => {
               <StatCard
                 icon='ri-heart-pulse-line'
                 valor={String(overview.gateways?.length ?? '—')}
+                countTo={overview.gateways?.length ?? null}
                 label={t('home_stat_gateways')}
                 detalle={t('home_stat_gateways_det')}
                 color='info'
@@ -175,6 +179,8 @@ const InicioPage = () => {
               <StatCard
                 icon='ri-calendar-check-line'
                 valor={`${overview.crons.length - overview.crons_en_error}/${overview.crons.length}`}
+                countTo={overview.crons.length - overview.crons_en_error}
+                countFormat={n => `${Math.round(n)}/${overview.crons.length}`}
                 label={t('home_stat_rutinas')}
                 detalle={overview.crons_en_error > 0 ? `${overview.crons_en_error} ${t('home_stat_rutinas_err')}` : t('home_stat_rutinas_ok')}
                 color={overview.crons_en_error > 0 ? 'warning' : 'success'}

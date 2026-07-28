@@ -19,6 +19,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 
 
 // Component Imports
 import DataGate from '@/components/dashboard/DataGate'
+import CountUp from '@/components/dashboard/CountUp'
 
 // Hook Imports
 import { useLang } from '@/lib/i18n'
@@ -60,7 +61,7 @@ const TokensPage = () => {
             <Card className='bs-full border border-solid border-success'>
               <CardContent className='flex flex-col gap-1'>
                 <Typography variant='body2' color='success.main' fontWeight={600}>{t('tokens_medido')}</Typography>
-                <Typography variant='h3' className='font-mono'>{fmtCorto(c.medido_tokens)}</Typography>
+                <Typography variant='h3' className='font-mono'><CountUp to={c.medido_tokens} format={fmtCorto} /></Typography>
                 <Typography variant='caption' color='text.secondary' className='font-mono'>
                   {fmt(c.medido_tokens)} tokens · {fmt(c.medido_llamadas)} {t('tokens_llamadas')}
                 </Typography>
@@ -71,7 +72,7 @@ const TokensPage = () => {
             <Card className='bs-full'>
               <CardContent className='flex flex-col gap-1'>
                 <Typography variant='body2' color='text.secondary' fontWeight={600}>{t('tokens_estimado')}</Typography>
-                <Typography variant='h3' className='font-mono'>{fmtCorto(c.estimado_tokens)}</Typography>
+                <Typography variant='h3' className='font-mono'><CountUp to={c.estimado_tokens} format={fmtCorto} /></Typography>
                 <Typography variant='caption' color='text.secondary' className='font-mono'>
                   {t('tokens_banda')}: {fmtCorto(c.banda_p25)} – {fmtCorto(c.banda_p75)}
                 </Typography>
@@ -82,7 +83,7 @@ const TokensPage = () => {
             <Card className='bs-full'>
               <CardContent className='flex flex-col gap-1'>
                 <Typography variant='body2' fontWeight={600}>{t('tokens_total')}</Typography>
-                <Typography variant='h3' className='font-mono'>{fmtCorto(c.total_tokens)}</Typography>
+                <Typography variant='h3' className='font-mono'><CountUp to={c.total_tokens} format={fmtCorto} /></Typography>
                 <Typography variant='caption' color='text.secondary' className='font-mono'>
                   {fmt(c.total_llamadas)} {t('tokens_llamadas')}
                 </Typography>
