@@ -12,6 +12,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recha
 import DataGate from '@/components/dashboard/DataGate'
 import StatCard from '@/components/dashboard/StatCard'
 import ClonOpina from '@/components/dashboard/ClonOpina'
+import EstaNoche from '@/components/dashboard/EstaNoche'
 import Latido from '@/components/dashboard/Latido'
 import DiaEnLaVida from '@/components/dashboard/DiaEnLaVida'
 import ConsolaClon from '@/components/dashboard/ConsolaClon'
@@ -147,6 +148,11 @@ const InicioPage = () => {
             {/* El clon opina */}
             <Grid size={12}>
               <ClonOpina data={data} />
+            </Grid>
+
+            {/* El clon te cuenta su noche */}
+            <Grid size={12}>
+              <EstaNoche data={data} />
             </Grid>
 
             {/* Cifras de cabecera — count-up animado al cargar */}

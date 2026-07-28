@@ -76,6 +76,26 @@ const STR = {
     es: 'MAD Clon · front office — solo cifras agregadas, sin datos personales',
     en: 'MAD Clon · front office — aggregated figures only, no personal data'
   },
+
+  // el clon te cuenta su noche
+  noche_titulo: {
+    es: 'Esta noche, mientras Miguel dormía',
+    en: 'Last night, while Miguel was asleep'
+  },
+  noche_frase: {
+    es: 'El clon pensó {tokens} tokens en {llamadas} llamadas, terminó {tareas} tareas y amaneció con todo {salud}. Nadie se lo pidió: son sus rutinas de cada noche.',
+    en: 'The clone thought {tokens} tokens over {llamadas} calls, finished {tareas} tasks and woke up with everything {salud}. Nobody asked it to: these are its nightly routines.'
+  },
+  noche_caption: {
+    es: 'última noche medida: {fecha} · se actualiza solo cada madrugada',
+    en: 'last measured night: {fecha} · updates by itself every early morning'
+  },
+  noche_chip_tokens: { es: '{tokens} tokens pensados', en: '{tokens} tokens thought' },
+  noche_chip_tareas: { es: '{tareas} tareas terminadas', en: '{tareas} tasks finished' },
+  noche_chip_llamadas: { es: '{llamadas} llamadas entre modelos', en: '{llamadas} calls between models' },
+  noche_salud_verde: { es: 'en verde', en: 'in the green' },
+  noche_salud_ambar: { es: 'en amarillo, con algún aviso', en: 'in amber, with a warning or two' },
+  noche_salud_rojo: { es: 'en rojo, pidiendo atención', en: 'in the red, asking for attention' },
   home_pulso_leyenda_tokens: {
     es: 'trabajo de IA (lo que piensa cada día)',
     en: 'AI work (how much it thinks each day)'
