@@ -246,7 +246,14 @@ const InicioPage = () => {
                         />
                         <YAxis
                           hide
+                          yAxisId='tokens'
                           domain={[0, (dataMax: number) => dataMax * 1.15]}
+                        />
+                        <YAxis
+                          hide
+                          yAxisId='tareas'
+                          orientation='right'
+                          domain={[0, (dataMax: number) => dataMax * 1.6]}
                         />
                         <Tooltip
                           cursor={{ fill: 'var(--mui-palette-action-hover)' }}
@@ -260,9 +267,20 @@ const InicioPage = () => {
                             name === 'tokens' ? t('home_pulso_tooltip_tokens') : t('home_pulso_tooltip_tareas')
                           ]}
                         />
-                        <Bar dataKey='tokens' fill='var(--mui-palette-primary-main)' radius={[6, 6, 0, 0]} maxBarSize={56} />
+                        <Bar dataKey='tokens' yAxisId='tokens' fill='var(--mui-palette-primary-main)' radius={[6, 6, 0, 0]} maxBarSize={40} />
+                        <Bar dataKey='tareas' yAxisId='tareas' fill='#06C9A8' radius={[6, 6, 0, 0]} maxBarSize={40} />
                       </BarChart>
                     </ResponsiveContainer>
+                  </div>
+                  <div className='flex flex-wrap items-center gap-x-5 gap-y-1'>
+                    <span className='flex items-center gap-2'>
+                      <span className='inline-block bs-2.5 is-2.5 rounded-sm' style={{ background: 'var(--mui-palette-primary-main)' }} />
+                      <Typography variant='caption' color='text.secondary'>{t('home_pulso_leyenda_tokens')}</Typography>
+                    </span>
+                    <span className='flex items-center gap-2'>
+                      <span className='inline-block bs-2.5 is-2.5 rounded-sm' style={{ background: '#06C9A8' }} />
+                      <Typography variant='caption' color='text.secondary'>{t('home_pulso_leyenda_tareas')}</Typography>
+                    </span>
                   </div>
                 </CardContent>
               </Card>

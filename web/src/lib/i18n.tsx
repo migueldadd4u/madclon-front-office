@@ -56,11 +56,19 @@ const STR = {
   },
   home_pulso_titulo: { es: 'El pulso de los últimos días', en: 'The pulse of the last few days' },
   home_pulso_caption: {
-    es: 'trabajo de IA por día · la serie crece sola cada noche',
-    en: 'AI work per day · the series grows by itself every night'
+    es: 'dos voces por día: cuánto piensa y cuánto termina · la serie crece sola cada noche',
+    en: 'two voices per day: how much it thinks and how much it finishes · the series grows by itself every night'
   },
   home_pulso_tooltip_tokens: { es: 'trabajo de IA', en: 'AI work' },
   home_pulso_tooltip_tareas: { es: 'tareas hechas', en: 'tasks done' },
+  home_pulso_leyenda_tokens: {
+    es: 'trabajo de IA (lo que piensa cada día)',
+    en: 'AI work (how much it thinks each day)'
+  },
+  home_pulso_leyenda_tareas: {
+    es: 'tareas completadas (lo que termina cada día)',
+    en: 'tasks completed (what it finishes each day)'
+  },
 
   // latido en vivo
   latido_ultima: { es: 'última señal de vida', en: 'last sign of life' },
