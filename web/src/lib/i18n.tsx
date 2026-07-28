@@ -112,6 +112,18 @@ const STR = {
   ab_antes: { es: 'antes', en: 'before' },
   ab_hoy: { es: 'hoy', en: 'today' },
 
+  // coste en euros (estimado)
+  eur_titulo: { es: '¿Y todo eso, en euros?', en: 'And all that, in euros?' },
+  eur_valor: { es: 'valor de mercado estimado del trabajo de 30 días', en: 'estimated market value of 30 days of work' },
+  eur_nota: {
+    es: 'Estimación orientativa: ~3 € por millón de tokens, un precio medio típico de API. No es un gasto real.',
+    en: 'Ballpark estimate: ~€3 per million tokens, a typical average API price. It is not a real expense.'
+  },
+  eur_cero: {
+    es: 'gasto por uso variable este mes: 0 € — el clon funciona con planes ya pagados y con modelos que corren en casa',
+    en: 'pay-per-use spend this month: €0 — the clone runs on already-paid plans and on models hosted at home'
+  },
+
   // frase de estado (plantillas)
   frase_tranquilo: { es: 'Hoy el sistema respira tranquilo', en: 'Today the system breathes easy' },
   frase_bien: { es: 'Hoy el sistema va bien, con un deber pendiente', en: 'Today the system is doing well, with one pending chore' },

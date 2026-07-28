@@ -126,6 +126,25 @@ const TokensPage = () => {
             </Card>
           </Grid>
 
+          {/* Valor estimado en euros */}
+          <Grid size={12}>
+            <Card className='fo-card-hover' sx={{ background: 'linear-gradient(135deg, rgba(122,127,255,.10), rgba(6,201,168,.10))' }}>
+              <CardContent className='flex flex-col gap-2'>
+                <div className='flex flex-wrap items-center justify-between gap-3'>
+                  <div className='flex flex-col gap-1'>
+                    <Typography variant='h6'>{t('eur_titulo')}</Typography>
+                    <Typography variant='body2' color='text.secondary'>{t('eur_valor')}</Typography>
+                  </div>
+                  <Typography variant='h3' className='font-mono' sx={{ background: 'linear-gradient(90deg,#7A7FFF,#06C9A8)', WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent' }}>
+                    <CountUp to={c.ventana_30d !== null && c.ventana_30d !== undefined ? (c.ventana_30d / 1_000_000) * 3 : null} format={n => `~ ${fmt(Math.round(n))} €`} />
+                  </Typography>
+                </div>
+                <Typography variant='caption' color='text.disabled'>{t('eur_nota')}</Typography>
+                <Typography variant='caption' color='success.main' fontWeight={600}>{t('eur_cero')}</Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+
           {/* Por clon */}
           <Grid size={{ xs: 12, lg: 6 }}>
             <Card className='bs-full'>
