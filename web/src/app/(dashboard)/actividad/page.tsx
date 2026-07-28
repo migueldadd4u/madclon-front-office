@@ -1,5 +1,8 @@
 'use client'
 
+// React Imports
+import { useEffect, useState } from 'react'
+
 // MUI Imports
 import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
@@ -12,6 +15,7 @@ import CustomAvatar from '@core/components/mui/Avatar'
 // Component Imports
 import DataGate from '@/components/dashboard/DataGate'
 import StatCard from '@/components/dashboard/StatCard'
+import CountUp from '@/components/dashboard/CountUp'
 
 // Hook Imports
 import { useLang } from '@/lib/i18n'
@@ -21,6 +25,20 @@ import { fmt } from '@/lib/data'
 
 const ActividadPage = () => {
   const { t } = useLang()
+
+  // Las barras arrancan en 0 y crecen al entrar (sin animación con reduced-motion)
+  const [barras, setBarras] = useState(false)
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setBarras(true)
+
+      return
+    }
+    const id = setTimeout(() => setBarras(true), 60)
+
+    return () => clearTimeout(id)
+  }, [])
 
   return (
   <DataGate>
@@ -44,17 +62,19 @@ const ActividadPage = () => {
             <StatCard
               icon='ri-vote-line'
               valor={fmt(gtd.propuestas)}
+              countTo={gtd.propuestas}
               label={t('act_propuestas')}
               color='warning'
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-            <StatCard icon='ri-inbox-line' valor={fmt(gtd.bandeja)} label={t('act_bandeja')} color='info' />
+            <StatCard icon='ri-inbox-line' valor={fmt(gtd.bandeja)} countTo={gtd.bandeja} label={t('act_bandeja')} color='info' />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
             <StatCard
               icon='ri-hourglass-line'
               valor={fmt(gtd.esperas_vencidas)}
+              countTo={gtd.esperas_vencidas}
               label={t('act_esperas')}
               color={(gtd.esperas_vencidas ?? 0) > 0 ? 'error' : 'success'}
             />
@@ -63,6 +83,7 @@ const ActividadPage = () => {
             <StatCard
               icon='ri-list-check-3'
               valor={fmt(gtd.decisiones)}
+              countTo={gtd.decisiones}
               label={t('act_decisiones')}
               color='secondary'
             />
@@ -92,7 +113,12 @@ const ActividadPage = () => {
                       <Typography variant='body2' color='text.secondary'>{f.label}</Typography>
                       <Typography variant='body2' className='font-mono'>{f.valor}</Typography>
                     </div>
-                    <LinearProgress variant='determinate' value={(f.valor / colaTotal) * 100} color={f.color} />
+                    <LinearProgress
+                      variant='determinate'
+                      value={barras ? (f.valor / colaTotal) * 100 : 0}
+                      color={f.color}
+                      sx={{ '& .MuiLinearProgress-bar': { transition: 'transform 1s cubic-bezier(.4,0,.2,1)' } }}
+                    />
                   </div>
                 ))}
                 <Typography variant='caption' color='text.secondary'>
@@ -117,11 +143,11 @@ const ActividadPage = () => {
               <CardContent className='flex flex-col gap-4'>
                 <div className='flex items-end gap-8'>
                   <div>
-                    <Typography variant='h2' className='font-mono'>{fmt(personas.fichas_curadas)}</Typography>
+                    <Typography variant='h2' className='font-mono'><CountUp to={personas.fichas_curadas} /></Typography>
                     <Typography variant='body2' color='text.secondary'>{t('act_fichas')}</Typography>
                   </div>
                   <div>
-                    <Typography variant='h3' className='font-mono' color='warning.main'>{fmt(personas.staged)}</Typography>
+                    <Typography variant='h3' className='font-mono' color='warning.main'><CountUp to={personas.staged} /></Typography>
                     <Typography variant='body2' color='text.secondary'>{t('act_staged')}</Typography>
                   </div>
                 </div>
