@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="mc" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7A7FFF"/>
+      <stop offset="0.55" stop-color="#4E8FE8"/>
+      <stop offset="1" stop-color="#06C9A8"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="100" height="100" rx="26" fill="url(#mc)"/>
+  <!-- Variante 16 px: M sólida extragruesa, sin nodos (no caben con claridad) -->
+  <path d="M22 78 V26 L50 60 L78 26 V78" fill="none" stroke="#ffffff" stroke-width="15" stroke-linecap="round" stroke-linejoin="round" opacity="0.98"/>
+</svg>
