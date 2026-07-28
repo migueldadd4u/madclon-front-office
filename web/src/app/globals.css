@@ -237,3 +237,33 @@ code {
     animation: none;
   }
 }
+
+/* Skeletons con shimmer de marca — barrido indigo→teal mientras cargan los datos */
+@keyframes fo-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+.fo-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.fo-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(122, 127, 255, 0.22) 40%,
+    rgba(6, 201, 168, 0.22) 60%,
+    transparent 100%
+  );
+  animation: fo-shimmer 1.7s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .fo-shimmer::after {
+    animation: none;
+  }
+}

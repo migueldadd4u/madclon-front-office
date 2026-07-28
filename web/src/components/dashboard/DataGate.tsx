@@ -13,20 +13,26 @@ import { usePanelData } from '@/lib/data'
 import type { PanelData } from '@/lib/data'
 
 const SkeletonPanel = () => (
-  <Grid container spacing={6}>
+  <Grid container spacing={6} aria-hidden='true'>
     <Grid size={12}>
-      <Skeleton variant='rounded' height={150} />
+      <Skeleton variant='rounded' height={150} animation={false} className='fo-shimmer' />
     </Grid>
     {[...Array(4)].map((_, i) => (
       <Grid key={i} size={{ xs: 12, sm: 6, lg: 3 }}>
-        <Skeleton variant='rounded' height={86} />
+        <Skeleton variant='rounded' height={86} animation={false} className='fo-shimmer' />
       </Grid>
     ))}
     {[...Array(4)].map((_, i) => (
       <Grid key={i} size={{ xs: 12, sm: 6, lg: 3 }}>
-        <Skeleton variant='rounded' height={180} />
+        <Skeleton variant='rounded' height={180} animation={false} className='fo-shimmer' />
       </Grid>
     ))}
+    <Grid size={12}>
+      <Skeleton variant='rounded' height={130} animation={false} className='fo-shimmer' />
+    </Grid>
+    <Grid size={12}>
+      <Skeleton variant='rounded' height={320} animation={false} className='fo-shimmer' />
+    </Grid>
   </Grid>
 )
 
