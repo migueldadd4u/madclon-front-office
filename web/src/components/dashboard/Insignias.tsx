@@ -69,7 +69,7 @@ const Insignias = ({ data, diasVida }: Props) => {
               <Grid key={ins.id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
                 <Card
                   variant='outlined'
-                  className='bs-full'
+                  className='bs-full fo-card-hover'
                   sx={desbloqueada ? { borderColor: 'success.main' } : { opacity: 0.85 }}
                 >
                   <CardContent className='flex flex-col gap-2'>

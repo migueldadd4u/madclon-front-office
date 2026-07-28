@@ -21,7 +21,7 @@ type Props = {
 }
 
 const StatCard = ({ icon, valor, label, detalle, color = 'primary', countTo, countFormat }: Props) => (
-  <Card>
+  <Card className='fo-card-hover'>
     <CardContent className='flex items-center gap-4'>
       <CustomAvatar color={color} skin='light' size={46} variant='rounded'>
         <i className={`${icon} text-2xl`} />

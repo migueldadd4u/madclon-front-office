@@ -58,7 +58,7 @@ const TokensPage = () => {
 
           {/* Contador común */}
           <Grid size={{ xs: 12, md: 4 }}>
-            <Card className='bs-full border border-solid border-success'>
+            <Card className='bs-full fo-card-hover border border-solid border-success'>
               <CardContent className='flex flex-col gap-1'>
                 <Typography variant='body2' color='success.main' fontWeight={600}>{t('tokens_medido')}</Typography>
                 <Typography variant='h3' className='font-mono'><CountUp to={c.medido_tokens} format={fmtCorto} /></Typography>
@@ -69,7 +69,7 @@ const TokensPage = () => {
             </Card>
           </Grid>
           <Grid size={{ xs: 12, md: 4 }}>
-            <Card className='bs-full'>
+            <Card className='bs-full fo-card-hover'>
               <CardContent className='flex flex-col gap-1'>
                 <Typography variant='body2' color='text.secondary' fontWeight={600}>{t('tokens_estimado')}</Typography>
                 <Typography variant='h3' className='font-mono'><CountUp to={c.estimado_tokens} format={fmtCorto} /></Typography>
@@ -80,7 +80,7 @@ const TokensPage = () => {
             </Card>
           </Grid>
           <Grid size={{ xs: 12, md: 4 }}>
-            <Card className='bs-full'>
+            <Card className='bs-full fo-card-hover'>
               <CardContent className='flex flex-col gap-1'>
                 <Typography variant='body2' fontWeight={600}>{t('tokens_total')}</Typography>
                 <Typography variant='h3' className='font-mono'><CountUp to={c.total_tokens} format={fmtCorto} /></Typography>

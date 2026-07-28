@@ -205,3 +205,35 @@ code {
   background-color: rgb(var(--mui-palette-info-mainChannel) / 0.08);
   border: 0;
 }
+
+/* ---------------------------------------------------------- micro-interacciones MAD Clon */
+/* Elevación al pasar el ratón por las tarjetas interactivas (solo con hover real y sin reduced-motion) */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .fo-card-hover {
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  .fo-card-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32);
+  }
+}
+
+/* Entrada suave de página al navegar entre secciones */
+@keyframes fo-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.fo-page-in {
+  animation: fo-fade-in 0.38s ease both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .fo-page-in {
+    animation: none;
+  }
+}

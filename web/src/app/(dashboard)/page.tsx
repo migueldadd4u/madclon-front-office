@@ -199,7 +199,7 @@ const InicioPage = () => {
             </Grid>
             {PASOS.map((p, i) => (
               <Grid key={p.icon} size={{ xs: 12, sm: 6, lg: 3 }}>
-                <Card className='bs-full'>
+                <Card className='bs-full fo-card-hover'>
                   <CardContent className='flex flex-col gap-2'>
                     <div className='flex items-center justify-between'>
                       <i className={`${p.icon} text-3xl text-primary`} />
