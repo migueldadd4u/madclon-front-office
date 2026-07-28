@@ -13,6 +13,34 @@ import StatCard from '@/components/dashboard/StatCard'
 
 // Data Imports
 import { fmt, fmtCorto, fmtFecha } from '@/lib/data'
+import type { PanelData } from '@/lib/data'
+
+/** Resumen del estado en lenguaje llano, generado de los datos (sin IA en tiempo real). */
+function fraseEstado(data: PanelData): string {
+  const { overview } = data
+  const partes: string[] = []
+  const cronsOk = overview.crons.length - overview.crons_en_error
+  const saludOk = (overview.salud_global ?? '').includes('🟢')
+
+  if (saludOk && overview.crons_en_error === 0) {
+    partes.push('Hoy el sistema respira tranquilo')
+  } else if (saludOk) {
+    partes.push('Hoy el sistema va bien, con un deber pendiente')
+  } else {
+    partes.push('Hoy el sistema pide atención')
+  }
+
+  partes.push(`${cronsOk} de ${overview.crons.length} rutinas al día`)
+  if (overview.gateways?.length) partes.push(`${overview.gateways.length} puertas de entrada abiertas`)
+  const problemas = overview.healthcheck?.problemas ?? 0
+  if (problemas > 0) partes.push(`${problemas} aviso${problemas === 1 ? '' : 's'} menor${problemas === 1 ? '' : 'es'} en el motor`)
+  const propuestas = overview.gtd.propuestas ?? 0
+  if (propuestas > 0) {
+    partes.push(`y ${propuestas} propuestas del clon esperan el sí o el no de Miguel`)
+  }
+
+  return partes.join(', ') + '.'
+}
 
 const PASOS = [
   {
@@ -64,6 +92,12 @@ const InicioPage = () => (
                   clasifica lo importante, prepara decisiones, vigila el patrimonio y se mejora a sí mismo cada noche.
                   Esta web es su cuadro de mandos — los mismos números que ve él, explicados para personas.
                 </Typography>
+                <Card variant='outlined' className='border-success'>
+                  <CardContent className='flex items-start gap-3'>
+                    <i className='ri-double-quotes-l text-2xl text-success' />
+                    <Typography fontWeight={500}>{fraseEstado(data)}</Typography>
+                  </CardContent>
+                </Card>
                 <Typography variant='caption' color='text.disabled' className='font-mono'>
                   datos generados el {fmtFecha(manifest.generado)} · solo cifras agregadas, sin información personal
                 </Typography>
