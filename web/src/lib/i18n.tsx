@@ -62,6 +62,14 @@ const STR = {
   home_pulso_tooltip_tokens: { es: 'trabajo de IA', en: 'AI work' },
   home_pulso_tooltip_tareas: { es: 'tareas hechas', en: 'tasks done' },
 
+  // latido en vivo
+  latido_ultima: { es: 'última señal de vida', en: 'last sign of life' },
+  latido_ahora: { es: 'ahora mismo', en: 'right now' },
+  latido_ago: { es: 'hace', en: 'ago' },
+  latido_min: { es: 'min', en: 'min' },
+  latido_h: { es: 'h', en: 'h' },
+  latido_d: { es: 'd', en: 'd' },
+
   // frase de estado (plantillas)
   frase_tranquilo: { es: 'Hoy el sistema respira tranquilo', en: 'Today the system breathes easy' },
   frase_bien: { es: 'Hoy el sistema va bien, con un deber pendiente', en: 'Today the system is doing well, with one pending chore' },

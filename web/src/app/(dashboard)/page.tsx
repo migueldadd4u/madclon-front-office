@@ -12,6 +12,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recha
 import DataGate from '@/components/dashboard/DataGate'
 import StatCard from '@/components/dashboard/StatCard'
 import ClonOpina from '@/components/dashboard/ClonOpina'
+import Latido from '@/components/dashboard/Latido'
 
 // Hook Imports
 import { useLang } from '@/lib/i18n'
@@ -121,6 +122,7 @@ const InicioPage = () => {
                       icon={<i className={saludOk ? 'ri-checkbox-circle-line' : 'ri-alert-line'} />}
                       label={overview.salud_global?.replace(/[🟢🟡🔴]/g, '').trim() || '—'}
                     />
+                    <Latido crons={overview.crons} generado={manifest.generado} />
                   </div>
                   <Typography color='text.secondary' className='max-is-3xl'>
                     {t('home_intro')}
