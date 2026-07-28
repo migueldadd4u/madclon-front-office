@@ -13,6 +13,7 @@ import DataGate from '@/components/dashboard/DataGate'
 import StatCard from '@/components/dashboard/StatCard'
 import ClonOpina from '@/components/dashboard/ClonOpina'
 import Latido from '@/components/dashboard/Latido'
+import MadClonLogoAnimado from '@/components/dashboard/MadClonLogoAnimado'
 
 // Hook Imports
 import { useLang } from '@/lib/i18n'
@@ -114,6 +115,7 @@ const InicioPage = () => {
               <Card>
                 <CardContent className='flex flex-col gap-3'>
                   <div className='flex flex-wrap items-center gap-3'>
+                    <MadClonLogoAnimado size={52} />
                     <Typography variant='h4'>{t('home_titulo')}</Typography>
                     <Chip
                       size='small'
