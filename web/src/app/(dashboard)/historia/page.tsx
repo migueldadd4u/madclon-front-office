@@ -15,6 +15,7 @@ import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent'
 
 // Component Imports
 import DataGate from '@/components/dashboard/DataGate'
+import Insignias from '@/components/dashboard/Insignias'
 import StatCard from '@/components/dashboard/StatCard'
 
 // Hook Imports
@@ -118,7 +119,8 @@ const HistoriaPage = () => {
 
   return (
     <DataGate>
-      {({ tokens, clones }) => {
+      {data => {
+        const { tokens, clones } = data
         const diasVida = Math.max(1, Math.floor((Date.now() - NACIMIENTO.getTime()) / 86_400_000))
 
         return (
@@ -204,6 +206,11 @@ const HistoriaPage = () => {
                   </Timeline>
                 </CardContent>
               </Card>
+            </Grid>
+
+            {/* Insignias del sistema */}
+            <Grid size={12}>
+              <Insignias data={data} diasVida={diasVida} />
             </Grid>
           </Grid>
         )

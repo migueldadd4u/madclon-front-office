@@ -82,6 +82,14 @@ const STR = {
     en: 'While Miguel sleeps, the clone runs its self-audit before dawn; in the morning it prepares the day; and it watches important mail around the clock. The indigo line marks this very moment.'
   },
 
+  // insignias
+  ins_titulo: { es: 'Insignias del sistema', en: 'System badges' },
+  ins_caption: {
+    es: 'hitos reales, desbloqueados con las cifras públicas de este panel',
+    en: "real milestones, unlocked with this dashboard's public figures"
+  },
+  ins_ok: { es: 'desbloqueada', en: 'unlocked' },
+
   // frase de estado (plantillas)
   frase_tranquilo: { es: 'Hoy el sistema respira tranquilo', en: 'Today the system breathes easy' },
   frase_bien: { es: 'Hoy el sistema va bien, con un deber pendiente', en: 'Today the system is doing well, with one pending chore' },
