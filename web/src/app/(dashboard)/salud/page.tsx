@@ -17,6 +17,9 @@ import TableRow from '@mui/material/TableRow'
 // Component Imports
 import DataGate from '@/components/dashboard/DataGate'
 
+// Hook Imports
+import { useLang } from '@/lib/i18n'
+
 // Data Imports
 import { fmtFecha } from '@/lib/data'
 
@@ -27,22 +30,24 @@ const iconoEstado = (e: string) =>
       ? 'ri-close-circle-fill text-error'
       : 'ri-information-fill text-secondary'
 
-const SaludPage = () => (
+const SaludPage = () => {
+  const { t } = useLang()
+
+  return (
   <DataGate>
     {({ overview, clones }) => (
       <Grid container spacing={6}>
         <Grid size={12} className='flex flex-wrap items-end justify-between gap-4'>
           <div>
-            <Typography variant='h4' className='mbe-1'>Salud del sistema</Typography>
+            <Typography variant='h4' className='mbe-1'>{t('salud_titulo')}</Typography>
             <Typography color='text.secondary' className='max-is-2xl'>
-              Un guardián automático comprueba cada hora que el clon puede leer el correo y las agendas.
-              Si algo falla, el panel lo grita antes de que se note.
+              {t('salud_intro')}
             </Typography>
           </div>
           <Chip
             color={(overview.salud_global ?? '').includes('🟢') ? 'success' : 'warning'}
             variant='tonal'
-            label={`estado global: ${overview.salud_global ?? '—'}`}
+            label={`${t('salud_global')}: ${overview.salud_global ?? '—'}`}
           />
         </Grid>
 
@@ -50,16 +55,16 @@ const SaludPage = () => (
         <Grid size={{ xs: 12, lg: 6 }}>
           <Card className='bs-full'>
             <CardHeader
-              title='Accesos vigilados'
-              subheader='correos y agendas que el clon necesita para trabajar'
+              title={t('salud_accesos')}
+              subheader={t('salud_accesos_sub')}
             />
             <TableContainer>
               <Table size='small'>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Integración</TableCell>
-                    <TableCell>Detalle</TableCell>
-                    <TableCell align='right'>Último OK</TableCell>
+                    <TableCell>{t('salud_integracion')}</TableCell>
+                    <TableCell>{t('salud_detalle')}</TableCell>
+                    <TableCell align='right'>{t('salud_ultimo_ok')}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -86,7 +91,7 @@ const SaludPage = () => (
             </TableContainer>
             <CardContent>
               <Typography variant='caption' color='text.disabled' className='font-mono'>
-                último chequeo del guardián: {fmtFecha(overview.watchdog_ts)}
+                {t('salud_ultimo_chequeo')}: {fmtFecha(overview.watchdog_ts)}
               </Typography>
             </CardContent>
           </Card>
@@ -97,7 +102,7 @@ const SaludPage = () => (
             {/* Gateways */}
             <Grid size={12}>
               <Card>
-                <CardHeader title='Puertas de entrada vivas' subheader='los procesos por los que Miguel habla con su clon' />
+                <CardHeader title={t('salud_puertas')} subheader={t('salud_puertas_sub')} />
                 <CardContent className='flex flex-col gap-3'>
                   <div className='flex flex-wrap gap-2'>
                     {(overview.gateways ?? []).map(g => (
@@ -106,12 +111,12 @@ const SaludPage = () => (
                   </div>
                   {overview.healthcheck && (
                     <Typography variant='caption' color='text.secondary'>
-                      motor <span className='font-mono'>{overview.healthcheck.head}</span>
+                      {t('salud_motor')} <span className='font-mono'>{overview.healthcheck.head}</span>
                       {' · '}
                       {overview.healthcheck.problemas === 0 ? (
-                        <span className='text-success'>sin problemas</span>
+                        <span className='text-success'>{t('salud_sin_problemas')}</span>
                       ) : (
-                        <span className='text-warning'>{overview.healthcheck.problemas} aviso(s)</span>
+                        <span className='text-warning'>{overview.healthcheck.problemas} {t('salud_avisos')}</span>
                       )}
                     </Typography>
                   )}
@@ -123,8 +128,8 @@ const SaludPage = () => (
             <Grid size={12}>
               <Card>
                 <CardHeader
-                  title='Rutinas automáticas'
-                  subheader='lo que el sistema hace solo cada día o cada semana'
+                  title={t('salud_rutinas')}
+                  subheader={t('salud_rutinas_sub')}
                 />
                 <TableContainer>
                   <Table size='small'>
@@ -155,6 +160,7 @@ const SaludPage = () => (
       </Grid>
     )}
   </DataGate>
-)
+  )
+}
 
 export default SaludPage

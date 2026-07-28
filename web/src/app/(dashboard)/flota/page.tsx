@@ -12,6 +12,9 @@ import CustomAvatar from '@core/components/mui/Avatar'
 // Component Imports
 import DataGate from '@/components/dashboard/DataGate'
 
+// Hook Imports
+import { useLang } from '@/lib/i18n'
+
 // Data Imports
 import { fmtCorto } from '@/lib/data'
 
@@ -35,7 +38,10 @@ const COLORES: Record<string, 'primary' | 'success' | 'warning' | 'error' | 'inf
   tecnico: 'info'
 }
 
-const FlotaPage = () => (
+const FlotaPage = () => {
+  const { t } = useLang()
+
+  return (
   <DataGate>
     {({ clones, tokens }) => {
       const consumo = new Map(tokens.por_clon.map(c => [c.clon, c.tokens ?? 0]))
@@ -44,12 +50,9 @@ const FlotaPage = () => (
       return (
         <Grid container spacing={6}>
           <Grid size={12}>
-            <Typography variant='h4' className='mbe-1'>La flota: siete clones, siete oficios</Typography>
+            <Typography variant='h4' className='mbe-1'>{t('flota_titulo')}</Typography>
             <Typography color='text.secondary' className='max-is-3xl'>
-              El Clon de MAD no es una sola mente: son siete perfiles especializados que comparten la misma memoria.
-              Cada uno atiende un territorio de la vida de Miguel — la empresa, el patrimonio, la familia, las ideas —
-              y un octavo actor, el <em>motor</em>, se dedica a mejorar a los demás. La barra muestra cuánto ha
-              trabajado cada uno en los últimos 30 días.
+              {t('flota_intro_1')} <em>{t('flota_intro_2')}</em>{t('flota_intro_3')}
             </Typography>
           </Grid>
 
@@ -87,8 +90,8 @@ const FlotaPage = () => (
 
                     <div>
                       <div className='flex justify-between mbe-1'>
-                        <Typography variant='caption' color='text.secondary'>trabajo 30 d</Typography>
-                        <Typography variant='caption' className='font-mono'>{fmtCorto(usado)} tokens</Typography>
+                        <Typography variant='caption' color='text.secondary'>{t('flota_trabajo')}</Typography>
+                        <Typography variant='caption' className='font-mono'>{fmtCorto(usado)} {t('flota_tokens')}</Typography>
                       </div>
                       <LinearProgress variant='determinate' value={pct} color={COLORES[c.perfil] ?? 'primary'} />
                     </div>
@@ -101,6 +104,7 @@ const FlotaPage = () => (
       )
     }}
   </DataGate>
-)
+  )
+}
 
 export default FlotaPage

@@ -12,6 +12,7 @@ import { Menu, MenuItem } from '@menu/vertical-menu'
 
 // Hook Imports
 import useVerticalNav from '@menu/hooks/useVerticalNav'
+import { useLang } from '@/lib/i18n'
 
 // Styled Component Imports
 import StyledVerticalNavExpandIcon from '@menu/styles/vertical/StyledVerticalNavExpandIcon'
@@ -39,6 +40,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   // Hooks
   const theme = useTheme()
   const verticalNavOptions = useVerticalNav()
+  const { t } = useLang()
 
   // Vars
   const { isBreakpointReached, transitionDuration } = verticalNavOptions
@@ -69,28 +71,28 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}
       >
         <MenuItem href='/' icon={<i className='ri-dashboard-3-line' />}>
-          Panel
+          {t('nav_panel')}
         </MenuItem>
         <MenuItem href='/flota' icon={<i className='ri-robot-2-line' />}>
-          La flota
+          {t('nav_flota')}
         </MenuItem>
         <MenuItem href='/salud' icon={<i className='ri-heart-pulse-line' />}>
-          Salud
+          {t('nav_salud')}
         </MenuItem>
         <MenuItem href='/tokens' icon={<i className='ri-coins-line' />}>
-          Tokens
+          {t('nav_tokens')}
         </MenuItem>
         <MenuItem href='/eficiencia' icon={<i className='ri-line-chart-line' />}>
-          Eficiencia
+          {t('nav_eficiencia')}
         </MenuItem>
         <MenuItem href='/actividad' icon={<i className='ri-inbox-line' />}>
-          Actividad
+          {t('nav_actividad')}
         </MenuItem>
         <MenuItem href='/historia' icon={<i className='ri-time-line' />}>
-          Historia
+          {t('nav_historia')}
         </MenuItem>
         <MenuItem href='/preguntas' icon={<i className='ri-question-line' />}>
-          Preguntas
+          {t('nav_preguntas')}
         </MenuItem>
       </Menu>
       {/* <Menu

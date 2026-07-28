@@ -20,6 +20,9 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 
 // Component Imports
 import DataGate from '@/components/dashboard/DataGate'
 
+// Hook Imports
+import { useLang } from '@/lib/i18n'
+
 // Data Imports
 import { fmt, fmtCorto } from '@/lib/data'
 
@@ -34,7 +37,10 @@ const COLORES_CLON = [
   'var(--mui-palette-text-disabled)'
 ]
 
-const TokensPage = () => (
+const TokensPage = () => {
+  const { t } = useLang()
+
+  return (
   <DataGate>
     {({ tokens }) => {
       const c = tokens.contador
@@ -43,12 +49,9 @@ const TokensPage = () => (
       return (
         <Grid container spacing={6}>
           <Grid size={12}>
-            <Typography variant='h4' className='mbe-1'>¿Cuánto trabaja y quién lo hace?</Typography>
+            <Typography variant='h4' className='mbe-1'>{t('tokens_titulo')}</Typography>
             <Typography color='text.secondary' className='max-is-3xl'>
-              La IA se paga por <strong>tokens</strong>: la unidad con que se mide el texto
-              (un token ≈ 3-4 letras; una página son unos 500). Cada cifra dice de dónde viene:
-              <strong> medida</strong> (la dio el proveedor, exacta) o <strong>estimada</strong>
-              (calculada, porque ese proveedor no informa). Nunca se mezclan.
+              {t('tokens_intro_1')}
             </Typography>
           </Grid>
 
@@ -56,10 +59,10 @@ const TokensPage = () => (
           <Grid size={{ xs: 12, md: 4 }}>
             <Card className='bs-full border border-solid border-success'>
               <CardContent className='flex flex-col gap-1'>
-                <Typography variant='body2' color='success.main' fontWeight={600}>✅ Medido por el proveedor</Typography>
+                <Typography variant='body2' color='success.main' fontWeight={600}>{t('tokens_medido')}</Typography>
                 <Typography variant='h3' className='font-mono'>{fmtCorto(c.medido_tokens)}</Typography>
                 <Typography variant='caption' color='text.secondary' className='font-mono'>
-                  {fmt(c.medido_tokens)} tokens · {fmt(c.medido_llamadas)} llamadas
+                  {fmt(c.medido_tokens)} tokens · {fmt(c.medido_llamadas)} {t('tokens_llamadas')}
                 </Typography>
               </CardContent>
             </Card>
@@ -67,10 +70,10 @@ const TokensPage = () => (
           <Grid size={{ xs: 12, md: 4 }}>
             <Card className='bs-full'>
               <CardContent className='flex flex-col gap-1'>
-                <Typography variant='body2' color='text.secondary' fontWeight={600}>≈ Estimado (pasado ciego)</Typography>
+                <Typography variant='body2' color='text.secondary' fontWeight={600}>{t('tokens_estimado')}</Typography>
                 <Typography variant='h3' className='font-mono'>{fmtCorto(c.estimado_tokens)}</Typography>
                 <Typography variant='caption' color='text.secondary' className='font-mono'>
-                  banda p25–p75: {fmtCorto(c.banda_p25)} – {fmtCorto(c.banda_p75)}
+                  {t('tokens_banda')}: {fmtCorto(c.banda_p25)} – {fmtCorto(c.banda_p75)}
                 </Typography>
               </CardContent>
             </Card>
@@ -78,10 +81,10 @@ const TokensPage = () => (
           <Grid size={{ xs: 12, md: 4 }}>
             <Card className='bs-full'>
               <CardContent className='flex flex-col gap-1'>
-                <Typography variant='body2' fontWeight={600}>🧮 Total reconstruido</Typography>
+                <Typography variant='body2' fontWeight={600}>{t('tokens_total')}</Typography>
                 <Typography variant='h3' className='font-mono'>{fmtCorto(c.total_tokens)}</Typography>
                 <Typography variant='caption' color='text.secondary' className='font-mono'>
-                  {fmt(c.total_llamadas)} llamadas
+                  {fmt(c.total_llamadas)} {t('tokens_llamadas')}
                 </Typography>
               </CardContent>
             </Card>
@@ -92,12 +95,12 @@ const TokensPage = () => (
             <Card className='bs-full'>
               <CardContent className='flex flex-col gap-2'>
                 <div className='flex items-baseline justify-between'>
-                  <Typography variant='h6'>Cobertura medida</Typography>
+                  <Typography variant='h6'>{t('tokens_cobertura')}</Typography>
                   <Typography variant='h5' className='font-mono'>{c.cobertura_pct ?? '—'} %</Typography>
                 </div>
                 <LinearProgress variant='determinate' value={c.cobertura_pct ?? 0} color='success' />
                 <Typography variant='caption' color='text.secondary'>
-                  la «nota de honestidad» del panel: qué parte de estas cifras es dato real y no estimación (objetivo ≥ 95 %)
+                  {t('tokens_cobertura_caption')}
                 </Typography>
               </CardContent>
             </Card>
@@ -105,12 +108,12 @@ const TokensPage = () => (
           <Grid size={{ xs: 12, md: 6 }}>
             <Card className='bs-full'>
               <CardContent>
-                <Typography variant='h6' className='mbe-3'>Ventanas de consumo</Typography>
+                <Typography variant='h6' className='mbe-3'>{t('tokens_ventanas')}</Typography>
                 <div className='flex gap-3'>
                   {[
-                    { l: '30 días', v: c.ventana_30d },
-                    { l: '7 días', v: c.ventana_7d },
-                    { l: 'hoy', v: c.hoy }
+                    { l: t('tokens_30d'), v: c.ventana_30d },
+                    { l: t('tokens_7d'), v: c.ventana_7d },
+                    { l: t('tokens_hoy'), v: c.hoy }
                   ].map(w => (
                     <Card key={w.l} variant='outlined' className='flex-auto text-center p-3'>
                       <Typography variant='h6' className='font-mono'>{fmtCorto(w.v)}</Typography>
@@ -126,8 +129,8 @@ const TokensPage = () => (
           <Grid size={{ xs: 12, lg: 6 }}>
             <Card className='bs-full'>
               <CardHeader
-                title='¿Qué clon ha trabajado más? · 30 d'
-                subheader='tokens por perfil (el «motor» es la maquinaria de automejora)'
+                title={t('tokens_por_clon')}
+                subheader={t('tokens_por_clon_sub')}
               />
               <CardContent className='bs-72'>
                 <ResponsiveContainer width='100%' height='100%'>
@@ -164,14 +167,14 @@ const TokensPage = () => (
           {/* Por modelo */}
           <Grid size={{ xs: 12, lg: 6 }}>
             <Card className='bs-full'>
-              <CardHeader title='¿De qué cerebros depende? · 30 d' subheader='los modelos de IA que hicieron el trabajo' />
+              <CardHeader title={t('tokens_por_modelo')} subheader={t('tokens_por_modelo_sub')} />
               <TableContainer>
                 <Table size='small'>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Modelo</TableCell>
+                      <TableCell>{t('tokens_modelo')}</TableCell>
                       <TableCell align='right'>Tokens</TableCell>
-                      <TableCell align='right'>Llamadas</TableCell>
+                      <TableCell align='right'>{t('tokens_llamadas')}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -191,6 +194,7 @@ const TokensPage = () => (
       )
     }}
   </DataGate>
-)
+  )
+}
 
 export default TokensPage

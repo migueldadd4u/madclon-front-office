@@ -14,19 +14,24 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 // Component Imports
 import DataGate from '@/components/dashboard/DataGate'
 
+// Hook Imports
+import { useLang } from '@/lib/i18n'
+
 // Data Imports
 import { fmt } from '@/lib/data'
-
-const GRUPOS = [
-  { clave: 'eficiencia' as const, titulo: '⚙️ Eficiencia', sub: 'lo que cuesta el trabajo' },
-  { clave: 'eficacia' as const, titulo: '🎯 Eficacia', sub: 'el trabajo que sale' },
-  { clave: 'honestidad' as const, titulo: '🔍 Honestidad', sub: 'fiabilidad de la propia medida' }
-]
 
 const colorVariacion = (estado: string): 'success' | 'error' | 'warning' | 'default' =>
   estado.includes('🟢') ? 'success' : estado.includes('🔴') ? 'error' : estado.includes('🟡') ? 'warning' : 'default'
 
-const EficienciaPage = () => (
+const EficienciaPage = () => {
+  const { t } = useLang()
+  const GRUPOS = [
+    { clave: 'eficiencia' as const, titulo: t('ef_g1'), sub: t('ef_g1_sub') },
+    { clave: 'eficacia' as const, titulo: t('ef_g2'), sub: t('ef_g2_sub') },
+    { clave: 'honestidad' as const, titulo: t('ef_g3'), sub: t('ef_g3_sub') }
+  ]
+
+  return (
   <DataGate>
     {({ tokens, serie }) => {
       const puntos = serie.serie.map(p => ({
@@ -37,15 +42,13 @@ const EficienciaPage = () => (
       return (
         <Grid container spacing={6}>
           <Grid size={12}>
-            <Typography variant='h4' className='mbe-1'>¿Está mejorando el clon?</Typography>
+            <Typography variant='h4' className='mbe-1'>{t('ef_titulo')}</Typography>
             <Typography color='text.secondary' className='max-is-3xl'>
-              Desde el {tokens.linea_base_fecha ?? '—'} hay una <strong>línea base congelada</strong>: la foto del «antes».
-              Cada indicador compara contra ella en su propia dirección — en unas cosas mejorar es subir (tareas hechas)
-              y en otras es bajar (tokens por tarea).
+              {t('ef_intro_1')} {tokens.linea_base_fecha ?? '—'} {t('ef_intro_2')}
             </Typography>
             {tokens.soporte && (
               <Typography variant='caption' color='text.disabled' className='font-mono'>
-                soporte de la lectura: {tokens.soporte}
+                {t('ef_soporte')}: {tokens.soporte}
               </Typography>
             )}
           </Grid>
@@ -71,7 +74,7 @@ const EficienciaPage = () => (
                           />
                         </div>
                         <Typography variant='h4' className='font-mono'>{k.ahora}</Typography>
-                        <Typography variant='caption' color='text.disabled' className='font-mono'>base: {k.base}</Typography>
+                        <Typography variant='caption' color='text.disabled' className='font-mono'>{t('ef_base')}: {k.base}</Typography>
                         <Typography variant='caption' color='text.secondary' className='line-clamp-3'>{k.significado}</Typography>
                       </CardContent>
                     </Card>
@@ -85,8 +88,8 @@ const EficienciaPage = () => (
           <Grid size={{ xs: 12, lg: 6 }}>
             <Card className='bs-full'>
               <CardHeader
-                title='El índice, día a día'
-                subheader='tokens del motor por tarea hecha — si baja, el clon hace lo mismo gastando menos'
+                title={t('ef_indice')}
+                subheader={t('ef_indice_sub')}
               />
               <CardContent>
                 {puntos.length >= 2 ? (
@@ -122,8 +125,8 @@ const EficienciaPage = () => (
                 ) : (
                   <Card variant='outlined' className='bs-56 grid place-items-center text-center p-6'>
                     <Typography variant='body2' color='text.secondary'>
-                      La serie diaria acaba de nacer ({puntos.length} punto{puntos.length === 1 ? '' : 's'}).<br />
-                      Cada día a las 03:00 se añade un punto — vuelve en una semana y verás la curva.
+                      {t('ef_serie_nace_1')} ({puntos.length}).<br />
+                      {t('ef_serie_nace_2')}
                     </Typography>
                   </Card>
                 )}
@@ -134,12 +137,12 @@ const EficienciaPage = () => (
           <Grid size={{ xs: 12, lg: 6 }}>
             <Card className='bs-full'>
               <CardHeader
-                title='Intervenciones: ¿sirvió lo que cambiamos?'
-                subheader='cada mejora aplicada se anota y se juzga sola comparando su KPI antes y después'
+                title={t('ef_intervenciones')}
+                subheader={t('ef_intervenciones_sub')}
               />
               <CardContent className='flex flex-col gap-4'>
                 {tokens.intervenciones.length === 0 && (
-                  <Typography variant='body2' color='text.secondary'>todavía no hay intervenciones registradas</Typography>
+                  <Typography variant='body2' color='text.secondary'>{t('ef_sin_intervenciones')}</Typography>
                 )}
                 {tokens.intervenciones.map((i, idx) => (
                   <div key={idx} className='flex gap-3'>
@@ -158,6 +161,7 @@ const EficienciaPage = () => (
       )
     }}
   </DataGate>
-)
+  )
+}
 
 export default EficienciaPage

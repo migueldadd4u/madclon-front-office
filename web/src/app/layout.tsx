@@ -10,6 +10,9 @@ import type { ChildrenType } from '@core/types'
 // Util Imports
 import { getSystemMode } from '@core/utils/serverHelpers'
 
+// Component Imports
+import { LangProvider } from '@/lib/i18n'
+
 // Style Imports
 import '@/app/globals.css'
 
@@ -54,7 +57,7 @@ const RootLayout = async (props: ChildrenType) => {
     <html id='__next' lang='es' dir={direction} suppressHydrationWarning>
       <body className='flex is-full min-bs-full flex-auto flex-col'>
         <InitColorSchemeScript attribute='data' defaultMode={systemMode} />
-        {children}
+        <LangProvider>{children}</LangProvider>
       </body>
     </html>
   )

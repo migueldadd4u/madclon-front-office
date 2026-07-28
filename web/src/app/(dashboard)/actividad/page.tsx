@@ -13,10 +13,16 @@ import CustomAvatar from '@core/components/mui/Avatar'
 import DataGate from '@/components/dashboard/DataGate'
 import StatCard from '@/components/dashboard/StatCard'
 
+// Hook Imports
+import { useLang } from '@/lib/i18n'
+
 // Data Imports
 import { fmt } from '@/lib/data'
 
-const ActividadPage = () => (
+const ActividadPage = () => {
+  const { t } = useLang()
+
+  return (
   <DataGate>
     {({ overview }) => {
       const { gtd, automejora, personas } = overview
@@ -28,10 +34,9 @@ const ActividadPage = () => (
       return (
         <Grid container spacing={6}>
           <Grid size={12}>
-            <Typography variant='h4' className='mbe-1'>¿Qué espera de Miguel ahora mismo?</Typography>
+            <Typography variant='h4' className='mbe-1'>{t('act_titulo')}</Typography>
             <Typography color='text.secondary' className='max-is-2xl'>
-              El clon prepara; el humano decide. Esto es lo que hay encima de la mesa — solo cantidades,
-              el contenido vive a salvo en el vault privado.
+              {t('act_intro')}
             </Typography>
           </Grid>
 
@@ -39,18 +44,18 @@ const ActividadPage = () => (
             <StatCard
               icon='ri-vote-line'
               valor={fmt(gtd.propuestas)}
-              label='propuestas esperando el sí o el no'
+              label={t('act_propuestas')}
               color='warning'
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-            <StatCard icon='ri-inbox-line' valor={fmt(gtd.bandeja)} label='capturas sin clasificar' color='info' />
+            <StatCard icon='ri-inbox-line' valor={fmt(gtd.bandeja)} label={t('act_bandeja')} color='info' />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
             <StatCard
               icon='ri-hourglass-line'
               valor={fmt(gtd.esperas_vencidas)}
-              label='respuestas de terceros vencidas'
+              label={t('act_esperas')}
               color={(gtd.esperas_vencidas ?? 0) > 0 ? 'error' : 'success'}
             />
           </Grid>
@@ -58,7 +63,7 @@ const ActividadPage = () => (
             <StatCard
               icon='ri-list-check-3'
               valor={fmt(gtd.decisiones)}
-              label='decisiones abiertas del sistema'
+              label={t('act_decisiones')}
               color='secondary'
             />
           </Grid>
@@ -67,8 +72,8 @@ const ActividadPage = () => (
           <Grid size={{ xs: 12, lg: 6 }}>
             <Card className='bs-full'>
               <CardHeader
-                title='El motor que se mejora solo · 7 días'
-                subheader={`cada noche se autoaudita y propone mejoras · coste en factura variable: ${automejora.metered} tokens`}
+                title={t('act_motor')}
+                subheader={`${t('act_motor_sub_1')} ${automejora.metered} tokens`}
                 avatar={
                   <CustomAvatar color='primary' skin='light' variant='rounded'>
                     <i className='ri-settings-5-line' />
@@ -77,10 +82,10 @@ const ActividadPage = () => (
               />
               <CardContent className='flex flex-col gap-3'>
                 {[
-                  { label: 'mejoras completadas', valor: automejora.hechas, color: 'success' as const },
-                  { label: 'pendientes', valor: automejora.pendientes, color: 'info' as const },
-                  { label: 'aparcadas', valor: automejora.aparcadas, color: 'secondary' as const },
-                  { label: 'bloqueadas', valor: automejora.bloqueadas, color: 'error' as const }
+                  { label: t('act_hechas'), valor: automejora.hechas, color: 'success' as const },
+                  { label: t('act_pendientes'), valor: automejora.pendientes, color: 'info' as const },
+                  { label: t('act_aparcadas'), valor: automejora.aparcadas, color: 'secondary' as const },
+                  { label: t('act_bloqueadas'), valor: automejora.bloqueadas, color: 'error' as const }
                 ].map(f => (
                   <div key={f.label}>
                     <div className='flex justify-between mbe-1'>
@@ -91,7 +96,7 @@ const ActividadPage = () => (
                   </div>
                 ))}
                 <Typography variant='caption' color='text.secondary'>
-                  {fmt(automejora.llamadas)} llamadas al consejo de modelos · reparto: {automejora.top}
+                  {fmt(automejora.llamadas)} {t('act_llamadas_consejo')}: {automejora.top}
                 </Typography>
               </CardContent>
             </Card>
@@ -101,8 +106,8 @@ const ActividadPage = () => (
           <Grid size={{ xs: 12, lg: 6 }}>
             <Card className='bs-full'>
               <CardHeader
-                title='La memoria de las personas'
-                subheader='fichas curadas de la red de contactos — quien es quién, de qué se habló, qué se debe'
+                title={t('act_personas')}
+                subheader={t('act_personas_sub')}
                 avatar={
                   <CustomAvatar color='success' skin='light' variant='rounded'>
                     <i className='ri-team-line' />
@@ -113,16 +118,15 @@ const ActividadPage = () => (
                 <div className='flex items-end gap-8'>
                   <div>
                     <Typography variant='h2' className='font-mono'>{fmt(personas.fichas_curadas)}</Typography>
-                    <Typography variant='body2' color='text.secondary'>fichas curadas</Typography>
+                    <Typography variant='body2' color='text.secondary'>{t('act_fichas')}</Typography>
                   </div>
                   <div>
                     <Typography variant='h3' className='font-mono' color='warning.main'>{fmt(personas.staged)}</Typography>
-                    <Typography variant='body2' color='text.secondary'>esperando revisión humana</Typography>
+                    <Typography variant='body2' color='text.secondary'>{t('act_staged')}</Typography>
                   </div>
                 </div>
                 <Typography variant='body2' color='text.secondary'>
-                  Cada ficha pasa por un control de calidad: la IA propone, pero fusionar o dar por buena una
-                  identidad exige evidencia. Nadie entra en la memoria por la puerta de atrás.
+                  {t('act_personas_texto')}
                 </Typography>
               </CardContent>
             </Card>
@@ -131,6 +135,7 @@ const ActividadPage = () => (
       )
     }}
   </DataGate>
-)
+  )
+}
 
 export default ActividadPage
