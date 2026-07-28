@@ -14,6 +14,7 @@ import StatCard from '@/components/dashboard/StatCard'
 import ClonOpina from '@/components/dashboard/ClonOpina'
 import Latido from '@/components/dashboard/Latido'
 import MadClonLogoAnimado from '@/components/dashboard/MadClonLogoAnimado'
+import DiaEnLaVida from '@/components/dashboard/DiaEnLaVida'
 
 // Hook Imports
 import { useLang } from '@/lib/i18n'
@@ -210,6 +211,11 @@ const InicioPage = () => {
                 </Card>
               </Grid>
             ))}
+
+            {/* Un día en la vida del clon */}
+            <Grid size={12}>
+              <DiaEnLaVida crons={overview.crons} />
+            </Grid>
 
             {/* Tendencia reciente */}
             <Grid size={12}>

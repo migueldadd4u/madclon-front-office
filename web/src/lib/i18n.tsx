@@ -70,6 +70,18 @@ const STR = {
   latido_h: { es: 'h', en: 'h' },
   latido_d: { es: 'd', en: 'd' },
 
+  // un día en la vida del clon
+  dia_titulo: { es: 'Un día en la vida del clon', en: 'A day in the life of the clone' },
+  dia_caption: {
+    es: 'cada punto es una rutina real, a la hora en que corrió por última vez',
+    en: 'each dot is a real routine, at the hour it last ran'
+  },
+  dia_ahora: { es: 'ahora', en: 'now' },
+  dia_leyenda: {
+    es: 'Mientras Miguel duerme, el clon hace su autoauditoría de madrugada; por la mañana prepara el día; y vigila el correo importante a todas horas. La línea indigo marca este instante.',
+    en: 'While Miguel sleeps, the clone runs its self-audit before dawn; in the morning it prepares the day; and it watches important mail around the clock. The indigo line marks this very moment.'
+  },
+
   // frase de estado (plantillas)
   frase_tranquilo: { es: 'Hoy el sistema respira tranquilo', en: 'Today the system breathes easy' },
   frase_bien: { es: 'Hoy el sistema va bien, con un deber pendiente', en: 'Today the system is doing well, with one pending chore' },
