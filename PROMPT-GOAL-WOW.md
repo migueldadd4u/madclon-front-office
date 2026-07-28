@@ -1,6 +1,6 @@
 # /goal — BUCLE DE AUTOMEJORA «WOW» DEL FRONT OFFICE MAD CLON
 
-> Prompt listo para lanzar en una sesión nueva. Ejecuta el bucle completo, iteración tras iteración, sin pedirme confirmación salvo zona roja. Presupuesto: ~2 horas o 5 iteraciones, lo primero que llegue.
+> Prompt listo para lanzar en una sesión nueva. Ejecuta el bucle completo, iteración tras iteración, sin pedirme confirmación salvo zona roja. Presupuesto: ~5 horas o 25 iteraciones, lo primero que llegue.
 
 ## Contexto (léelo antes de empezar)
 
@@ -48,4 +48,4 @@
 
 ## CRITERIO DE PARADA E INFORME
 
-Tras 5 iteraciones o 2 horas: informe final con lo desplegado (con capturas), lo que descartaste y por qué, y el backlog actualizado para la próxima tanda. Si detectas una colisión (lock ajeno, conflicto git): PARA, anota en TABLERO y avisa.
+Tras 25 iteraciones o 5 horas: informe final con lo desplegado (con capturas), lo que descartaste y por qué, y el backlog actualizado para la próxima tanda. Si detectas una colisión (lock ajeno, conflicto git): PARA, anota en TABLERO y avisa. Asegurate que lo que diseñes sea accesible AA, que sea multidispositivo (Ordenador, Tablet y Móvil) y que sea perfectamente comprensible por cualquier persona que no sepa lo que es un clon
