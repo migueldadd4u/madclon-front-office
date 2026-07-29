@@ -245,6 +245,33 @@ code {
   border-radius: 8px;
 }
 
+/* Franja 24 h — anillo de foco cuando la región desplazable recibe el teclado */
+.fo-pista:focus-visible {
+  outline: 2px solid var(--mui-palette-primary-main);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Pista «desliza» de la franja 24 h — flecha que empuja hasta el primer scroll */
+@keyframes fo-desliza-x {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+}
+.fo-desliza {
+  display: inline-block;
+  animation: fo-desliza-x 1.6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .fo-desliza {
+    animation: none;
+  }
+}
+
 /* Skeletons con shimmer de marca — barrido indigo→teal mientras cargan los datos */
 @keyframes fo-shimmer {
   100% {

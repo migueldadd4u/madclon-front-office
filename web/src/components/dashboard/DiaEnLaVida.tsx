@@ -1,7 +1,7 @@
 'use client'
 
 // React Imports
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 // MUI Imports
 import Box from '@mui/material/Box'
@@ -37,12 +37,45 @@ type Props = { crons: Cron[] }
 const DiaEnLaVida = ({ crons }: Props) => {
   const { lang, t } = useLang()
   const [ahora, setAhora] = useState(() => new Date())
+  const pistaRef = useRef<HTMLDivElement | null>(null)
+  const [sombra, setSombra] = useState({ izq: false, der: false })
+  const [deslizado, setDeslizado] = useState(false)
 
   useEffect(() => {
     const id = setInterval(() => setAhora(new Date()), 60_000)
 
     return () => clearInterval(id)
   }, [])
+
+  // Sombras de borde: solo aparecen cuando la franja tiene más por ese lado
+  const mideSombra = useCallback(() => {
+    const el = pistaRef.current
+
+    if (!el) return
+    setSombra({
+      izq: el.scrollLeft > 8,
+      der: el.scrollLeft + el.clientWidth < el.scrollWidth - 8
+    })
+  }, [])
+
+  useEffect(() => {
+    mideSombra()
+
+    const el = pistaRef.current
+
+    if (!el || typeof ResizeObserver === 'undefined') return
+
+    const ro = new ResizeObserver(mideSombra)
+
+    ro.observe(el)
+
+    return () => ro.disconnect()
+  }, [mideSombra])
+
+  const alDesplazar = () => {
+    setDeslizado(true)
+    mideSombra()
+  }
 
   const puntos = useMemo<Punto[]>(() => {
     const base = crons
@@ -79,8 +112,17 @@ const DiaEnLaVida = ({ crons }: Props) => {
           <Typography variant='h6'>{t('dia_titulo')}</Typography>
           <Typography variant='caption' color='text.disabled'>{t('dia_caption')}</Typography>
         </div>
-        <Box sx={{ overflowX: 'auto', pb: 1 }} role='img' aria-label={`${t('dia_titulo')}: ${resumen}`}>
-          <Box sx={{ position: 'relative', minWidth: 560, height: 96, mx: 1 }}>
+        <Box sx={{ position: 'relative' }}>
+          <Box
+            ref={pistaRef}
+            onScroll={alDesplazar}
+            tabIndex={0}
+            className='fo-pista'
+            sx={{ overflowX: 'auto', pb: 1 }}
+            role='img'
+            aria-label={`${t('dia_titulo')}: ${resumen}`}
+          >
+            <Box sx={{ position: 'relative', minWidth: 560, height: 96, mx: 1 }}>
             {/* regla de horas */}
             {[0, 6, 12, 18, 24].map(h => (
               <Box
@@ -149,11 +191,56 @@ const DiaEnLaVida = ({ crons }: Props) => {
                 type='button'
               />
             </Tooltip>
+            </Box>
           </Box>
+          {/* sombras de borde — solo cuando la franja sigue por ese lado */}
+          <Box
+            aria-hidden
+            sx={{
+              position: 'absolute',
+              top: 0,
+              bottom: 8,
+              left: 0,
+              width: 34,
+              pointerEvents: 'none',
+              background: 'linear-gradient(90deg, var(--mui-palette-background-paper) 15%, transparent)',
+              opacity: sombra.izq ? 1 : 0,
+              transition: 'opacity .35s ease'
+            }}
+          />
+          <Box
+            aria-hidden
+            sx={{
+              position: 'absolute',
+              top: 0,
+              bottom: 8,
+              right: 0,
+              width: 34,
+              pointerEvents: 'none',
+              background: 'linear-gradient(270deg, var(--mui-palette-background-paper) 15%, transparent)',
+              opacity: sombra.der ? 1 : 0,
+              transition: 'opacity .35s ease'
+            }}
+          />
         </Box>
-        <Typography variant='caption' color='text.secondary'>
-          {t('dia_leyenda')}
-        </Typography>
+        <div className='flex flex-wrap items-baseline justify-between gap-2'>
+          <Typography variant='caption' color='text.secondary'>
+            {t('dia_leyenda')}
+          </Typography>
+          {sombra.der && !deslizado && (
+            <Typography
+              variant='caption'
+              color='text.disabled'
+              component='span'
+              sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, whiteSpace: 'nowrap' }}
+            >
+              {t('dia_desliza')}
+              <span className='fo-desliza' aria-hidden>
+                →
+              </span>
+            </Typography>
+          )}
+        </div>
       </CardContent>
     </Card>
   )

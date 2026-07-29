@@ -157,6 +157,7 @@ const STR = {
     en: 'each dot is a real routine, at the hour it last ran'
   },
   dia_ahora: { es: 'ahora', en: 'now' },
+  dia_desliza: { es: 'desliza para ver las 24 h', en: 'swipe to see the full 24 h' },
   dia_leyenda: {
     es: 'Mientras Miguel duerme, el clon hace su autoauditoría de madrugada; por la mañana prepara el día; y vigila el correo importante a todas horas. La línea indigo marca este instante.',
     en: 'While Miguel sleeps, the clone runs its self-audit before dawn; in the morning it prepares the day; and it watches important mail around the clock. The indigo line marks this very moment.'
