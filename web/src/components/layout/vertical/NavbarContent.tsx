@@ -7,6 +7,7 @@ import classnames from 'classnames'
 import NavToggle from './NavToggle'
 import ModeDropdown from '@components/layout/shared/ModeDropdown'
 import LangToggle from '@components/layout/shared/LangToggle'
+import ModoPresentacion from '@/components/dashboard/ModoPresentacion'
 
 // Hook Imports
 import { useLang } from '@/lib/i18n'
@@ -24,6 +25,7 @@ const NavbarContent = () => {
         <span className='hidden sm:block text-sm text-textSecondary'>{t('chrome_tagline')}</span>
       </div>
       <div className='flex items-center'>
+        <ModoPresentacion />
         <LangToggle />
         <ModeDropdown />
       </div>

@@ -33,6 +33,8 @@ const STR = {
   share_copiar: { es: 'Copiar enlace', en: 'Copy link' },
   share_copiado: { es: '¡Enlace copiado!', en: 'Link copied!' },
   menu_abrir: { es: 'Abrir o cerrar el menú', en: 'Open or close the menu' },
+  kiosk_entrar: { es: 'Modo presentación: oculta menús y muestra solo el panel', en: 'Presentation mode: hides menus and shows only the dashboard' },
+  kiosk_salir: { es: 'Salir (Esc)', en: 'Exit (Esc)' },
 
   // ------------------------------------------------------------- portada
   home_titulo: { es: 'La sala de control del Clon de MAD', en: 'The MAD Clone control room' },
