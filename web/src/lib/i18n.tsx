@@ -32,6 +32,7 @@ const STR = {
   cargando_error: { es: 'No se pudieron cargar los datos del panel', en: 'Panel data could not be loaded' },
   share_copiar: { es: 'Copiar enlace', en: 'Copy link' },
   share_copiado: { es: '¡Enlace copiado!', en: 'Link copied!' },
+  menu_abrir: { es: 'Abrir o cerrar el menú', en: 'Open or close the menu' },
 
   // ------------------------------------------------------------- portada
   home_titulo: { es: 'La sala de control del Clon de MAD', en: 'The MAD Clone control room' },

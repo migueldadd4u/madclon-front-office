@@ -2,21 +2,28 @@
 
 // Hook Imports
 import useVerticalNav from '@menu/hooks/useVerticalNav'
+import { useLang } from '@/lib/i18n'
 
+// Botón de menú real: antes era un icono <i> con onClick, inalcanzable por
+// teclado y mudo para lectores de pantalla. Ahora es un <button> con
+// aria-label bilingüe y aria-expanded según el estado del panel lateral.
 const NavToggle = () => {
   // Hooks
-  const { toggleVerticalNav, isBreakpointReached } = useVerticalNav()
+  const { toggleVerticalNav, isBreakpointReached, isToggled } = useVerticalNav()
+  const { t } = useLang()
 
-  const handleClick = () => {
-    toggleVerticalNav()
-  }
+  if (!isBreakpointReached) return null
 
   return (
-    <>
-      {/* <i className='ri-menu-line text-xl cursor-pointer' onClick={handleClick} /> */}
-      {/* Comment following code and uncomment above code in order to toggle menu on desktop screens as well */}
-      {isBreakpointReached && <i className='ri-menu-line text-xl cursor-pointer' onClick={handleClick} />}
-    </>
+    <button
+      type='button'
+      onClick={() => toggleVerticalNav()}
+      aria-label={t('menu_abrir')}
+      aria-expanded={Boolean(isToggled)}
+      className='flex items-center justify-center bs-10 is-10 rounded-full text-textPrimary transition-colors hover:bg-actionHover focus-visible:outline-2 focus-visible:outline-primary cursor-pointer'
+    >
+      <i className='ri-menu-line text-xl' aria-hidden='true' />
+    </button>
   )
 }
 
