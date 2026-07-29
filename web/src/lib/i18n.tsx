@@ -358,6 +358,16 @@ const STR = {
   his_clones: { es: 'clones con oficio', en: 'clones with a craft' },
   his_tokens_det: { es: 'y contando, cada noche', en: 'and counting, every night' },
 
+  // récords del sistema (máximos reales de la serie)
+  rec_titulo: { es: 'Récords del sistema', en: 'System records' },
+  rec_sub: {
+    es: 'los techos medidos de la serie, con su fecha — se superan solos la próxima vez que el clon bata su marca',
+    en: 'the measured highs of the series, with their dates — they beat themselves next time the clone breaks its record'
+  },
+  rec_tokens: { es: 'el día que más pensó', en: 'the day it thought the most' },
+  rec_tareas: { es: 'el día que más terminó', en: 'the day it finished the most' },
+  rec_llamadas: { es: 'el día con más llamadas', en: 'the day with the most calls' },
+
   // ------------------------------------------------------------- preguntas
   faq_titulo: { es: 'Preguntas que la gente hace', en: 'Questions people ask' },
   faq_intro: {

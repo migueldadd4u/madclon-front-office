@@ -114,6 +114,14 @@ const HITOS = [
 
 const NACIMIENTO = new Date('2026-04-14T00:00:00')
 
+// Máximo de la serie por métrica, conservando la fecha en la que se marcó
+const maxPor = (puntos: { fecha: string; contexto?: Record<string, number> }[], clave: string) =>
+  puntos.reduce<{ v: number; f: string } | null>((acc, p) => {
+    const v = p.contexto?.[clave]
+
+    return v != null && v > 0 && (!acc || v > acc.v) ? { v, f: p.fecha } : acc
+  }, null)
+
 const HistoriaPage = () => {
   const { lang, t } = useLang()
 
@@ -207,6 +215,52 @@ const HistoriaPage = () => {
                 </CardContent>
               </Card>
             </Grid>
+
+            {/* Récords del sistema: techos medidos de la serie con su fecha */}
+            {(() => {
+              const records = [
+                { rec: maxPor(data.serie.serie, 'tokens'), label: t('rec_tokens'), icon: 'ri-brain-line', color: 'warning' as const, formato: fmtCorto },
+                { rec: maxPor(data.serie.serie, 'tareas_hechas'), label: t('rec_tareas'), icon: 'ri-checkbox-circle-line', color: 'success' as const, formato: undefined },
+                { rec: maxPor(data.serie.serie, 'llamadas'), label: t('rec_llamadas'), icon: 'ri-exchange-line', color: 'info' as const, formato: undefined }
+              ].filter(r => r.rec !== null)
+
+              if (records.length === 0) return null
+
+              const fechaLocal = (iso: string) =>
+                new Date(`${iso}T00:00:00`).toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-GB', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric'
+                })
+
+              return (
+                <>
+                  <Grid size={12}>
+                    <Card>
+                      <CardContent className='flex flex-col gap-2'>
+                        <Typography variant='h5'>{t('rec_titulo')}</Typography>
+                        <Typography color='text.secondary' variant='body2' className='max-is-2xl'>
+                          {t('rec_sub')}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                  {records.map(r => (
+                    <Grid key={r.label} size={{ xs: 12, sm: 4 }}>
+                      <StatCard
+                        icon={r.icon}
+                        valor=''
+                        label={r.label}
+                        detalle={fechaLocal(r.rec!.f)}
+                        color={r.color}
+                        countTo={r.rec!.v}
+                        countFormat={r.formato}
+                      />
+                    </Grid>
+                  ))}
+                </>
+              )
+            })()}
 
             {/* Insignias del sistema */}
             <Grid size={12}>
