@@ -6,11 +6,12 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import Chip from '@mui/material/Chip'
-import LinearProgress from '@mui/material/LinearProgress'
 import CustomAvatar from '@core/components/mui/Avatar'
 
 // Component Imports
 import DataGate from '@/components/dashboard/DataGate'
+import CountUp from '@/components/dashboard/CountUp'
+import BarraEntra from '@/components/dashboard/BarraEntra'
 
 // Hook Imports
 import { useLang } from '@/lib/i18n'
@@ -62,7 +63,7 @@ const FlotaPage = () => {
 
             return (
               <Grid key={c.perfil} size={{ xs: 12, sm: 6, lg: 4 }}>
-                <Card className='bs-full'>
+                <Card className='bs-full fo-card-hover'>
                   <CardContent className='flex flex-col gap-4 bs-full'>
                     <div className='flex items-center gap-3'>
                       <CustomAvatar color={COLORES[c.perfil] ?? 'primary'} skin='light' size={42} variant='rounded'>
@@ -91,9 +92,11 @@ const FlotaPage = () => {
                     <div>
                       <div className='flex justify-between mbe-1'>
                         <Typography variant='caption' color='text.secondary'>{t('flota_trabajo')}</Typography>
-                        <Typography variant='caption' className='font-mono'>{fmtCorto(usado)} {t('flota_tokens')}</Typography>
+                        <Typography variant='caption' className='font-mono'>
+                          <CountUp to={usado} format={fmtCorto} /> {t('flota_tokens')}
+                        </Typography>
                       </div>
-                      <LinearProgress variant='determinate' value={pct} color={COLORES[c.perfil] ?? 'primary'} />
+                      <BarraEntra value={pct} color={COLORES[c.perfil] ?? 'primary'} />
                     </div>
                   </CardContent>
                 </Card>
