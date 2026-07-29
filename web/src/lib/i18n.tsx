@@ -30,6 +30,8 @@ const STR = {
     en: 'Live panels live in the private vault; an exporter brings only the aggregates here.'
   },
   cargando_error: { es: 'No se pudieron cargar los datos del panel', en: 'Panel data could not be loaded' },
+  share_copiar: { es: 'Copiar enlace', en: 'Copy link' },
+  share_copiado: { es: '¡Enlace copiado!', en: 'Link copied!' },
 
   // ------------------------------------------------------------- portada
   home_titulo: { es: 'La sala de control del Clon de MAD', en: 'The MAD Clone control room' },

@@ -7,6 +7,9 @@ import classnames from 'classnames'
 import useVerticalNav from '@menu/hooks/useVerticalNav'
 import { useLang } from '@/lib/i18n'
 
+// Component Imports
+import CopiarEnlace from '@/components/dashboard/CopiarEnlace'
+
 // Util Imports
 import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
 
@@ -25,11 +28,14 @@ const FooterContent = () => {
           {t('chrome_footer_1')}
         </span>
       </p>
-      {!isBreakpointReached && (
-        <span className='text-textDisabled text-sm'>
-          {t('chrome_footer_2')}
-        </span>
-      )}
+      <div className='flex items-center gap-3 flex-wrap'>
+        {!isBreakpointReached && (
+          <span className='text-textDisabled text-sm'>
+            {t('chrome_footer_2')}
+          </span>
+        )}
+        <CopiarEnlace />
+      </div>
     </div>
   )
 }
