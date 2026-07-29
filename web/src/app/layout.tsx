@@ -31,7 +31,7 @@ export const metadata = {
     description: 'Un equipo de IA que trabaja mientras Miguel vive su vida — los números del clon, explicados para personas.',
     url: 'https://migueldadd4u.github.io/madclon-front-office/',
     siteName: 'MAD Clon',
-    images: [{ url: '/madclon-front-office/images/og-madclon.png', width: 1200, height: 630, alt: 'MAD Clon — Front Office' }],
+    images: [{ url: '/images/og-madclon.png', width: 1200, height: 630, alt: 'MAD Clon — Front Office' }],
     locale: 'es_ES',
     type: 'website'
   },
@@ -39,7 +39,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'MAD Clon — Front Office',
     description: 'Un equipo de IA que trabaja mientras Miguel vive su vida — los números del clon, explicados para personas.',
-    images: ['/madclon-front-office/images/og-madclon.png']
+    images: ['/images/og-madclon.png']
   }
 }
 
