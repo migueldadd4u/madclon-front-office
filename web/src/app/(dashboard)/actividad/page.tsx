@@ -117,6 +117,7 @@ const ActividadPage = () => {
                       variant='determinate'
                       value={barras ? (f.valor / colaTotal) * 100 : 0}
                       color={f.color}
+                      aria-label={`${f.label}: ${f.valor}`}
                       sx={{ '& .MuiLinearProgress-bar': { transition: 'transform 1s cubic-bezier(.4,0,.2,1)' } }}
                     />
                   </div>

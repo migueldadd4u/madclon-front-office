@@ -70,11 +70,17 @@ const Insignias = ({ data, diasVida }: Props) => {
                 <Card
                   variant='outlined'
                   className='bs-full fo-card-hover'
-                  sx={desbloqueada ? { borderColor: 'success.main' } : { opacity: 0.85 }}
+                  sx={desbloqueada ? { borderColor: 'success.main' } : { borderStyle: 'dashed' }}
                 >
                   <CardContent className='flex flex-col gap-2'>
                     <div className='flex items-center justify-between'>
-                      <CustomAvatar color={desbloqueada ? 'success' : 'secondary'} skin='light' size={40} variant='rounded'>
+                      <CustomAvatar
+                        color={desbloqueada ? 'success' : 'secondary'}
+                        skin='light'
+                        size={40}
+                        variant='rounded'
+                        sx={desbloqueada ? undefined : { opacity: 0.7 }}
+                      >
                         <i className={`${ins.icon} text-xl`} />
                       </CustomAvatar>
                       {desbloqueada && (

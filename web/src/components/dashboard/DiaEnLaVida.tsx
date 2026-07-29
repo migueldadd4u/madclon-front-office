@@ -116,10 +116,9 @@ const DiaEnLaVida = ({ crons }: Props) => {
           <Box
             ref={pistaRef}
             onScroll={alDesplazar}
-            tabIndex={0}
             className='fo-pista'
             sx={{ overflowX: 'auto', pb: 1 }}
-            role='img'
+            role='group'
             aria-label={`${t('dia_titulo')}: ${resumen}`}
           >
             <Box sx={{ position: 'relative', minWidth: 560, height: 96, mx: 1 }}>

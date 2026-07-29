@@ -236,7 +236,7 @@ const colorSchemes = (skin: Skin): Theme['colorSchemes'] => {
         text: {
           primary: `rgb(var(--mui-mainColorChannels-dark) / 0.9)`,
           secondary: `rgb(var(--mui-mainColorChannels-dark) / 0.7)`,
-          disabled: `rgb(var(--mui-mainColorChannels-dark) / 0.4)`,
+          disabled: `rgb(var(--mui-mainColorChannels-dark) / 0.6)`,
           primaryChannel: 'var(--mui-mainColorChannels-dark)',
           secondaryChannel: 'var(--mui-mainColorChannels-dark)'
         },

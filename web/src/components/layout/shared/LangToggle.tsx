@@ -25,10 +25,11 @@ const LangToggle = () => {
           key={o.codigo}
           onClick={() => setLang(o.codigo)}
           aria-pressed={lang === o.codigo}
-          className={
+          className='rounded-full px-2.5 py-0.5'
+          sx={
             lang === o.codigo
-              ? 'rounded-full bg-primary text-textPrimary px-2.5 py-0.5'
-              : 'rounded-full text-textSecondary px-2.5 py-0.5'
+              ? { bgcolor: 'primary.dark', color: '#fff' }
+              : { color: 'text.secondary', '&:hover': { bgcolor: 'action.hover' } }
           }
         >
           <Typography variant='caption' fontWeight={700} color='inherit'>

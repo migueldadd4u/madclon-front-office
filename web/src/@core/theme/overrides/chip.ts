@@ -11,6 +11,9 @@ const chip: Theme['components'] = {
             style: {
               backgroundColor: 'var(--mui-palette-primary-lightOpacity)',
               color: 'var(--mui-palette-primary-main)',
+              ...theme.applyStyles('dark', {
+                color: 'color-mix(in srgb, var(--mui-palette-primary-main) 45%, #fff)'
+              }),
               '&.Mui-focusVisible': {
                 backgroundColor: 'var(--mui-palette-primary-mainOpacity)'
               },
@@ -31,6 +34,9 @@ const chip: Theme['components'] = {
             style: {
               backgroundColor: 'var(--mui-palette-secondary-lightOpacity)',
               color: 'var(--mui-palette-secondary-main)',
+              ...theme.applyStyles('dark', {
+                color: 'color-mix(in srgb, var(--mui-palette-secondary-main) 45%, #fff)'
+              }),
               '&.Mui-focusVisible': {
                 backgroundColor: 'var(--mui-palette-secondary-mainOpacity)'
               },
@@ -51,6 +57,9 @@ const chip: Theme['components'] = {
             style: {
               backgroundColor: 'var(--mui-palette-error-lightOpacity)',
               color: 'var(--mui-palette-error-main)',
+              ...theme.applyStyles('dark', {
+                color: 'color-mix(in srgb, var(--mui-palette-error-main) 45%, #fff)'
+              }),
               '&.Mui-focusVisible': {
                 backgroundColor: 'var(--mui-palette-error-mainOpacity)'
               },
@@ -71,6 +80,9 @@ const chip: Theme['components'] = {
             style: {
               backgroundColor: 'var(--mui-palette-warning-lightOpacity)',
               color: 'var(--mui-palette-warning-main)',
+              ...theme.applyStyles('dark', {
+                color: 'color-mix(in srgb, var(--mui-palette-warning-main) 45%, #fff)'
+              }),
               '&.Mui-focusVisible': {
                 backgroundColor: 'var(--mui-palette-warning-mainOpacity)'
               },
@@ -91,6 +103,9 @@ const chip: Theme['components'] = {
             style: {
               backgroundColor: 'var(--mui-palette-info-lightOpacity)',
               color: 'var(--mui-palette-info-main)',
+              ...theme.applyStyles('dark', {
+                color: 'color-mix(in srgb, var(--mui-palette-info-main) 45%, #fff)'
+              }),
               '&.Mui-focusVisible': {
                 backgroundColor: 'var(--mui-palette-info-mainOpacity)'
               },
@@ -111,6 +126,9 @@ const chip: Theme['components'] = {
             style: {
               backgroundColor: 'var(--mui-palette-success-lightOpacity)',
               color: 'var(--mui-palette-success-main)',
+              ...theme.applyStyles('dark', {
+                color: 'color-mix(in srgb, var(--mui-palette-success-main) 45%, #fff)'
+              }),
               '&.Mui-focusVisible': {
                 backgroundColor: 'var(--mui-palette-success-mainOpacity)'
               },

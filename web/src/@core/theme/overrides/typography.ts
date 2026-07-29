@@ -32,11 +32,11 @@ const typography: Theme['components'] = {
           },
           {
             props: { variant: 'subtitle1' },
-            style: { color: 'rgb(var(--mui-palette-text-primaryChannel) / 0.55)' }
+            style: { color: 'var(--mui-palette-text-secondary)' }
           },
           {
             props: { variant: 'subtitle2' },
-            style: { color: 'rgb(var(--mui-palette-text-primaryChannel) / 0.55)' }
+            style: { color: 'var(--mui-palette-text-secondary)' }
           },
           {
             props: { variant: 'body1' },

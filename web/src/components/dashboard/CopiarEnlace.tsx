@@ -50,6 +50,7 @@ const CopiarEnlace = () => {
       onClick={copiar}
       startIcon={<i className={copiado ? 'ri-check-line' : 'ri-link'} />}
       aria-live='polite'
+      sx={copiado ? undefined : { color: 'primary.light' }}
     >
       {copiado ? t('share_copiado') : t('share_copiar')}
     </Button>

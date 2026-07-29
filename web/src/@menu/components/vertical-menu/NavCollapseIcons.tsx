@@ -5,6 +5,7 @@ import type { HTMLAttributes, ReactElement } from 'react'
 
 // Hook Imports
 import useVerticalNav from '../../hooks/useVerticalNav'
+import { useLang } from '@/lib/i18n'
 
 // Icon Imports
 import CloseIcon from '../../svg/Close'
@@ -25,6 +26,7 @@ const NavCollapseIcons = (props: NavCollapseIconsProps) => {
 
   // Hooks
   const { isCollapsed, collapseVerticalNav, isBreakpointReached, toggleVerticalNav } = useVerticalNav()
+  const { t } = useLang()
 
   // Handle Lock / Unlock Icon Buttons click
   const handleClick = (action: 'lock' | 'unlock') => {
@@ -47,18 +49,36 @@ const NavCollapseIcons = (props: NavCollapseIconsProps) => {
     onClose && onClose()
   }
 
+  // Enter/Espacio activan como en un botón de verdad
+  const alPulsarTecla = (accion: () => void) => (e: React.KeyboardEvent<HTMLSpanElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      accion()
+    }
+  }
+
   return (
     <>
       {isBreakpointReached ? (
-        <span role='button' tabIndex={0} style={{ display: 'flex', cursor: 'pointer' }} onClick={handleClose} {...rest}>
+        <span
+          role='button'
+          tabIndex={0}
+          aria-label={t('nav_cierra')}
+          style={{ display: 'flex', cursor: 'pointer' }}
+          onClick={handleClose}
+          onKeyDown={alPulsarTecla(handleClose)}
+          {...rest}
+        >
           {closeIcon ?? <CloseIcon />}
         </span>
       ) : isCollapsed ? (
         <span
           role='button'
           tabIndex={0}
+          aria-label={t('nav_fija')}
           style={{ display: 'flex', cursor: 'pointer' }}
           onClick={() => handleClick('lock')}
+          onKeyDown={alPulsarTecla(() => handleClick('lock'))}
           {...rest}
         >
           {unlockedIcon ?? <RadioCircleIcon />}
@@ -67,8 +87,10 @@ const NavCollapseIcons = (props: NavCollapseIconsProps) => {
         <span
           role='button'
           tabIndex={0}
+          aria-label={t('nav_pliega')}
           style={{ display: 'flex', cursor: 'pointer' }}
           onClick={() => handleClick('unlock')}
+          onKeyDown={alPulsarTecla(() => handleClick('unlock'))}
           {...rest}
         >
           {lockedIcon ?? <RadioCircleMarkedIcon />}

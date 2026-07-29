@@ -99,7 +99,12 @@ const TokensPage = () => {
                   <Typography variant='h6'>{t('tokens_cobertura')}</Typography>
                   <Typography variant='h5' className='font-mono'>{c.cobertura_pct ?? '—'} %</Typography>
                 </div>
-                <LinearProgress variant='determinate' value={c.cobertura_pct ?? 0} color='success' />
+                <LinearProgress
+                  variant='determinate'
+                  value={c.cobertura_pct ?? 0}
+                  color='success'
+                  aria-label={`${t('tokens_cobertura')}: ${c.cobertura_pct ?? 0} %`}
+                />
                 <Typography variant='caption' color='text.secondary'>
                   {t('tokens_cobertura_caption')}
                 </Typography>
@@ -202,7 +207,7 @@ const TokensPage = () => {
                       <TableRow key={m.modelo} hover>
                         <TableCell><span className='font-mono text-sm'>{m.modelo}</span></TableCell>
                         <TableCell align='right'><span className='font-mono'>{fmtCorto(m.total)}</span></TableCell>
-                        <TableCell align='right'><span className='font-mono text-secondary'>{fmt(m.llamadas)}</span></TableCell>
+                        <TableCell align='right'><span className='font-mono text-textSecondary'>{fmt(m.llamadas)}</span></TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

@@ -96,7 +96,11 @@ const FlotaPage = () => {
                           <CountUp to={usado} format={fmtCorto} /> {t('flota_tokens')}
                         </Typography>
                       </div>
-                      <BarraEntra value={pct} color={COLORES[c.perfil] ?? 'primary'} />
+                      <BarraEntra
+                        value={pct}
+                        color={COLORES[c.perfil] ?? 'primary'}
+                        label={`${c.perfil} — ${t('flota_trabajo')}: ${fmtCorto(usado)} ${t('flota_tokens')}`}
+                      />
                     </div>
                   </CardContent>
                 </Card>

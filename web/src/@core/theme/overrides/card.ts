@@ -34,7 +34,7 @@ const card = (skin: Skin): Theme['components'] => {
         }),
         subheader: ({ theme }) => ({
           ...theme.typography.subtitle1,
-          color: 'rgb(var(--mui-palette-text-primaryChannel) / 0.55)'
+          color: 'var(--mui-palette-text-secondary)'
         }),
         action: ({ theme }) => ({
           ...theme.typography.body1,

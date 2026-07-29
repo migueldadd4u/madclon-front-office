@@ -32,7 +32,7 @@ const iconoEstado = (e: string) =>
     ? 'ri-checkbox-circle-fill text-success'
     : e.toLowerCase().includes('error') || e.includes('🔴')
       ? 'ri-close-circle-fill text-error'
-      : 'ri-information-fill text-secondary'
+      : 'ri-information-fill text-textSecondary'
 
 const SaludPage = () => {
   const { t } = useLang()

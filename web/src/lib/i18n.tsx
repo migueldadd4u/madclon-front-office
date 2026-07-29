@@ -150,6 +150,11 @@ const STR = {
   latido_h: { es: 'h', en: 'h' },
   latido_d: { es: 'd', en: 'd' },
 
+  // menú lateral — botones de plegado (nombres accesibles)
+  nav_cierra: { es: 'cerrar el menú', en: 'close the menu' },
+  nav_fija: { es: 'fijar el menú abierto', en: 'pin the menu open' },
+  nav_pliega: { es: 'plegar el menú', en: 'collapse the menu' },
+
   // un día en la vida del clon
   dia_titulo: { es: 'Un día en la vida del clon', en: 'A day in the life of the clone' },
   dia_caption: {

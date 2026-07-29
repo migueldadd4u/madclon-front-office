@@ -245,13 +245,6 @@ code {
   border-radius: 8px;
 }
 
-/* Franja 24 h — anillo de foco cuando la región desplazable recibe el teclado */
-.fo-pista:focus-visible {
-  outline: 2px solid var(--mui-palette-primary-main);
-  outline-offset: 2px;
-  border-radius: 8px;
-}
-
 /* Pista «desliza» de la franja 24 h — flecha que empuja hasta el primer scroll */
 @keyframes fo-desliza-x {
   0%,

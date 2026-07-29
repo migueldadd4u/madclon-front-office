@@ -10,13 +10,15 @@ type Props = {
   /** Porcentaje final (0–100). */
   value: number
   color?: 'primary' | 'success' | 'warning' | 'error' | 'info' | 'secondary'
+  /** Nombre accesible de la barra (lectores de pantalla). */
+  label?: string
 }
 
 /**
  * Barra que crece desde 0 hasta su valor al entrar en pantalla.
  * Accesibilidad: con prefers-reduced-motion aparece directamente en su valor.
  */
-const BarraEntra = ({ value, color = 'primary' }: Props) => {
+const BarraEntra = ({ value, color = 'primary', label }: Props) => {
   const [v, setV] = useState(0)
 
   useEffect(() => {
@@ -31,7 +33,7 @@ const BarraEntra = ({ value, color = 'primary' }: Props) => {
     return () => cancelAnimationFrame(id)
   }, [value])
 
-  return <LinearProgress variant='determinate' value={v} color={color} />
+  return <LinearProgress variant='determinate' value={v} color={color} aria-label={label} />
 }
 
 export default BarraEntra
