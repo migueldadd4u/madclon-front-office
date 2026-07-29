@@ -119,6 +119,19 @@ const STR = {
     es: 'tareas completadas (lo que termina cada día)',
     en: 'tasks completed (what it finishes each day)'
   },
+  pulso_tooltip_pct: { es: '{pct} % de un día normal', en: '{pct}% of a normal day' },
+  pulso_explora_aria: {
+    es: 'Gráfico del pulso de los últimos días. Con las flechas izquierda y derecha recorres los días; con Escape sueltas la selección.',
+    en: 'Pulse chart of the last few days. Use the left and right arrows to move through the days; Escape clears the selection.'
+  },
+  pulso_explora_hint: {
+    es: 'con el foco en el gráfico, ← → recorre los días · Esc suelta',
+    en: 'with focus on the chart, ← → moves through the days · Esc releases'
+  },
+  pulso_dia_sel: {
+    es: '{fecha}: {tokens} de trabajo de IA y {tareas} tareas — un {pct} % de un día normal',
+    en: '{fecha}: {tokens} of AI work and {tareas} tasks — {pct}% of a normal day'
+  },
 
   // latido en vivo
   latido_ultima: { es: 'última señal de vida', en: 'last sign of life' },

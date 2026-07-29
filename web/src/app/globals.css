@@ -238,6 +238,13 @@ code {
   }
 }
 
+/* Pulso explorable — anillo de foco visible al recorrer el gráfico con teclado */
+.fo-pulso:focus-visible {
+  outline: 2px solid var(--mui-palette-primary-main);
+  outline-offset: 6px;
+  border-radius: 8px;
+}
+
 /* Skeletons con shimmer de marca — barrido indigo→teal mientras cargan los datos */
 @keyframes fo-shimmer {
   100% {
