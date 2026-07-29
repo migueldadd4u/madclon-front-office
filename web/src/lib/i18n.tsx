@@ -36,6 +36,15 @@ const STR = {
   kiosk_entrar: { es: 'Modo presentación: oculta menús y muestra solo el panel', en: 'Presentation mode: hides menus and shows only the dashboard' },
   kiosk_salir: { es: 'Salir (Esc)', en: 'Exit (Esc)' },
 
+  // atajos de teclado (g + letra para navegar, ? para la ayuda)
+  atajos_boton: { es: 'Atajos de teclado', en: 'Keyboard shortcuts' },
+  atajos_titulo: { es: 'Atajos de teclado', en: 'Keyboard shortcuts' },
+  atajos_sub: {
+    es: '«g» seguida de una letra te lleva a cada sección, sin soltar el teclado. «?» abre y cierra esta ayuda.',
+    en: '«g» followed by a letter takes you to each section, without leaving the keyboard. «?» opens and closes this help.'
+  },
+  atajos_ayuda_fila: { es: 'mostrar u ocultar esta ayuda', en: 'show or hide this help' },
+
   // ------------------------------------------------------------- portada
   home_titulo: { es: 'La sala de control del Clon de MAD', en: 'The MAD Clone control room' },
   home_intro: {
