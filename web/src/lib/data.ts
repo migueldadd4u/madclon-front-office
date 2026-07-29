@@ -158,18 +158,35 @@ export function usePanelData(): { data: PanelData | null; error: string | null }
 
   useEffect(() => {
     const ficheros = ['manifest', 'overview', 'clones', 'tokens', 'serie'] as const
+    let cancelado = false
 
-    Promise.all(
-      ficheros.map(f =>
-        fetch(`${BASE}/data/${f}.json`).then(r => {
-          if (!r.ok) throw new Error(`${f}.json: HTTP ${r.status}`)
+    const carga = () =>
+      Promise.all(
+        ficheros.map(f =>
+          fetch(`${BASE}/data/${f}.json`).then(r => {
+            if (!r.ok) throw new Error(`${f}.json: HTTP ${r.status}`)
 
-          return r.json()
-        })
-      )
-    )
-      .then(([manifest, overview, clones, tokens, serie]) => setData({ manifest, overview, clones, tokens, serie }))
-      .catch(e => setError(String(e)))
+            return r.json()
+          })
+        )
+      ).then(([manifest, overview, clones, tokens, serie]) => ({ manifest, overview, clones, tokens, serie }))
+
+    // Un reintento a los 1,5 s: si el service worker acaba de despertar en frío
+    // (offline), la primera ráfaga de peticiones puede llegar antes que él.
+    carga()
+      .then(d => !cancelado && setData(d))
+      .catch(() => {
+        setTimeout(() => {
+          if (cancelado) return
+          carga()
+            .then(d => !cancelado && setData(d))
+            .catch(e => !cancelado && setError(String(e)))
+        }, 1500)
+      })
+
+    return () => {
+      cancelado = true
+    }
   }, [])
 
   return { data, error }

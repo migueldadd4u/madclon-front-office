@@ -12,6 +12,7 @@ import { getSystemMode } from '@core/utils/serverHelpers'
 
 // Component Imports
 import { LangProvider } from '@/lib/i18n'
+import RegistraSW from '@/components/layout/shared/RegistraSW'
 
 // Style Imports
 import '@/app/globals.css'
@@ -65,6 +66,7 @@ const RootLayout = async (props: ChildrenType) => {
           }}
         />
         <LangProvider>{children}</LangProvider>
+        <RegistraSW />
       </body>
     </html>
   )

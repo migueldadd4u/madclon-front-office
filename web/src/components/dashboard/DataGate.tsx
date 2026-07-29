@@ -8,6 +8,9 @@ import Grid from '@mui/material/Grid'
 import Skeleton from '@mui/material/Skeleton'
 import Typography from '@mui/material/Typography'
 
+// Hook Imports
+import { useLang } from '@/lib/i18n'
+
 // Data Imports
 import { usePanelData } from '@/lib/data'
 import type { PanelData } from '@/lib/data'
@@ -38,8 +41,22 @@ const SkeletonPanel = () => (
 
 const DataGate = ({ children }: { children: (data: PanelData) => ReactNode }) => {
   const { data, error } = usePanelData()
+  const { t } = useLang()
 
   if (error) {
+    // Sin conexión y sin caché (primera visita offline): mensaje amable, no técnico
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      return (
+        <div className='flex flex-col items-center gap-2 p-8 text-center'>
+          <i className='ri-wifi-off-line text-4xl text-textSecondary' />
+          <Typography fontWeight={600}>{t('offline_titulo')}</Typography>
+          <Typography variant='body2' color='text.secondary' className='max-is-md'>
+            {t('offline_texto')}
+          </Typography>
+        </div>
+      )
+    }
+
     return (
       <div className='flex flex-col items-center gap-2 p-8 text-center'>
         <i className='ri-error-warning-line text-4xl text-error' />

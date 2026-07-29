@@ -164,6 +164,13 @@ const STR = {
   // modo alto contraste
   contraste_aria: { es: 'alto contraste', en: 'high contrast' },
 
+  // offline — primera visita sin datos en caché
+  offline_titulo: { es: 'Sin conexión y aún sin datos guardados', en: 'Offline and no saved data yet' },
+  offline_texto: {
+    es: 'Abre la web una vez con internet: a partir de ese momento, la portada y sus números funcionan también sin conexión.',
+    en: 'Open the site once while online: from then on, the dashboard and its numbers work offline too.'
+  },
+
   // un día en la vida del clon
   dia_titulo: { es: 'Un día en la vida del clon', en: 'A day in the life of the clone' },
   dia_caption: {
