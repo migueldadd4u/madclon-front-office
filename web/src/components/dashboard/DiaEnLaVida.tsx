@@ -231,6 +231,7 @@ const DiaEnLaVida = ({ crons }: Props) => {
               variant='caption'
               color='text.disabled'
               component='span'
+              className='fo-no-print'
               sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, whiteSpace: 'nowrap' }}
             >
               {t('dia_desliza')}

@@ -327,3 +327,93 @@ html.fo-kiosk .ts-vertical-layout-content-wrapper {
 html:not(.fo-kiosk) .fo-kiosk-salir {
   display: none;
 }
+
+/* ---------------------------------------------------------- print bonito — la portada como informe de una página */
+/* Cabecera de informe: invisible en pantalla, visible solo en papel */
+.fo-print-only {
+  display: none;
+}
+
+@media print {
+  @page {
+    margin: 8mm;
+  }
+
+  /* Papel: fondo blanco y tinta oscura — basta reasignar los canales del tema */
+  :root {
+    --mui-palette-background-default: #ffffff;
+    --mui-palette-background-paper: #ffffff;
+    --mui-mainColorChannels-dark: 26 29 54;
+  }
+  body {
+    background: #fff !important;
+  }
+
+  /* Los acentos de marca (barras del pulso, puntos, tintes) sí van al papel */
+  * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* Sin chrome de pantalla: menú, cabecera y pie no se imprimen */
+  .ts-vertical-nav-root,
+  .ts-vertical-layout-header,
+  .ts-vertical-layout-footer {
+    display: none !important;
+  }
+  .ts-vertical-layout-content-wrapper,
+  .ts-vertical-layout-content {
+    margin-inline-start: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Tarjetas: borde fino en lugar de sombra, compactas y sin partirse entre páginas */
+  .MuiPaper-root {
+    box-shadow: none !important;
+    border: 1px solid rgb(26 29 54 / 0.14) !important;
+    break-inside: avoid;
+  }
+  .MuiCardContent-root {
+    padding: 7px 11px !important;
+  }
+  .MuiGrid-container {
+    row-gap: 8px !important;
+    column-gap: 8px !important;
+  }
+
+  /* El pulso se compacta y todo el informe se escala suavemente para caber en una página */
+  .fo-pulso {
+    block-size: 140px !important;
+  }
+  .ts-vertical-layout-content-wrapper {
+    zoom: 0.64;
+  }
+
+  /* Los chips «tonal» pasan a tinta oscura sobre su tinte claro (legible en papel) */
+  .MuiChip-root[class*='MuiChip-tonal'] {
+    color: rgb(26 29 54) !important;
+  }
+
+  /* Jerarquía tipográfica algo más contenida para que quepa en una página */
+  .MuiTypography-h4 {
+    font-size: 1.45rem !important;
+  }
+  .MuiTypography-h5 {
+    font-size: 1.05rem !important;
+  }
+  .MuiTypography-h6 {
+    font-size: 0.85rem !important;
+  }
+
+  /* La cabecera de informe solo existe en papel */
+  .fo-print-only {
+    display: block;
+    border-block-end: 2px solid var(--mui-palette-primary-main);
+    padding-block-end: 6px;
+  }
+
+  /* Pistas pensadas para la pantalla (desliza, teclado) no van al papel */
+  .fo-no-print {
+    display: none !important;
+  }
+}

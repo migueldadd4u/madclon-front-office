@@ -155,6 +155,12 @@ const STR = {
   nav_fija: { es: 'fijar el menú abierto', en: 'pin the menu open' },
   nav_pliega: { es: 'plegar el menú', en: 'collapse the menu' },
 
+  // print bonito — cabecera del informe en papel
+  print_informe: {
+    es: 'informe de una página · los mismos números de la web, en papel',
+    en: 'one-page report · the same numbers as the website, on paper'
+  },
+
   // un día en la vida del clon
   dia_titulo: { es: 'Un día en la vida del clon', en: 'A day in the life of the clone' },
   dia_caption: {

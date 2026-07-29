@@ -136,6 +136,19 @@ const InicioPage = () => {
 
         return (
           <Grid container spacing={6}>
+            {/* Cabecera de informe — solo aparece en papel */}
+            <Grid size={12} className='fo-print-only'>
+              <div className='flex flex-wrap items-baseline justify-between gap-2'>
+                <Typography variant='h6'>MAD Clon — {t('home_titulo')}</Typography>
+                <Typography variant='caption' className='font-mono'>
+                  migueldadd4u.github.io/madclon-front-office
+                </Typography>
+              </div>
+              <Typography variant='caption' color='text.secondary'>
+                {t('print_informe')}
+              </Typography>
+            </Grid>
+
             {/* Bienvenida */}
             <Grid size={12}>
               <Card>
@@ -370,7 +383,7 @@ const InicioPage = () => {
                       <span className='inline-block bs-2.5 is-2.5 rounded-sm' style={{ background: '#06C9A8' }} />
                       <Typography variant='caption' color='text.secondary'>{t('home_pulso_leyenda_tareas')}</Typography>
                     </span>
-                    <Typography variant='caption' color='text.disabled' className='mis-auto'>
+                    <Typography variant='caption' color='text.disabled' className='mis-auto fo-no-print'>
                       {t('pulso_explora_hint')}
                     </Typography>
                   </div>
