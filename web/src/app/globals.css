@@ -328,6 +328,21 @@ html:not(.fo-kiosk) .fo-kiosk-salir {
   display: none;
 }
 
+/* ---------------------------------------------------------- modo alto contraste */
+/* Sube la opacidad de los textos secundarios/atenuados y refuerza los divisores.
+   Se activa con el botón de la cabecera (persistido) o solo, si el sistema pide más contraste. */
+:root.fo-contraste {
+  --mui-palette-text-secondary: rgb(var(--mui-mainColorChannels-dark) / 0.9);
+  --mui-palette-text-disabled: rgb(var(--mui-mainColorChannels-dark) / 0.82);
+  --mui-palette-divider: rgb(var(--mui-mainColorChannels-dark) / 0.3);
+}
+@media (prefers-contrast: more) {
+  :root {
+    --mui-palette-text-secondary: rgb(var(--mui-mainColorChannels-dark) / 0.9);
+    --mui-palette-text-disabled: rgb(var(--mui-mainColorChannels-dark) / 0.82);
+  }
+}
+
 /* ---------------------------------------------------------- print bonito — la portada como informe de una página */
 /* Cabecera de informe: invisible en pantalla, visible solo en papel */
 .fo-print-only {

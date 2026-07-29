@@ -7,6 +7,7 @@ import classnames from 'classnames'
 import NavToggle from './NavToggle'
 import ModeDropdown from '@components/layout/shared/ModeDropdown'
 import LangToggle from '@components/layout/shared/LangToggle'
+import AltoContraste from '@components/layout/shared/AltoContraste'
 import ModoPresentacion from '@/components/dashboard/ModoPresentacion'
 import AtajosTeclado from '@/components/dashboard/AtajosTeclado'
 
@@ -28,6 +29,7 @@ const NavbarContent = () => {
       <div className='flex items-center'>
         <AtajosTeclado />
         <ModoPresentacion />
+        <AltoContraste />
         <LangToggle />
         <ModeDropdown />
       </div>

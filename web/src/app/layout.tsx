@@ -57,6 +57,13 @@ const RootLayout = async (props: ChildrenType) => {
     <html id='__next' lang='es' dir={direction} suppressHydrationWarning>
       <body className='flex is-full min-bs-full flex-auto flex-col'>
         <InitColorSchemeScript attribute='data' defaultMode={systemMode} />
+        {/* Precarga del modo alto contraste: evita parpadeo antes de React */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(localStorage.getItem('madclon-contraste')==='1')document.documentElement.classList.add('fo-contraste')}catch(e){}"
+          }}
+        />
         <LangProvider>{children}</LangProvider>
       </body>
     </html>

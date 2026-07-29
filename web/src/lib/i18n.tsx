@@ -161,6 +161,9 @@ const STR = {
     en: 'one-page report · the same numbers as the website, on paper'
   },
 
+  // modo alto contraste
+  contraste_aria: { es: 'alto contraste', en: 'high contrast' },
+
   // un día en la vida del clon
   dia_titulo: { es: 'Un día en la vida del clon', en: 'A day in the life of the clone' },
   dia_caption: {
