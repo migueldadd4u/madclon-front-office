@@ -16,6 +16,8 @@ import TableRow from '@mui/material/TableRow'
 
 // Component Imports
 import DataGate from '@/components/dashboard/DataGate'
+import Latido from '@/components/dashboard/Latido'
+import PuntoVivo from '@/components/dashboard/PuntoVivo'
 
 // Hook Imports
 import { useLang } from '@/lib/i18n'
@@ -23,8 +25,10 @@ import { useLang } from '@/lib/i18n'
 // Data Imports
 import { fmtFecha } from '@/lib/data'
 
+const esOk = (e: string) => e.toLowerCase().includes('ok') || e.includes('🟢')
+
 const iconoEstado = (e: string) =>
-  e.toLowerCase().includes('ok') || e.includes('🟢')
+  esOk(e)
     ? 'ri-checkbox-circle-fill text-success'
     : e.toLowerCase().includes('error') || e.includes('🔴')
       ? 'ri-close-circle-fill text-error'
@@ -35,7 +39,7 @@ const SaludPage = () => {
 
   return (
   <DataGate>
-    {({ overview, clones }) => (
+    {({ overview, clones, manifest }) => (
       <Grid container spacing={6}>
         <Grid size={12} className='flex flex-wrap items-end justify-between gap-4'>
           <div>
@@ -44,11 +48,14 @@ const SaludPage = () => {
               {t('salud_intro')}
             </Typography>
           </div>
-          <Chip
-            color={(overview.salud_global ?? '').includes('🟢') ? 'success' : 'warning'}
-            variant='tonal'
-            label={`${t('salud_global')}: ${overview.salud_global ?? '—'}`}
-          />
+          <div className='flex items-center gap-4 flex-wrap'>
+            <Latido crons={overview.crons} generado={manifest.generado} />
+            <Chip
+              color={(overview.salud_global ?? '').includes('🟢') ? 'success' : 'warning'}
+              variant='tonal'
+              label={`${t('salud_global')}: ${overview.salud_global ?? '—'}`}
+            />
+          </div>
         </Grid>
 
         {/* Accesos vigilados */}
@@ -72,7 +79,7 @@ const SaludPage = () => {
                     <TableRow key={i.nombre} hover>
                       <TableCell>
                         <div className='flex items-center gap-2'>
-                          <i className={iconoEstado(i.estado)} />
+                          {esOk(i.estado) ? <PuntoVivo /> : <i className={iconoEstado(i.estado)} />}
                           <Typography variant='body2'>{i.nombre}</Typography>
                         </div>
                       </TableCell>
@@ -138,7 +145,7 @@ const SaludPage = () => {
                         <TableRow key={c.nombre} hover>
                           <TableCell>
                             <div className='flex items-center gap-2'>
-                              <i className={c.estado === 'ok' ? 'ri-checkbox-circle-fill text-success' : 'ri-close-circle-fill text-error'} />
+                              {c.estado === 'ok' ? <PuntoVivo /> : <i className='ri-close-circle-fill text-error' />}
                               <Typography variant='body2'>{c.nombre}</Typography>
                             </div>
                           </TableCell>
