@@ -262,6 +262,112 @@ const STR = {
   flota_agendas: { es: 'agendas', en: 'calendars' },
   flota_trabajo: { es: 'trabajo 30 d', en: 'work 30 d' },
   flota_tokens: { es: 'tokens', en: 'tokens' },
+  flota_intro_4: {
+    es: 'Pulsa cualquier tarjeta: debajo de cada clon hay más de lo que se ve.',
+    en: 'Press any card: there is more underneath each clone than meets the eye.'
+  },
+
+  // anatomía del clon — lo que hay debajo de cada tarjeta
+  anat_ver: { es: 'ver qué hay debajo', en: 'see what’s underneath' },
+  anat_abrir_aria: { es: 'Ver qué hay debajo de {nombre}', en: 'See what’s underneath {nombre}' },
+  anat_cerrar: { es: 'Cerrar', en: 'Close' },
+  anat_quees: {
+    es: 'Un clon es una misión escrita que no se olvida, una memoria que crece cada noche, unas puertas por donde le llega el mundo, unas rutinas que corren solas de madrugada y un cerebro propio que piensa por él. Esto es lo que hay debajo de este:',
+    en: 'A clone is a written mission it never forgets, a memory that grows every night, doors through which the world reaches it, routines that run by themselves in the early morning, and a brain of its own that thinks for it. This is what lies underneath this one:'
+  },
+  anat_puertas: { es: 'Sus puertas', en: 'Its doors' },
+  anat_puertas_sub: {
+    es: 'cada canal es una puerta por la que el mundo le llega — y por la que responde',
+    en: 'each channel is a door through which the world reaches it — and through which it answers'
+  },
+  anat_conexiones: { es: 'Sus conexiones, en vivo', en: 'Its connections, live' },
+  anat_conexiones_sub: {
+    es: 'su correo y sus agendas, vigilados cada hora por un guardián automático',
+    en: 'its mailbox and calendars, watched every hour by an automatic watchdog'
+  },
+  anat_senal: { es: 'última señal {x}', en: 'last signal {x}' },
+  anat_sin_senal: { es: 'sin señal registrada', en: 'no signal recorded' },
+  anat_sin_conexiones: {
+    es: 'No tiene correo ni agendas propias: vive en {canales}, ligero a propósito.',
+    en: 'No mailbox or calendars of its own: it lives on {canales}, light on purpose.'
+  },
+  anat_rutinas: { es: 'Sus rutinas de madrugada', en: 'Its early-morning routines' },
+  anat_rutinas_sub: {
+    es: 'trabajo que corre solo, de noche, sin que nadie lo pida',
+    en: 'work that runs by itself, at night, without anyone asking'
+  },
+  anat_rutinas_compartidas: {
+    es: 'No tiene rutinas propias: le sirven estas rutinas compartidas del sistema.',
+    en: 'It has no routines of its own: these shared system routines serve it.'
+  },
+  anat_rutina_ultima: { es: 'última: {x}', en: 'last run: {x}' },
+  anat_cerebro: { es: 'Su cerebro', en: 'Its brain' },
+  anat_cerebro_router: {
+    es: '{gateway}: el router principal — la puerta por la que piensa el director y reparte el trabajo a toda la flota.',
+    en: '{gateway}: the main router — the door through which the conductor thinks and hands out work to the whole fleet.'
+  },
+  anat_cerebro_texto: {
+    es: '{gateway}: la puerta por la que piensa este clon — su canal privado hacia los modelos de IA, independiente de los demás.',
+    en: '{gateway}: the door through which this clone thinks — its private channel to the AI models, independent from the others.'
+  },
+  anat_cerebro_ausente: {
+    es: 'su cerebro no aparece hoy en la lista de puertas vivas — si falta, el panel no lo inventa',
+    en: 'its brain is not on today’s list of live doors — if it is missing, the dashboard does not invent it'
+  },
+  anat_peso: { es: 'Su peso en la orquesta', en: 'Its weight in the orchestra' },
+  anat_peso_sub: {
+    es: 'tokens de trabajo en los últimos 30 días — un {pct} % de todo el sistema',
+    en: 'tokens of work in the last 30 days — {pct}% of the whole system'
+  },
+  anat_peso_frase_10: {
+    es: 'De cada 10 tokens que piensa el sistema, {x} son suyos.',
+    en: 'Out of every 10 tokens the system thinks, {x} are its own.'
+  },
+  anat_peso_frase_1000: {
+    es: 'De cada 1.000 tokens que piensa el sistema, {x} son suyos.',
+    en: 'Out of every 1,000 tokens the system thinks, {x} are its own.'
+  },
+  anat_peso_escala: {
+    es: 'la escala, con toda la flota (cada barra es la parte del sistema que piensa un clon)',
+    en: 'the scale, with the whole fleet (each bar is the share of the system one clone thinks)'
+  },
+  anat_mapa_titulo: { es: 'La orquesta, en un vistazo', en: 'The orchestra at a glance' },
+  anat_mapa_sub: {
+    es: 'seis oficios alrededor; el director reparte y recoge el trabajo',
+    en: 'six crafts around it; the conductor hands out and gathers the work'
+  },
+  anat_mapa_aria: {
+    es: 'Esquema: el clon director en el centro coordina a los otros seis clones, conectado a cada uno',
+    en: 'Diagram: the conductor clone at the center coordinates the other six clones, connected to each one'
+  },
+  anat_cierre_clon: {
+    es: 'El director que no duerme: mientras la casa descansa, reparte el trabajo de mañana.',
+    en: 'The conductor that never sleeps: while the house rests, it hands out tomorrow’s work.'
+  },
+  anat_cierre_ceo: {
+    es: 'Mira lejos para que nadie tenga que correr: su rutina diaria es la estrategia.',
+    en: 'It looks far so nobody has to run: its daily routine is strategy.'
+  },
+  anat_cierre_patrimonio: {
+    es: 'El guardián de lo que cuesta años construir: cada euro, vigilado mientras duermes.',
+    en: 'The guardian of what takes years to build: every euro, watched while you sleep.'
+  },
+  anat_cierre_padre: {
+    es: 'Su territorio no sale en ningún organigrama: es el tiempo que de verdad importa.',
+    en: 'Its territory appears on no org chart: it is the time that truly matters.'
+  },
+  anat_cierre_ideas: {
+    es: 'Aquí ninguna idea llega demasiado pronto ni demasiado rara: todas entran; algunas salen proyecto.',
+    en: 'Here no idea arrives too early or too strange: they all come in; some leave as projects.'
+  },
+  anat_cierre_licitador: {
+    es: 'Lee pliegos como otros leen el periódico: encuentra la oportunidad antes de que tenga nombre.',
+    en: 'It reads public tenders the way others read the paper: it spots the opportunity before it has a name.'
+  },
+  anat_cierre_tecnico: {
+    es: 'El mecánico de la flota: si los demás piensan sin tropezar, es porque pasó la noche afinando.',
+    en: 'The fleet’s mechanic: if the others think without stumbling, it is because it spent the night tuning.'
+  },
 
   // ------------------------------------------------------------- salud
   salud_titulo: { es: 'Salud del sistema', en: 'System health' },
