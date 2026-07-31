@@ -4,6 +4,8 @@
   "license": "Commercial",
   "private": true,
   "scripts": {
+    "predev": "node scripts/build-stamp.mjs",
+    "prebuild": "node scripts/build-stamp.mjs",
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",

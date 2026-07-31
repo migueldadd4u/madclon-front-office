@@ -12,11 +12,15 @@ import CopiarEnlace from '@/components/dashboard/CopiarEnlace'
 
 // Util Imports
 import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
+import { buildStamp, buildHuman } from '@/lib/build-stamp'
 
 const FooterContent = () => {
   // Hooks
   const { isBreakpointReached } = useVerticalNav()
   const { t } = useLang()
+
+  // Sello de versión: qué build se está viendo, sin preguntar (esquema add4u-web)
+  const version = t('footer_version').replace('{v}', buildStamp).replace('{fecha}', buildHuman)
 
   return (
     <div
@@ -34,6 +38,9 @@ const FooterContent = () => {
             {t('chrome_footer_2')}
           </span>
         )}
+        <span className='text-textDisabled text-sm font-mono' title={version} aria-label={version}>
+          {buildStamp}
+        </span>
         <CopiarEnlace />
       </div>
     </div>

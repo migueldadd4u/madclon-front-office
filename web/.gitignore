@@ -39,3 +39,6 @@ next-env.d.ts
 # icon generated file
 src/assets/iconify-icons/generated-icons.js
 src/assets/iconify-icons/generated-icons.css
+
+# sello de versión generado por scripts/build-stamp.mjs en cada build
+src/lib/build-stamp.ts
