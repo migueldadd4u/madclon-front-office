@@ -20,6 +20,7 @@ import Latido from '@/components/dashboard/Latido'
 import DiaEnLaVida from '@/components/dashboard/DiaEnLaVida'
 import ProgresoDia from '@/components/dashboard/ProgresoDia'
 import ConsolaClon from '@/components/dashboard/ConsolaClon'
+import HeroAmbiental from '@/components/dashboard/HeroAmbiental'
 
 // Hook Imports
 import { useLang } from '@/lib/i18n'
@@ -149,10 +150,11 @@ const InicioPage = () => {
               </Typography>
             </Grid>
 
-            {/* Bienvenida */}
+            {/* Bienvenida — con atmósfera viva de marca detrás */}
             <Grid size={12}>
-              <Card>
-                <CardContent className='flex flex-col gap-3'>
+              <Card className='relative overflow-hidden'>
+                <HeroAmbiental />
+                <CardContent className='relative flex flex-col gap-3'>
                   <div className='flex flex-wrap items-center gap-3'>
                     <ConsolaClon data={data} diasVida={diasVida} />
                     <Typography variant='h4'>{t('home_titulo')}</Typography>
