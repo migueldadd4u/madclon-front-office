@@ -1,7 +1,7 @@
 {
-  "name": "MAD Clon — Front Office",
+  "name": "MAD Clon — el Clon de Miguel Ángel Delgado",
   "short_name": "MAD Clon",
-  "description": "Cuadro de mando público del Clon de MAD: los números del sistema, explicados para personas.",
+  "description": "Cuadro de mando público del Clon de Miguel Ángel Delgado (MAD): los números del sistema, explicados para personas.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

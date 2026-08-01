@@ -22,24 +22,26 @@ import '@assets/iconify-icons/generated-icons.css'
 
 export const metadata = {
   metadataBase: new URL('https://migueldadd4u.github.io/madclon-front-office'),
-  title: 'MAD Clon — Front Office',
+  title: 'MAD Clon — el Clon de Miguel Ángel Delgado',
   description:
-    'Cuadro de mando público del Clon de MAD: salud del sistema, flota de clones, consumo y eficiencia de la IA, explicados para personas.',
+    'Cuadro de mando público del Clon de Miguel Ángel Delgado (MAD): salud del sistema, flota de clones, consumo y eficiencia de la IA, explicados para personas.',
   applicationName: 'MAD Clon',
   manifest: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/manifest.webmanifest`,
   openGraph: {
-    title: 'MAD Clon — Front Office',
-    description: 'Un equipo de IA que trabaja mientras Miguel vive su vida — los números del clon, explicados para personas.',
+    title: 'MAD Clon — el Clon de Miguel Ángel Delgado',
+    description:
+      'Un equipo de IA que trabaja mientras Miguel Ángel Delgado (MAD) vive su vida — los números del Clon de MAD, explicados para personas.',
     url: 'https://migueldadd4u.github.io/madclon-front-office/',
     siteName: 'MAD Clon',
-    images: [{ url: '/images/og-madclon.png', width: 1200, height: 630, alt: 'MAD Clon — Front Office' }],
+    images: [{ url: '/images/og-madclon.png', width: 1200, height: 630, alt: 'MAD Clon — el Clon de Miguel Ángel Delgado' }],
     locale: 'es_ES',
     type: 'website'
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'MAD Clon — Front Office',
-    description: 'Un equipo de IA que trabaja mientras Miguel vive su vida — los números del clon, explicados para personas.',
+    title: 'MAD Clon — el Clon de Miguel Ángel Delgado',
+    description:
+      'Un equipo de IA que trabaja mientras Miguel Ángel Delgado (MAD) vive su vida — los números del Clon de MAD, explicados para personas.',
     images: ['/images/og-madclon.png']
   }
 }

@@ -31,13 +31,9 @@ const TECNICISMOS = {
 // ── DEUDAS ABIERTAS ─────────────────────────────────────────────────────────────
 // Lista blanca EXPLÍCITA Y COMENTADA. Cada entrada es una deuda real, con el eje
 // y la entrega que debe borrarla. No se añade nada aquí sin anotarlo en MEJORAS.md.
-const DEUDA = [
-  // Eje 5 — «Miguel» a secas en todo el copy heredado. La salda la entrega 2.
-  { patron: /Miguel/, motivo: 'eje 5: identidad «Clon de Miguel Ángel Delgado (MAD)» pendiente (entrega 2)' },
-  // Eje 4 — «vault» y «token» se usan sin su traducción llana en algunos ficheros.
-  { termino: 'vault', motivo: 'eje 4: falta glosa llana de «vault» (entrega 2)' },
-  { termino: 'token', motivo: 'eje 4: falta glosa llana de «token» fuera de la página Preguntas (entrega 2)' }
-]
+// Vacía desde la entrega 2 (2026-08-01): las 35 cadenas heredadas de «Miguel» suelto
+// y las 4 sin glosa se saldaron ahí. A partir de ahora cualquier reincidencia FALLA.
+const DEUDA = []
 
 const esDeudaIdentidad = frase => DEUDA.some(d => d.patron && d.patron.test(frase))
 const esDeudaTermino = t => DEUDA.some(d => d.termino === t)

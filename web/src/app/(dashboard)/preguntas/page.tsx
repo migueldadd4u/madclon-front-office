@@ -16,21 +16,21 @@ const PREGUNTAS = [
   {
     es: {
       q: '¿Qué es exactamente el Clon de MAD?',
-      a: 'Un equipo de programas de inteligencia artificial que trabaja para Miguel las 24 horas. Lee lo que llega (correo, WhatsApp, notas), lo clasifica, prepara respuestas y dossieres, y deja las decisiones importantes listas para que el humano solo tenga que decir sí o no.'
+      a: 'Un equipo de programas de inteligencia artificial que trabaja para Miguel Ángel Delgado (MAD) las 24 horas. Lee lo que llega (correo, WhatsApp, notas), lo clasifica, prepara respuestas y dossieres, y deja las decisiones importantes listas para que el humano solo tenga que decir sí o no.'
     },
     en: {
       q: 'What exactly is the MAD Clone?',
-      a: 'A team of artificial intelligence programs working for Miguel 24 hours a day. It reads what arrives (mail, WhatsApp, notes), sorts it, prepares replies and dossiers, and leaves the important decisions ready so the human only has to say yes or no.'
+      a: 'A team of artificial intelligence programs working for Miguel Ángel Delgado (MAD) 24 hours a day. It reads what arrives (mail, WhatsApp, notes), sorts it, prepares replies and dossiers, and leaves the important decisions ready so the human only has to say yes or no.'
     }
   },
   {
     es: {
       q: '¿El clon decide cosas por su cuenta?',
-      a: 'No. El clon propone; Miguel dispone. Todo lo que toca a otras personas — enviar un correo, aceptar una cita, mover un euro — pasa antes por la aprobación humana. El clon prepara el trabajo; la firma es siempre de Miguel.'
+      a: 'No. El Clon propone; MAD dispone. Todo lo que toca a otras personas — enviar un correo, aceptar una cita, mover un euro — pasa antes por la aprobación humana. El Clon prepara el trabajo; la firma es siempre de MAD.'
     },
     en: {
       q: 'Does the clone decide things on its own?',
-      a: "No. The clone proposes; Miguel disposes. Anything that touches other people — sending an email, accepting a meeting, moving a euro — goes through human approval first. The clone prepares the work; the signature is always Miguel's."
+      a: "No. The clone proposes; MAD disposes. Anything that touches other people — sending an email, accepting a meeting, moving a euro — goes through human approval first. The clone prepares the work; the signature is always MAD's."
     }
   },
   {
@@ -56,11 +56,11 @@ const PREGUNTAS = [
   {
     es: {
       q: '¿Mis datos están seguros?',
-      a: 'Esta web pública solo muestra cifras agregadas del sistema: cuánto trabaja, cuánto falla, cuántas rutinas van en verde. Jamás aparecen nombres, correos, mensajes ni nada personal. Los datos vivos viven en un vault privado que no sale del equipo de Miguel.'
+      a: 'Esta web pública solo muestra cifras agregadas del sistema: cuánto trabaja, cuánto falla, cuántas rutinas van en verde. Jamás aparecen nombres, correos, mensajes ni nada personal. Los datos vivos viven en la memoria privada del sistema (el «vault»), que no sale del equipo de MAD.'
     },
     en: {
       q: 'Is my data safe?',
-      a: "This public website only shows aggregated system figures: how much it works, how often it fails, how many routines are green. Names, emails, messages or anything personal never appear. Live data lives in a private vault that never leaves Miguel's machine."
+      a: "This public website only shows aggregated system figures: how much it works, how often it fails, how many routines are green. Names, emails, messages or anything personal never appear. Live data lives in the system's private memory (the «vault»), which never leaves MAD's machine."
     }
   },
   {

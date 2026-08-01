@@ -26,8 +26,8 @@ const STR = {
     en: 'MAD Clon · front office — aggregated system figures only, no personal data'
   },
   chrome_footer_2: {
-    es: 'Los paneles vivos nacen en el vault privado; un exportador trae aquí solo los agregados.',
-    en: 'Live panels live in the private vault; an exporter brings only the aggregates here.'
+    es: 'Los paneles vivos nacen en la memoria privada del sistema (el «vault»); un exportador trae aquí solo los agregados.',
+    en: "Live panels are born in the system's private memory (the «vault»); an exporter brings only the aggregates here."
   },
   cargando_error: { es: 'No se pudieron cargar los datos del panel', en: 'Panel data could not be loaded' },
   footer_version: {
@@ -52,8 +52,8 @@ const STR = {
   // ------------------------------------------------------------- portada
   home_titulo: { es: 'La sala de control del Clon de MAD', en: 'The MAD Clone control room' },
   home_intro: {
-    es: 'Un equipo de inteligencia artificial que trabaja mientras Miguel vive su vida: lee el correo, clasifica lo importante, prepara decisiones, vigila el patrimonio y se mejora a sí mismo cada noche. Esta web es su cuadro de mandos — los mismos números que ve él, explicados para personas.',
-    en: "A team of artificial intelligence that works while Miguel lives his life: it reads the mail, sorts what matters, prepares decisions, watches over the family's assets and improves itself every night. This website is its dashboard — the same numbers it sees, explained for people."
+    es: 'Un equipo de inteligencia artificial que trabaja mientras Miguel Ángel Delgado (MAD) vive su vida: lee el correo, clasifica lo importante, prepara decisiones, vigila el patrimonio y se mejora a sí mismo cada noche. Esta web es su cuadro de mandos — los mismos números que ve él, explicados para personas.',
+    en: "A team of artificial intelligence that works while Miguel Ángel Delgado (MAD) lives his life: it reads the mail, sorts what matters, prepares decisions, watches over the family's assets and improves itself every night. This website is its dashboard — the same numbers it sees, explained for people."
   },
   home_caption_datos: {
     es: 'solo cifras agregadas, sin información personal',
@@ -82,8 +82,8 @@ const STR = {
 
   // 404 con personalidad
   nf_titulo: {
-    es: 'Esta página no existe… pero el clon sigue trabajando',
-    en: "This page doesn't exist… but the clone keeps working"
+    es: 'Esta página no existe… pero el Clon de MAD sigue trabajando',
+    en: "This page doesn't exist… but MAD's clone keeps working"
   },
   nf_sub: {
     es: 'Puede que el enlace esté mal escrito o que la página se moviera. Mientras tanto, el sistema ha seguido con sus rutinas: leyendo, clasificando y preparando el día.',
@@ -97,12 +97,12 @@ const STR = {
 
   // el clon te cuenta su noche
   noche_titulo: {
-    es: 'Esta noche, mientras Miguel dormía',
-    en: 'Last night, while Miguel was asleep'
+    es: 'Esta noche, mientras MAD dormía',
+    en: 'Last night, while MAD was asleep'
   },
   noche_frase: {
-    es: 'El clon pensó {tokens} tokens en {llamadas} llamadas, terminó {tareas} tareas y amaneció con todo {salud}. Nadie se lo pidió: son sus rutinas de cada noche.',
-    en: 'The clone thought {tokens} tokens over {llamadas} calls, finished {tareas} tasks and woke up with everything {salud}. Nobody asked it to: these are its nightly routines.'
+    es: 'Soy el Clon de Miguel Ángel Delgado. Pensé {tokens} tokens en {llamadas} llamadas, terminé {tareas} tareas y amanecí con todo {salud}. Nadie me lo pidió: son mis rutinas de cada noche.',
+    en: "I am Miguel Ángel Delgado's clone. I thought {tokens} tokens over {llamadas} calls, finished {tareas} tasks and woke up with everything {salud}. Nobody asked me to: these are my nightly routines."
   },
   noche_caption: {
     es: 'última noche medida: {fecha} · se actualiza solo cada madrugada',
@@ -184,8 +184,8 @@ const STR = {
   dia_ahora: { es: 'ahora', en: 'now' },
   dia_desliza: { es: 'desliza para ver las 24 h', en: 'swipe to see the full 24 h' },
   dia_leyenda: {
-    es: 'Mientras Miguel duerme, el clon hace su autoauditoría de madrugada; por la mañana prepara el día; y vigila el correo importante a todas horas. La línea indigo marca este instante.',
-    en: 'While Miguel sleeps, the clone runs its self-audit before dawn; in the morning it prepares the day; and it watches important mail around the clock. The indigo line marks this very moment.'
+    es: 'Mientras MAD duerme, el Clon hace su autoauditoría de madrugada; por la mañana prepara el día; y vigila el correo importante a todas horas. La línea indigo marca este instante.',
+    en: 'While MAD sleeps, the Clone runs its self-audit before dawn; in the morning it prepares the day; and it watches important mail around the clock. The indigo line marks this very moment.'
   },
 
   // insignias
@@ -205,7 +205,7 @@ const STR = {
   consola_verde: { es: 'en verde', en: 'in green' },
   consola_gateways: { es: 'gateways vivos', en: 'live gateways' },
   consola_cobertura: { es: 'cobertura medida', en: 'measured coverage' },
-  consola_propuestas: { es: 'propuestas esperando a Miguel', en: 'proposals waiting for Miguel' },
+  consola_propuestas: { es: 'propuestas esperando a MAD', en: 'proposals waiting for MAD' },
   consola_salud: { es: 'salud', en: 'health' },
   consola_cierra: { es: '$ pulsa Esc o toca fuera para cerrar', en: '$ press Esc or tap outside to close' },
 
@@ -240,8 +240,8 @@ const STR = {
   frase_aviso_1: { es: 'aviso menor en el motor', en: 'minor warning in the engine' },
   frase_aviso_n: { es: 'avisos menores en el motor', en: 'minor warnings in the engine' },
   frase_propuestas: {
-    es: 'propuestas del clon esperan el sí o el no de Miguel',
-    en: "clone proposals await Miguel's yes or no"
+    es: 'propuestas del Clon esperan el sí o el no de MAD',
+    en: "clone proposals await MAD's yes or no"
   },
 
   // ------------------------------------------------------------- el clon opina
@@ -254,8 +254,8 @@ const STR = {
   // ------------------------------------------------------------- flota
   flota_titulo: { es: 'La flota: siete clones, siete oficios', en: 'The fleet: seven clones, seven crafts' },
   flota_intro_1: {
-    es: 'El Clon de MAD no es una sola mente: son siete perfiles especializados que comparten la misma memoria. Cada uno atiende un territorio de la vida de Miguel — la empresa, el patrimonio, la familia, las ideas — y un octavo actor, el',
-    en: "The MAD Clone is not a single mind: it is seven specialized profiles sharing the same memory. Each one attends a territory of Miguel's life — the company, the assets, the family, the ideas — and an eighth actor, the"
+    es: 'El Clon de MAD no es una sola mente: son siete perfiles especializados que comparten la misma memoria. Cada uno atiende un territorio de la vida de MAD — la empresa, el patrimonio, la familia, las ideas — y un octavo actor, el',
+    en: "The MAD Clone is not a single mind: it is seven specialized profiles sharing the same memory. Each one attends a territory of MAD's life — the company, the assets, the family, the ideas — and an eighth actor, the"
   },
   flota_intro_2: { es: 'motor', en: 'engine' },
   flota_intro_3: {
@@ -391,8 +391,8 @@ const STR = {
   salud_ultimo_chequeo: { es: 'último chequeo del guardián', en: 'last watchdog check' },
   salud_puertas: { es: 'Puertas de entrada vivas', en: 'Live entry doors' },
   salud_puertas_sub: {
-    es: 'los procesos por los que Miguel habla con su clon',
-    en: 'the processes through which Miguel talks to his clone'
+    es: 'los procesos por los que MAD habla con su Clon',
+    en: 'the processes through which MAD talks to his clone'
   },
   salud_motor: { es: 'motor', en: 'engine' },
   salud_sin_problemas: { es: 'sin problemas', en: 'no issues' },
@@ -406,7 +406,7 @@ const STR = {
   // ------------------------------------------------------------- tokens
   tokens_titulo: { es: '¿Cuánto trabaja y quién lo hace?', en: 'How much work, and who does it?' },
   tokens_intro_1: {
-    es: 'La IA se paga por tokens: la unidad con que se mide el texto (un token ≈ 3-4 letras; una página son unos 500). Cada cifra dice de dónde viene: medida (la dio el proveedor, exacta) o estimada (calculada, porque ese proveedor no informa). Nunca se mezclan.',
+    es: 'La IA se paga por tokens — palabras pensadas: la unidad con que se mide el texto (un token ≈ 3-4 letras; una página son unos 500). Cada cifra dice de dónde viene: medida (la dio el proveedor, exacta) o estimada (calculada, porque ese proveedor no informa). Nunca se mezclan.',
     en: 'AI is paid for in tokens: the unit used to measure text (one token ≈ 3-4 letters; a page is about 500). Every figure says where it comes from: measured (reported by the provider, exact) or estimated (calculated, because that provider does not report). They are never mixed.'
   },
   tokens_medido: { es: '✅ Medido por el proveedor', en: '✅ Measured by the provider' },
@@ -468,7 +468,7 @@ const STR = {
   },
 
   // ------------------------------------------------------------- actividad
-  act_titulo: { es: '¿Qué espera de Miguel ahora mismo?', en: 'What is waiting for Miguel right now?' },
+  act_titulo: { es: '¿Qué espera de MAD ahora mismo?', en: 'What is waiting for MAD right now?' },
   act_intro: {
     es: 'El clon prepara; el humano decide. Esto es lo que hay encima de la mesa — solo cantidades, el contenido vive a salvo en el vault privado.',
     en: 'The clone prepares; the human decides. This is what is on the table — quantities only, the content lives safely in the private vault.'

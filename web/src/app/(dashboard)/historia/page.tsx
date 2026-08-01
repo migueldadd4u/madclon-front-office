@@ -77,8 +77,8 @@ const HITOS = [
   },
   {
     fecha: { es: '2 junio 2026', en: '2 June 2026' },
-    es: { titulo: 'El cerebro se interconecta', texto: 'Las notas del vault dejan de ser islas: todo queda enlazado y localizable en segundos.' },
-    en: { titulo: 'The brain interconnects', texto: 'Vault notes stop being islands: everything gets linked and findable in seconds.' },
+    es: { titulo: 'El cerebro se interconecta', texto: 'Las notas de la memoria privada (el «vault») dejan de ser islas: todo queda enlazado y localizable en segundos.' },
+    en: { titulo: 'The brain interconnects', texto: 'The private memory («vault») notes stop being islands: everything gets linked and findable in seconds.' },
     icon: 'ri-mind-map',
     color: 'primary' as const
   },

@@ -90,11 +90,11 @@ const PASOS = [
     icon: 'ri-hand-heart-line',
     es: {
       titulo: 'Actúa',
-      texto: 'Prepara borradores, persigue respuestas que se deben, monta dossieres y deja las propuestas listas para que Miguel solo tenga que decir sí o no.'
+      texto: 'Prepara borradores, persigue respuestas que se deben, monta dossieres y deja las propuestas listas para que MAD solo tenga que decir sí o no.'
     },
     en: {
       titulo: 'Act',
-      texto: 'It prepares drafts, chases owed replies, builds dossiers and leaves proposals ready so Miguel only has to say yes or no.'
+      texto: 'It prepares drafts, chases owed replies, builds dossiers and leaves proposals ready so MAD only has to say yes or no.'
     }
   },
   {

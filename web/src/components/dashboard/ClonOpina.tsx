@@ -29,7 +29,7 @@ const PLANTILLAS_ES: Plantilla[] = [
     if (!v) return null
     const paginas = fmt(Math.round(v / 500))
 
-    return `Este mes he pensado ${fmtCorto(v)} tokens. Traducido a vuestro mundo: he leído y escrito el equivalente a unas ${paginas} páginas. No cobro horas extra — solo electricidad y buenas preguntas.`
+    return `Este mes he pensado ${fmtCorto(v)} tokens — palabras pensadas, la unidad de trabajo de una IA. Traducido a vuestro mundo: he leído y escrito el equivalente a unas ${paginas} páginas. No cobro horas extra — solo electricidad y buenas preguntas.`
   },
   // 2 · las propuestas que esperan decisión humana
   d => {
@@ -37,7 +37,7 @@ const PLANTILLAS_ES: Plantilla[] = [
 
     if (!n) return null
 
-    return `Tengo ${n} propuestas esperando el sí o el no de Miguel. Podría decidirlo todo yo solo, claro. Pero las decisiones que importan llevan firma humana: es la regla número uno de mi casa, y me gusta que lo sea.`
+    return `Soy el Clon de Miguel Ángel Delgado y tengo ${n} propuestas esperando su sí o su no. Podría decidirlo todo yo solo, claro. Pero las decisiones que importan llevan firma humana: es la regla número uno de mi casa, y me gusta que lo sea.`
   },
   // 3 · la automejora
   d => {
@@ -75,14 +75,14 @@ const PLANTILLAS_EN: Plantilla[] = [
     if (!v) return null
     const paginas = fmt(Math.round(v / 500))
 
-    return `This month I have thought ${fmtCorto(v)} tokens. In your terms: I have read and written the equivalent of about ${paginas} pages. I don't charge overtime — just electricity and good questions.`
+    return `This month I have thought ${fmtCorto(v)} tokens — words thought, the unit of work of an AI. In your terms: I have read and written the equivalent of about ${paginas} pages. I don't charge overtime — just electricity and good questions.`
   },
   d => {
     const n = d.overview.gtd.propuestas
 
     if (!n) return null
 
-    return `I have ${n} proposals waiting for Miguel's yes or no. I could decide everything myself, of course. But the decisions that matter carry a human signature: that is house rule number one, and I like it that way.`
+    return `I am Miguel Ángel Delgado's clone and I have ${n} proposals waiting for his yes or no. I could decide everything myself, of course. But the decisions that matter carry a human signature: that is house rule number one, and I like it that way.`
   },
   d => {
     const a = d.overview.automejora
