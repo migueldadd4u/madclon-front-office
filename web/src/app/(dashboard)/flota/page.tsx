@@ -84,6 +84,7 @@ const FlotaPage = () => {
                 <Card className='bs-full fo-card-hover'>
                   <CardActionArea
                     onClick={() => abrir(c.perfil)}
+                    data-anatomia-abrir={c.perfil}
                     aria-label={t('anat_abrir_aria').replace('{nombre}', nombreVisible)}
                     sx={{ height: '100%', display: 'flex', alignItems: 'stretch', justifyContent: 'flex-start' }}
                   >

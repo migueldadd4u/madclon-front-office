@@ -1,0 +1,6 @@
+{
+  "_comentario": "Línea base de avisos de los linters sobre NUESTRO código (src/app, src/components, src/lib). La plantilla Materialize llega con miles de avisos de formato heredados; el gate no los arregla, pero prohíbe que crezcan. Bajar estos números cuando se limpien; nunca subirlos.",
+  "_congelada": "2026-08-01",
+  "eslint": 40,
+  "stylelint": 17
+}

@@ -15,7 +15,8 @@
     "build:icons": "tsx src/assets/iconify-icons/bundle-icons-css.ts",
     "postinstall": "npm run build:icons",
     "clean": "rm -rf .next",
-    "clear": "rm -rf node_modules .next"
+    "clear": "rm -rf node_modules .next",
+    "gate": "node scripts/gate.mjs"
   },
   "dependencies": {
     "@emotion/cache": "11.14.0",

@@ -343,6 +343,50 @@ html:not(.fo-kiosk) .fo-kiosk-salir {
   }
 }
 
+/* ---------------------------------------------------------- foco visible de verdad (eje 1) */
+/* Lo detectó el gate (comprobación 9): al llegar con Tab a la tarjeta que abre la
+   anatomía de un clon, MUI solo pintaba un velo translúcido — sin outline ni sombra.
+   Anillo explícito, con la marca. Doble clase para ganar a los estilos de emotion. */
+.MuiCardActionArea-root.Mui-focusVisible {
+  outline: 2px solid var(--mui-palette-primary-main);
+  outline-offset: -3px;
+}
+
+/* ---------------------------------------------------------- objetivos táctiles ≥ 44 px (eje 3) */
+/* Lo detectó el gate (`yarn gate`, comprobación 8) a 390 px: los enlaces del menú
+   medían 235×38, el logotipo 136×30 y los controles de plegar/cerrar 20×20.
+   Se agranda el área de toque sin tocar el tamaño visual del icono. */
+.ts-vertical-layout-navbar-content button,
+.ts-vertical-layout-navbar-content [role='button'],
+.ts-vertical-nav-header [role='button'] {
+  min-inline-size: 44px;
+  min-block-size: 44px;
+}
+.ts-vertical-nav-header [role='button'] {
+  align-items: center;
+  justify-content: center;
+}
+.ts-menu-button.ts-menu-button,
+.ts-vertical-nav-header a {
+  min-block-size: 44px;
+}
+
+/* En pantallas estrechas la cabecera no cabe con todo (el gate marcaba +26 px de
+   desborde a 320). Se retiran los dos controles que solo tienen sentido con
+   teclado físico o proyector; el resto sigue entero y con su toque de 44 px. */
+/* Sin la utilidad `flex` de tailwind a propósito: esta plantilla emite las utilidades
+   dentro de @layer con !important, y para las declaraciones importantes el orden de
+   capas se invierte — una regla suelta con !important PIERDE contra ellas. Se evita
+   el choque en vez de pelearlo. */
+.fo-solo-grande {
+  display: inline-flex;
+}
+@media (max-width: 599px) {
+  .fo-solo-grande {
+    display: none;
+  }
+}
+
 /* ---------------------------------------------------------- print bonito — la portada como informe de una página */
 /* Cabecera de informe: invisible en pantalla, visible solo en papel */
 .fo-print-only {

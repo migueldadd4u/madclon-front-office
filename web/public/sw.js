@@ -2,7 +2,7 @@
 // Estáticos con hash: caché primero (offline total una vez vistos).
 // Páginas HTML: red primero (fresco); sin red, la última versión vista.
 // JSON de /data: caché de UN DÍA — fresco se sirve al instante; viejo o sin red, lo guardado.
-const VERSION = 'v1'
+const VERSION = 'v2' // v2: los JSON se clonan antes de sellarlos en caché (arreglo del ERR_FAILED en frío)
 const ESTATICA = `madclon-estatica-${VERSION}`
 const PAGINAS = `madclon-paginas-${VERSION}`
 const DATOS = `madclon-datos-${VERSION}`
@@ -90,7 +90,13 @@ self.addEventListener('fetch', e => {
             const cabeceras = new Headers(res.headers)
 
             cabeceras.set('sw-fecha', String(Date.now()))
-            cache.put(req, new Response(res.body, { status: res.status, statusText: res.statusText, headers: cabeceras }))
+
+            // Ojo: hay que clonar ANTES de construir la copia sellada. Pasar `res.body`
+            // directamente deja la respuesta original sin cuerpo y la página recibe un
+            // ERR_FAILED en el primer arranque (era la causa del reintento a los 1,5 s).
+            const copia = res.clone()
+
+            cache.put(req, new Response(copia.body, { status: copia.status, statusText: copia.statusText, headers: cabeceras }))
           }
 
           return res

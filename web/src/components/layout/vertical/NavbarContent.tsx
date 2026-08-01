@@ -27,8 +27,13 @@ const NavbarContent = () => {
         <span className='hidden sm:block text-sm text-textSecondary'>{t('chrome_tagline')}</span>
       </div>
       <div className='flex items-center'>
-        <AtajosTeclado />
-        <ModoPresentacion />
+        {/* Teclado y proyector: sin sentido en un móvil, y a 320 px desbordaban la cabecera */}
+        <span className='fo-solo-grande'>
+          <AtajosTeclado />
+        </span>
+        <span className='fo-solo-grande'>
+          <ModoPresentacion />
+        </span>
         <AltoContraste />
         <LangToggle />
         <ModeDropdown />
