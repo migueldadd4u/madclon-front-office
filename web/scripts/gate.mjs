@@ -295,11 +295,33 @@ async function navegador() {
           }
         }
       }
+      // La capa 2 ABIERTA también se audita. Auditarla solo cerrada dejó pasar a
+      // producción tres botones a 3.01:1 en la entrega 3: lo que no se abre, no se mide.
+      for (const w of ANCHOS_AXE) {
+        await pg.goto(url('flota'), { waitUntil: 'domcontentloaded' })
+        await pg.waitForTimeout(1500)
+        await pg.setViewportSize({ width: w, height: 900 })
+        const abridor = pg.locator('[data-anatomia-abrir]').first()
+
+        if ((await abridor.count()) === 0) continue
+        await abridor.click()
+        await pg.waitForTimeout(700)
+        await pg.evaluate(axeSrc)
+        const r = await pg.evaluate(async () =>
+          axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } })
+        )
+
+        r.violations
+          .filter(v => v.impact === 'serious' || v.impact === 'critical')
+          .forEach(v => violaciones.push(`capa2 @${w} ${lang}${contraste ? '/AC' : ''}: ${v.id} (${v.nodes.length})`))
+        await pg.keyboard.press('Escape')
+      }
+
       await ctx.close()
     }
   }
 
-  const matriz = `${PAGINAS.length} páginas × ${ANCHOS_AXE.join('/')} × ${IDIOMAS.join('/')} × ${CONTRASTES.length === 2 ? 'normal+AC' : 'normal'}`
+  const matriz = `${PAGINAS.length} páginas + capa 2 × ${ANCHOS_AXE.join('/')} × ${IDIOMAS.join('/')} × ${CONTRASTES.length === 2 ? 'normal+AC' : 'normal'}`
 
   marca(5, `axe wcag2a/2aa/21aa (${matriz})`, violaciones.length === 0, violaciones.slice(0, 6).join(' | ') || '0 serious, 0 critical')
   marca(6, 'consola y red en el mismo barrido', erroresJs.length === 0 && respuestasMalas.length === 0,

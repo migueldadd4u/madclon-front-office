@@ -73,17 +73,17 @@ const MigaDeCapas = ({ superior, actual, icono, color, alSubir, alAnterior, alSi
               variant='text'
               onClick={alSubir}
               startIcon={<i className='ri-arrow-left-line' />}
-              sx={{ minBlockSize: 44, paddingInline: 2 }}
+              sx={{ minBlockSize: 44, paddingInline: 2, color: 'text.primary', '& i': { color: 'primary.light' } }}
             >
-              {superior} <span className='opacity-70 mis-1'>· {t('capa_1')}</span>
+              {superior} <span className='mis-1 font-normal'>· {t('capa_1')}</span>
             </Button>
           </li>
-          <li aria-hidden className='opacity-50'>
+          <li aria-hidden>
             <i className='ri-arrow-right-s-line' />
           </li>
           <li>
             <Typography variant='body2' component='span' aria-current='page' className='font-medium'>
-              {actual} <span className='opacity-70'>· {t('capa_2')}</span>
+              {actual} <span className='font-normal'>· {t('capa_2')}</span>
             </Typography>
           </li>
         </ol>
@@ -119,7 +119,7 @@ const MigaDeCapas = ({ superior, actual, icono, color, alSubir, alAnterior, alSi
               variant='outlined'
               onClick={alAnterior}
               startIcon={<i className='ri-arrow-left-s-line' />}
-              sx={{ minBlockSize: 44 }}
+              sx={{ minBlockSize: 44, color: 'text.primary', borderColor: 'primary.light', '& i': { color: 'primary.light' } }}
             >
               {t('capa_anterior')}
             </Button>
@@ -128,7 +128,7 @@ const MigaDeCapas = ({ superior, actual, icono, color, alSubir, alAnterior, alSi
               variant='outlined'
               onClick={alSiguiente}
               endIcon={<i className='ri-arrow-right-s-line' />}
-              sx={{ minBlockSize: 44 }}
+              sx={{ minBlockSize: 44, color: 'text.primary', borderColor: 'primary.light', '& i': { color: 'primary.light' } }}
             >
               {t('capa_siguiente')}
             </Button>
