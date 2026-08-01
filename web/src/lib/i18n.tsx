@@ -55,6 +55,19 @@ const STR = {
     es: 'Un equipo de inteligencia artificial que trabaja mientras Miguel Ángel Domínguez (MAD) vive su vida: lee el correo, clasifica lo importante, prepara decisiones, vigila el patrimonio y se mejora a sí mismo cada noche. Esta web es su cuadro de mandos — los mismos números que ve él, explicados para personas.',
     en: "A team of artificial intelligence that works while Miguel Ángel Domínguez (MAD) lives his life: it reads the mail, sorts what matters, prepares decisions, watches over the family's assets and improves itself every night. This website is its dashboard — the same numbers it sees, explained for people."
   },
+  sin_dato_valor: { es: 'sin dato', en: 'no data' },
+  sin_dato_pie: {
+    es: 'el refresco de esta noche no publicó esta cifra; vuelve mañana y estará',
+    en: 'tonight’s refresh did not publish this figure; come back tomorrow and it will be here'
+  },
+  act_medido: {
+    es: 'medido el {fecha} · se regenera solo cada noche',
+    en: 'measured on {fecha} · regenerates by itself every night'
+  },
+  ef_intro_sin_fecha: {
+    es: 'Hay una línea base congelada — la foto del «antes» —, aunque su fecha no viene en los datos de hoy. Cada indicador compara contra ella en su propia dirección — en unas cosas mejorar es subir (tareas hechas) y en otras es bajar (tokens por tarea).',
+    en: 'There is a frozen baseline — the «before» snapshot — although its date is missing from today’s data. Each indicator compares against it in its own direction — for some things improving means going up (tasks done) and for others going down (tokens per task).'
+  },
   rancio_aviso: {
     es: 'Estos números son del {fecha}: el refresco nocturno lleva {horas} h sin correr. Lo decimos en vez de enseñarte un dato viejo con cara de nuevo.',
     en: 'These figures are from {fecha}: the nightly refresh has not run for {horas} h. We say so instead of showing you an old number with a fresh face.'

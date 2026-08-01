@@ -26,6 +26,7 @@ const colorVariacion = (estado: string): 'success' | 'error' | 'warning' | 'defa
 
 const EficienciaPage = () => {
   const { t } = useLang()
+
   const GRUPOS = [
     { clave: 'eficiencia' as const, titulo: t('ef_g1'), sub: t('ef_g1_sub') },
     { clave: 'eficacia' as const, titulo: t('ef_g2'), sub: t('ef_g2_sub') },
@@ -45,7 +46,9 @@ const EficienciaPage = () => {
           <Grid size={12}>
             <Typography variant='h4' className='mbe-1'>{t('ef_titulo')}</Typography>
             <Typography color='text.secondary' className='max-is-3xl'>
-              {t('ef_intro_1')} {tokens.linea_base_fecha ?? '—'} {t('ef_intro_2')}
+              {tokens.linea_base_fecha
+                ? `${t('ef_intro_1')} ${tokens.linea_base_fecha} ${t('ef_intro_2')}`
+                : t('ef_intro_sin_fecha')}
             </Typography>
             {tokens.soporte && (
               <Typography variant='caption' color='text.disabled' className='font-mono'>

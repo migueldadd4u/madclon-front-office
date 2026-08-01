@@ -145,6 +145,10 @@ const MenuItem: ForwardRefRenderFunction<HTMLLIElement, MenuItemProps> = (props,
         className={classnames(menuClasses.button, { [menuClasses.active]: active })}
         component={component}
         tabIndex={disabled ? -1 : 0}
+
+        // El ítem activo se marcaba solo con color: para un lector de pantalla no
+        // había forma de saber en qué página estás (eje 4, «¿en qué parte estoy?»).
+        aria-current={active ? 'page' : undefined}
         {...rest}
         onClick={e => {
           handleClick()

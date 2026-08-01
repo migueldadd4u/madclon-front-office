@@ -4,7 +4,7 @@
 > detrás, no entra aquí. Lo que se puede medir, lo mide `web/scripts/gate.mjs`; lo que
 > no, se revisa a mano en `CHECKLIST-RECIEN-LLEGADO.md`.
 
-Última revisión: **2026-08-01** (entrega 1 de la tanda v5).
+Última revisión: **2026-08-01** (entregas 1-5 de la tanda v5).
 
 ---
 
@@ -18,8 +18,9 @@
 | Donde el clon habla (`ClonOpina`, `EstaNoche`, `ConsolaClon`), habla **en primera persona**: «Soy el Clon de Miguel Ángel Domínguez», no «ayudo a Miguel». | revisión manual + checklist |
 | **Nada de datos personales nuevos**: es el nombre público del titular. Ni cargo, ni empresa, ni correo, ni vida privada. | zona roja del prompt |
 
-Estado a 2026-08-01: **35 cadenas en deuda**, listadas por `node scripts/check-copy.mjs --deudas`.
-Están en lista blanca comentada hasta la entrega 2, que las salda.
+Estado a 2026-08-01: **saldado**. `check-copy.mjs` se quedó sin lista blanca en la entrega 2:
+cualquier «Miguel» suelto tumba el build. Y estrena la regla `identidad-prohibida`, que falla si
+reaparece «Delgado» — un apellido equivocado que llegué a publicar y que corrigió MAD.
 
 ## 2 · Lenguaje llano — cero tecnicismos sin traducir
 
@@ -50,8 +51,19 @@ Están en lista blanca comentada hasta la entrega 2, que las salda.
 - **Si el dato está rancio, se dice.** Con `manifest.json` de más de 48 h la web lo confiesa
   en pantalla; el gate (comprobación 11) falla si NO lo confiesa.
 - Excepciones permitidas (lista blanca comentada en `check-hardcode.mjs`): constantes del
-  mundo (24 h), extremos de escala (0 %, 100 %), unidades de precio (€/millón), la ventana
-  fija de medición (30 días) y las constantes de marca (los 5 nodos de la M).
+  mundo (24 h, un token ≈ 3-4 letras), extremos de escala (0 %, 100 %), unidades de precio
+  (€/millón), ventanas fijas de medición (30 días, 7 días), horas de reloj (03:00), nombres de
+  capa («capa 2») y los hitos fechados de la línea de tiempo — que cuentan lo que pasó ESE día
+  y actualizarlos sería reescribir la historia. `check-hardcode.mjs` está **sin deudas** desde
+  la entrega 4: cualquier cifra nueva a mano falla el build.
+
+## 3 bis · Estados vacíos (nacida de la entrega 5)
+
+- **Un hueco mudo no es un estado vacío, es un error.** Si una cifra no viene en los JSON, la
+  tarjeta dice «sin dato» y explica por qué y qué va a pasar: «el refresco de esta noche no
+  publicó esta cifra; vuelve mañana y estará». Nunca un «—» suelto.
+- **Una frase con un dato ausente se reescribe entera**, no se rellena con un guion: «Desde el —
+  hay una línea base congelada» es una frase rota, no una frase con un hueco.
 
 ## 4 · Navegación por capas — *ninguna capa puede ser una trampa*
 
@@ -71,7 +83,7 @@ Y una quinta, de contexto: **la capa superior no queda muerta**. En escritorio y
 se abre como panel lateral con la capa 1 legible al lado; en móvil (< 834) a pantalla completa,
 pero con la miga arriba y el gesto de atrás cableado.
 
-Estado a 2026-08-01: **deuda abierta** (comprobaciones 9 y 10 del gate en `DEUDA`). La salda la entrega 3.
+Estado a 2026-08-01: **saldado** en la entrega 3. Las comprobaciones 9 y 10 del gate ya tumban el build.
 
 ## 5 · Reglas de forma que ya son ley (nacidas de la entrega 1)
 

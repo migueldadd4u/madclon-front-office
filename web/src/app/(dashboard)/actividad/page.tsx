@@ -10,6 +10,7 @@ import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import LinearProgress from '@mui/material/LinearProgress'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 
 // Component Imports
@@ -21,7 +22,7 @@ import CountUp from '@/components/dashboard/CountUp'
 import { useLang } from '@/lib/i18n'
 
 // Data Imports
-import { fmt } from '@/lib/data'
+import { fmt, fmtFecha } from '@/lib/data'
 
 const ActividadPage = () => {
   const { t } = useLang()
@@ -35,6 +36,7 @@ const ActividadPage = () => {
 
       return
     }
+
     const id = setTimeout(() => setBarras(true), 60)
 
     return () => clearTimeout(id)
@@ -42,8 +44,9 @@ const ActividadPage = () => {
 
   return (
   <DataGate>
-    {({ overview }) => {
+    {({ overview, manifest }) => {
       const { gtd, automejora, personas } = overview
+
       const colaTotal = Math.max(
         automejora.hechas + automejora.bloqueadas + automejora.aparcadas + automejora.pendientes,
         1
@@ -55,6 +58,9 @@ const ActividadPage = () => {
             <Typography variant='h4' className='mbe-1'>{t('act_titulo')}</Typography>
             <Typography color='text.secondary' className='max-is-2xl'>
               {t('act_intro')}
+            </Typography>
+            <Typography variant='caption' color='text.secondary' className='mbs-2 block'>
+              {t('act_medido').replace('{fecha}', fmtFecha(manifest.generado))}
             </Typography>
           </Grid>
 
