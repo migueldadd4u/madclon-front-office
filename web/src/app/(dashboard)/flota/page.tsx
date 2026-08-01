@@ -10,6 +10,7 @@ import CardActionArea from '@mui/material/CardActionArea'
 import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import Chip from '@mui/material/Chip'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 
 // Component Imports
@@ -27,10 +28,13 @@ import { fmtCorto } from '@/lib/data'
 const FlotaPage = () => {
   const { t } = useLang()
   const [perfilAbierto, setPerfilAbierto] = useState<string | null>(null)
+  const [anuncio, setAnuncio] = useState('')
 
   // Deep-link compartible: #clon-<perfil> abre la anatomía directamente.
-  // Se escribe con replaceState (no ensucia el historial) y funciona con
-  // el basePath del export estático (solo tocamos el hash).
+  // El hash es HISTORIA REAL (pushState al abrir): así el gesto de atrás del
+  // navegador cierra la capa 2 y devuelve a la Flota en vez de sacarte de la web.
+  // Los saltos laterales entre clones, en cambio, van con replaceState: son un
+  // movimiento DENTRO de la misma capa, y «atrás» debe seguir subiendo a la capa 1.
   useEffect(() => {
     const desdeHash = () => {
       const m = /^#clon-([a-z]+)$/.exec(window.location.hash)
@@ -46,12 +50,17 @@ const FlotaPage = () => {
 
   const abrir = (perfil: string) => {
     setPerfilAbierto(perfil)
-    window.history.replaceState(null, '', `#clon-${perfil}`)
+    window.history.pushState(null, '', `#clon-${perfil}`)
   }
 
+  // Subir a la capa 1. Si la capa 2 la abrió esta sesión, se sube por el historial
+  // para que «atrás» y este botón sean literalmente lo mismo; si se llegó por
+  // deep-link (no hay nada detrás), se limpia el hash sin dejar rastro.
   const cerrar = () => {
     setPerfilAbierto(null)
-    window.history.replaceState(null, '', window.location.pathname + window.location.search)
+    setAnuncio('')
+    if (window.location.hash.startsWith('#clon-')) window.history.back()
+    else window.history.replaceState(null, '', window.location.pathname + window.location.search)
   }
 
   return (
@@ -60,6 +69,23 @@ const FlotaPage = () => {
       const consumo = new Map(tokens.por_clon.map(c => [c.clon, c.tokens ?? 0]))
       const maxConsumo = Math.max(...consumo.values(), 1)
       const clonSel = clones.clones.find(c => c.perfil === perfilAbierto) ?? null
+      const iSel = clones.clones.findIndex(c => c.perfil === perfilAbierto)
+
+      // Movimiento lateral DENTRO de la capa 2: cambia de clon sin volver a la capa 1.
+      // Va con replaceState a propósito (ver arriba) y se anuncia con aria-live.
+      const saltar = (paso: number) => {
+        const n = clones.clones.length
+        const destino = clones.clones[(iSel + paso + n) % n]
+        const nombre = destino.perfil.charAt(0).toUpperCase() + destino.perfil.slice(1)
+
+        setPerfilAbierto(destino.perfil)
+        window.history.replaceState(null, '', `#clon-${destino.perfil}`)
+        setAnuncio(
+          t('capa_anuncio')
+            .replace('{nombre}', nombre)
+            .replace('{pos}', t('capa_posicion').replace('{i}', String(((iSel + paso + n) % n) + 1)).replace('{total}', String(n)))
+        )
+      }
 
       return (
         <Grid container spacing={6}>
@@ -156,8 +182,16 @@ const FlotaPage = () => {
               color={COLORES[clonSel.perfil] ?? 'primary'}
               open
               onClose={cerrar}
+              onAnterior={() => saltar(-1)}
+              onSiguiente={() => saltar(1)}
+              posicion={{ i: iSel + 1, total: clones.clones.length }}
             />
           )}
+
+          {/* lo que cambia al saltar de clon se dice en voz alta para quien no lo ve */}
+          <div role='status' aria-live='polite' className='sr-only'>
+            {anuncio}
+          </div>
         </Grid>
       )
     }}

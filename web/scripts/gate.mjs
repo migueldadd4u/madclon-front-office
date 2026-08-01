@@ -35,10 +35,9 @@ const CONTRASTES = rapido ? [false] : [false, true]
 // Comprobaciones que hoy NO puede pasar la web porque miden una deuda todavía sin
 // saldar. Se ejecutan igual y se imprimen ALTO, pero no tumban el gate hasta que la
 // entrega correspondiente las salde (entonces se borra la línea de aquí).
-const DEUDAS = {
-  9: 'eje 6 — el recorrido lateral entre subclones aún no existe (entrega 3)',
-  10: 'eje 6 — capa 2 modal: sin migas, sin distintivo sticky, «atrás» no la cierra (entrega 3)'
-}
+// Vacío desde la entrega 3 (2026-08-01): las comprobaciones 9 y 10 (eje 6) pasaron a
+// verde con el panel lateral, así que ya tumban el gate como todas las demás.
+const DEUDAS = {}
 
 // Objetivos táctiles por debajo de 44 px aceptados hoy, con motivo. Cada entrada es
 // una excepción real y comentada, no una alfombra bajo la que barrer.

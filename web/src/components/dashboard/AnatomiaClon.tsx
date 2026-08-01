@@ -6,19 +6,18 @@ import type { ReactNode } from 'react'
 
 // MUI Imports
 import Box from '@mui/material/Box'
-import Dialog from '@mui/material/Dialog'
-import DialogContent from '@mui/material/DialogContent'
+import Drawer from '@mui/material/Drawer'
 import Divider from '@mui/material/Divider'
-import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import Chip from '@mui/material/Chip'
+import useMediaQuery from '@mui/material/useMediaQuery'
 import { useTheme } from '@mui/material/styles'
-import CustomAvatar from '@core/components/mui/Avatar'
 
 // Component Imports
 import CountUp from '@/components/dashboard/CountUp'
 import BarraEntra from '@/components/dashboard/BarraEntra'
 import PuntoVivo from '@/components/dashboard/PuntoVivo'
+import MigaDeCapas from '@/components/dashboard/MigaDeCapas'
 
 // Hook Imports
 import { useLang } from '@/lib/i18n'
@@ -34,9 +33,14 @@ import type { ClonePerfil, PanelData } from '@/lib/data'
 // rutinas de madrugada (crons por ámbito), cerebro (gateway propio) y
 // peso en la orquesta (tokens 30 d). Nada sale del vault: si un dato no
 // está en los JSON, la sección dice la verdad con gracia en vez de inventarlo.
-// Accesibilidad: Dialog MUI (foco atrapado, Esc y backdrop cierran, el foco
-// vuelve a la tarjeta al cerrar), aria-labelledby con el nombre del clon,
-// transición desactivada con prefers-reduced-motion.
+// Es la CAPA 2 del panel, y no puede ser una trampa (REGLAS-COPY.md §4): se abre
+// como panel lateral con la Flota viva y legible al lado en escritorio y tablet
+// (a pantalla completa por debajo de 834 px, donde no cabe otra cosa), con migas
+// de pan pulsables, distintivo de dueño pegado arriba al hacer scroll, salto
+// lateral entre clones y el gesto de atrás del navegador cableado.
+// Accesibilidad: foco atrapado, Esc y clic fuera cierran, el foco vuelve a la
+// tarjeta al cerrar, aria-labelledby con el nombre del clon, y transición
+// desactivada con prefers-reduced-motion.
 
 type Color = 'primary' | 'success' | 'warning' | 'error' | 'info' | 'secondary'
 
@@ -68,6 +72,11 @@ type Props = {
   color: Color
   open: boolean
   onClose: () => void
+
+  /** Salto lateral entre clones hermanos, sin volver a la capa 1. */
+  onAnterior?: () => void
+  onSiguiente?: () => void
+  posicion?: { i: number; total: number }
 }
 
 const CIERRE: Record<string, StrKey> = {
@@ -121,9 +130,10 @@ const PuntoRojo = ({ size = 9 }: { size?: number }) => (
   />
 )
 
-const AnatomiaClon = ({ clon, datos, icono, color, open, onClose }: Props) => {
+const AnatomiaClon = ({ clon, datos, icono, color, open, onClose, onAnterior, onSiguiente, posicion }: Props) => {
   const { lang, t } = useLang()
   const theme = useTheme()
+  const estrecho = useMediaQuery('(max-width: 833px)')
   const [ahora, setAhora] = useState(() => Date.now())
   const [reduced, setReduced] = useState(false)
 
@@ -133,6 +143,30 @@ const AnatomiaClon = ({ clon, datos, icono, color, open, onClose }: Props) => {
 
     return () => clearInterval(id)
   }, [])
+
+  // Flechas ← → para moverse entre clones sin salir de la capa 2.
+  // Nunca actúa dentro de un campo de texto ni con modificadores.
+  useEffect(() => {
+    if (!open || !onAnterior || !onSiguiente) return
+
+    const alPulsar = (e: KeyboardEvent) => {
+      const dentroDeTexto = e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement
+
+      if (dentroDeTexto || e.metaKey || e.ctrlKey || e.altKey) return
+
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        onAnterior()
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault()
+        onSiguiente()
+      }
+    }
+
+    window.addEventListener('keydown', alPulsar)
+
+    return () => window.removeEventListener('keydown', alPulsar)
+  }, [open, onAnterior, onSiguiente])
 
   // «hace 3 h» / «3 h ago» — mismo lenguaje que el Latido de la portada
   const haceX = (iso: string | null): string => {
@@ -172,6 +206,7 @@ const AnatomiaClon = ({ clon, datos, icono, color, open, onClose }: Props) => {
   const frac = total > 0 ? usado / total : 0
   const nf = new Intl.NumberFormat(lang === 'en' ? 'en-US' : 'es-ES', { maximumFractionDigits: 1 })
   const deCada10 = Math.round(frac * 10)
+
   const frasePeso = deCada10 >= 1
     ? reemplaza(t('anat_peso_frase_10'), 'x', nf.format(deCada10))
     : reemplaza(t('anat_peso_frase_1000'), 'x', nf.format(Math.max(1, Math.round(frac * 1000))))
@@ -186,37 +221,51 @@ const AnatomiaClon = ({ clon, datos, icono, color, open, onClose }: Props) => {
   const nombreVisible = clon.perfil.charAt(0).toUpperCase() + clon.perfil.slice(1)
 
   return (
-    <Dialog
+    <Drawer
       open={open}
       onClose={onClose}
-      aria-labelledby={tituloId}
-      maxWidth='sm'
-      fullWidth
-      scroll='paper'
+      anchor={estrecho ? 'bottom' : 'right'}
       transitionDuration={reduced ? 0 : 225}
-      sx={{
-        '& .MuiDialog-paper:not(.MuiDialog-paperFullScreen)': {
-          margin: { xs: '8px', sm: '32px' }
-        },
-        '& .MuiDialog-paper': {
-          width: { xs: 'calc(100% - 16px)', sm: 'calc(100% - 64px)' },
-          maxHeight: { xs: 'calc(100% - 16px)', sm: 'calc(100% - 64px)' }
+
+      // Sin velo oscuro a propósito: la capa 1 sigue siendo contexto legible,
+      // no un fondo apagado. El clic fuera cierra igual.
+      sx={{ '& .MuiBackdrop-root.MuiBackdrop-root': { backgroundColor: 'transparent' } }}
+      slotProps={{
+        paper: {
+          ...({ 'data-capa': '2' } as Record<string, string>),
+          role: 'dialog',
+          'aria-modal': true,
+          'aria-labelledby': tituloId,
+          sx: {
+            // El umbral es 834 px (el del eje 3), no un breakpoint de MUI: por
+            // debajo no cabe nada al lado y la capa 2 va a pantalla completa.
+            inlineSize: estrecho ? '100%' : 'min(560px, 62vw)',
+            blockSize: estrecho ? '100%' : 'auto',
+            boxShadow: 24,
+            borderStartStartRadius: { xs: 0, md: 8 },
+            borderEndStartRadius: { xs: 0, md: 8 }
+          }
         }
       }}
     >
-      <DialogContent className='flex flex-col gap-5'>
-        {/* cabecera: avatar, nombre, oficio y misión */}
+      {/* 1-2-4 de la regla de capas: dónde estoy, de quién es, cómo me muevo */}
+      <MigaDeCapas
+        superior={t('capa_flota')}
+        actual={nombreVisible}
+        icono={icono}
+        color={color}
+        alSubir={onClose}
+        alAnterior={onAnterior}
+        alSiguiente={onSiguiente}
+        posicion={posicion}
+      />
+      <div className='flex flex-col gap-5 plb-5 pli-5 sm:pli-6'>
+        {/* cabecera: nombre, oficio y misión */}
         <div className='flex items-start gap-3'>
-          <CustomAvatar color={color} skin='light' size={46} variant='rounded'>
-            <i className={`${icono} text-2xl`} />
-          </CustomAvatar>
           <div className='flex-auto'>
-            <Typography variant='h5' id={tituloId}>{nombreVisible}</Typography>
+            <Typography variant='h5' id={tituloId} className='capitalize'>{nombreVisible}</Typography>
             <Typography variant='body2' color='text.secondary'>{clon.rol}</Typography>
           </div>
-          <IconButton aria-label={t('anat_cerrar')} onClick={onClose} size='small' autoFocus>
-            <i className='ri-close-line text-xl' />
-          </IconButton>
         </div>
 
         {clon.mision && (
@@ -247,6 +296,7 @@ const AnatomiaClon = ({ clon, datos, icono, color, open, onClose }: Props) => {
               {conexiones.map(nombre => {
                 const integ = integraPorNombre.get(nombre)
                 const ok = integ?.estado?.includes('🟢') ?? false
+
                 const estadoTexto = integ
                   ? ok
                     ? t('anat_senal').replace('{x}', haceX(integ.ultimo_ok))
@@ -452,8 +502,8 @@ const AnatomiaClon = ({ clon, datos, icono, color, open, onClose }: Props) => {
             </Seccion>
           </>
         )}
-      </DialogContent>
-    </Dialog>
+      </div>
+    </Drawer>
   )
 }
 

@@ -275,6 +275,22 @@ const STR = {
   anat_ver: { es: 'ver qué hay debajo', en: 'see what’s underneath' },
   anat_abrir_aria: { es: 'Ver qué hay debajo de {nombre}', en: 'See what’s underneath {nombre}' },
   anat_cerrar: { es: 'Cerrar', en: 'Close' },
+
+  // navegación por capas — ninguna capa puede ser una trampa (ver REGLAS-COPY.md §4)
+  capa_migas_aria: { es: 'Dónde estás', en: 'Where you are' },
+  capa_flota: { es: 'Flota', en: 'Fleet' },
+  capa_1: { es: 'capa 1', en: 'layer 1' },
+  capa_2: { es: 'capa 2', en: 'layer 2' },
+  capa_volver: { es: 'volver a la flota', en: 'back to the fleet' },
+  capa_volver_pista: { es: 'o pulsa Esc, o el gesto de atrás', en: 'or press Esc, or the back gesture' },
+  capa_anterior: { es: 'Clon anterior', en: 'Previous clone' },
+  capa_siguiente: { es: 'Clon siguiente', en: 'Next clone' },
+  capa_lateral_pista: { es: 'muévete entre clones sin volver atrás (← →)', en: 'move between clones without going back (← →)' },
+  capa_posicion: { es: '{i} de {total}', en: '{i} of {total}' },
+  capa_anuncio: {
+    es: 'Estás en {nombre}, {pos} de la flota. Sigues dentro de la capa 2.',
+    en: 'You are on {nombre}, {pos} of the fleet. You are still inside layer 2.'
+  },
   anat_quees: {
     es: 'Un clon es una misión escrita que no se olvida, una memoria que crece cada noche, unas puertas por donde le llega el mundo, unas rutinas que corren solas de madrugada y un cerebro propio que piensa por él. Esto es lo que hay debajo de este:',
     en: 'A clone is a written mission it never forgets, a memory that grows every night, doors through which the world reaches it, routines that run by themselves in the early morning, and a brain of its own that thinks for it. This is what lies underneath this one:'
