@@ -438,12 +438,16 @@ const AnatomiaClon = ({ clon, datos, icono, color, open, onClose, onAnterior, on
         {esRouter && (
           <>
             <Divider />
-            <Seccion icono='ri-organization-chart' titulo={t('anat_mapa_titulo')} sub={t('anat_mapa_sub')}>
+            <Seccion
+              icono='ri-organization-chart'
+              titulo={t('anat_mapa_titulo')}
+              sub={t('anat_mapa_sub').replace('{n}', String(ORBITA.length))}
+            >
               <Box
                 component='svg'
                 viewBox='0 0 360 170'
                 role='img'
-                aria-label={t('anat_mapa_aria')}
+                aria-label={t('anat_mapa_aria').replace('{n}', String(ORBITA.length))}
                 sx={{ inlineSize: '100%', maxInlineSize: 420, display: 'block', mx: 'auto' }}
               >
                 <defs>

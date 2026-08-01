@@ -12,10 +12,10 @@
 
 | Regla | Cómo se comprueba |
 |---|---|
-| La identidad canónica es **«el Clon de Miguel Ángel Delgado (MAD)»**. Tras la primera mención de cada página, **«el Clon de MAD»**. | `check-copy.mjs`, regla `identidad` |
-| En inglés: **«Miguel Ángel Delgado's clone (MAD)»** / **«MAD's clone»**. | ídem |
+| La identidad canónica es **«el Clon de Miguel Ángel Domínguez (MAD)»**. Tras la primera mención de cada página, **«el Clon de MAD»**. | `check-copy.mjs`, regla `identidad` |
+| En inglés: **«Miguel Ángel Domínguez's clone (MAD)»** / **«MAD's clone»**. | ídem |
 | **«Miguel» nunca va suelto**: en la misma frase tiene que aparecer «Ángel» o «MAD». | ídem — falla el gate |
-| Donde el clon habla (`ClonOpina`, `EstaNoche`, `ConsolaClon`), habla **en primera persona**: «Soy el Clon de Miguel Ángel Delgado», no «ayudo a Miguel». | revisión manual + checklist |
+| Donde el clon habla (`ClonOpina`, `EstaNoche`, `ConsolaClon`), habla **en primera persona**: «Soy el Clon de Miguel Ángel Domínguez», no «ayudo a Miguel». | revisión manual + checklist |
 | **Nada de datos personales nuevos**: es el nombre público del titular. Ni cargo, ni empresa, ni correo, ni vida privada. | zona roja del prompt |
 
 Estado a 2026-08-01: **35 cadenas en deuda**, listadas por `node scripts/check-copy.mjs --deudas`.

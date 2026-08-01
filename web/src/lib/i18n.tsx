@@ -52,8 +52,12 @@ const STR = {
   // ------------------------------------------------------------- portada
   home_titulo: { es: 'La sala de control del Clon de MAD', en: 'The MAD Clone control room' },
   home_intro: {
-    es: 'Un equipo de inteligencia artificial que trabaja mientras Miguel Ángel Delgado (MAD) vive su vida: lee el correo, clasifica lo importante, prepara decisiones, vigila el patrimonio y se mejora a sí mismo cada noche. Esta web es su cuadro de mandos — los mismos números que ve él, explicados para personas.',
-    en: "A team of artificial intelligence that works while Miguel Ángel Delgado (MAD) lives his life: it reads the mail, sorts what matters, prepares decisions, watches over the family's assets and improves itself every night. This website is its dashboard — the same numbers it sees, explained for people."
+    es: 'Un equipo de inteligencia artificial que trabaja mientras Miguel Ángel Domínguez (MAD) vive su vida: lee el correo, clasifica lo importante, prepara decisiones, vigila el patrimonio y se mejora a sí mismo cada noche. Esta web es su cuadro de mandos — los mismos números que ve él, explicados para personas.',
+    en: "A team of artificial intelligence that works while Miguel Ángel Domínguez (MAD) lives his life: it reads the mail, sorts what matters, prepares decisions, watches over the family's assets and improves itself every night. This website is its dashboard — the same numbers it sees, explained for people."
+  },
+  rancio_aviso: {
+    es: 'Estos números son del {fecha}: el refresco nocturno lleva {horas} h sin correr. Lo decimos en vez de enseñarte un dato viejo con cara de nuevo.',
+    en: 'These figures are from {fecha}: the nightly refresh has not run for {horas} h. We say so instead of showing you an old number with a fresh face.'
   },
   home_caption_datos: {
     es: 'solo cifras agregadas, sin información personal',
@@ -67,7 +71,7 @@ const STR = {
   home_stat_rutinas: { es: 'rutinas automáticas en verde', en: 'automatic routines in green' },
   home_stat_rutinas_ok: { es: 'todas al día', en: 'all on track' },
   home_stat_rutinas_err: { es: 'en error', en: 'in error' },
-  home_quees_titulo: { es: '¿Qué es esto, en cuatro ideas?', en: 'What is this, in four ideas?' },
+  home_quees_titulo: { es: '¿Qué es esto, en {n} ideas?', en: 'What is this, in {n} ideas?' },
   home_quees_sub: {
     es: 'No hace falta saber lo que es un «second brain». Basta con esto:',
     en: "You don't need to know what a «second brain» is. This is enough:"
@@ -101,8 +105,8 @@ const STR = {
     en: 'Last night, while MAD was asleep'
   },
   noche_frase: {
-    es: 'Soy el Clon de Miguel Ángel Delgado. Pensé {tokens} tokens en {llamadas} llamadas, terminé {tareas} tareas y amanecí con todo {salud}. Nadie me lo pidió: son mis rutinas de cada noche.',
-    en: "I am Miguel Ángel Delgado's clone. I thought {tokens} tokens over {llamadas} calls, finished {tareas} tasks and woke up with everything {salud}. Nobody asked me to: these are my nightly routines."
+    es: 'Soy el Clon de Miguel Ángel Domínguez. Pensé {tokens} tokens en {llamadas} llamadas, terminé {tareas} tareas y amanecí con todo {salud}. Nadie me lo pidió: son mis rutinas de cada noche.',
+    en: "I am Miguel Ángel Domínguez's clone. I thought {tokens} tokens over {llamadas} calls, finished {tareas} tasks and woke up with everything {salud}. Nobody asked me to: these are my nightly routines."
   },
   noche_caption: {
     es: 'última noche medida: {fecha} · se actualiza solo cada madrugada',
@@ -252,10 +256,10 @@ const STR = {
   },
 
   // ------------------------------------------------------------- flota
-  flota_titulo: { es: 'La flota: siete clones, siete oficios', en: 'The fleet: seven clones, seven crafts' },
+  flota_titulo: { es: 'La flota: {n} clones, {n} oficios', en: 'The fleet: {n} clones, {n} crafts' },
   flota_intro_1: {
-    es: 'El Clon de MAD no es una sola mente: son siete perfiles especializados que comparten la misma memoria. Cada uno atiende un territorio de la vida de MAD — la empresa, el patrimonio, la familia, las ideas — y un octavo actor, el',
-    en: "The MAD Clone is not a single mind: it is seven specialized profiles sharing the same memory. Each one attends a territory of MAD's life — the company, the assets, the family, the ideas — and an eighth actor, the"
+    es: 'El Clon de MAD no es una sola mente: son {n} perfiles especializados que comparten la misma memoria. Cada uno atiende un territorio de la vida de MAD — la empresa, el patrimonio, la familia, las ideas — y un actor más, el',
+    en: "The MAD Clone is not a single mind: it is {n} specialized profiles sharing the same memory. Each one attends a territory of MAD's life — the company, the assets, the family, the ideas — and one more actor, the"
   },
   flota_intro_2: { es: 'motor', en: 'engine' },
   flota_intro_3: {
@@ -353,12 +357,12 @@ const STR = {
   },
   anat_mapa_titulo: { es: 'La orquesta, en un vistazo', en: 'The orchestra at a glance' },
   anat_mapa_sub: {
-    es: 'seis oficios alrededor; el director reparte y recoge el trabajo',
-    en: 'six crafts around it; the conductor hands out and gathers the work'
+    es: '{n} oficios alrededor; el director reparte y recoge el trabajo',
+    en: '{n} crafts around it; the conductor hands out and gathers the work'
   },
   anat_mapa_aria: {
-    es: 'Esquema: el clon director en el centro coordina a los otros seis clones, conectado a cada uno',
-    en: 'Diagram: the conductor clone at the center coordinates the other six clones, connected to each one'
+    es: 'Esquema: el clon director en el centro coordina a los otros {n} clones, conectado a cada uno',
+    en: 'Diagram: the conductor clone at the center coordinates the other {n} clones, connected to each one'
   },
   anat_cierre_clon: {
     es: 'El director que no duerme: mientras la casa descansa, reparte el trabajo de mañana.',

@@ -414,8 +414,27 @@ async function navegador() {
   await k.waitForTimeout(1600)
   const confiesa = await k.evaluate(() => !!document.querySelector('[data-frescura-rancia]'))
 
-  marca(11, 'frescura de datos', horas <= 48 || confiesa,
-    `manifest de hace ${horas.toFixed(1)} h · ${horas > 48 ? (confiesa ? 'la web lo confiesa' : 'LA WEB NO LO CONFIESA') : 'fresco (no procede confesar)'}`)
+  // Y el ensayo: se sirve un manifest de hace 3 días para comprobar que la confesión
+  // aparece de verdad. Si solo se mirase el dato real, esta rama no se probaría nunca.
+  // Contexto aparte con el service worker BLOQUEADO: si no, el SW sirve el manifest
+  // de su propia caché y la interceptación no llega a la página.
+  const viejo = { ...manifest, generado: new Date(Date.now() - 72 * 36e5).toISOString() }
+  const ctxViejo = await navegadorPw.newContext({ viewport: { width: 1440, height: 900 }, serviceWorkers: 'block' })
+
+  await ctxViejo.addInitScript(() => localStorage.setItem('madclon-lang', 'es'))
+  await ctxViejo.route(`**${BASE}/data/manifest.json`, r =>
+    r.fulfill({ contentType: 'application/json', body: JSON.stringify(viejo) })
+  )
+  const pv = await ctxViejo.newPage()
+
+  await pv.goto(url(''), { waitUntil: 'domcontentloaded' })
+  await pv.waitForTimeout(2200)
+  const confiesaEnsayo = await pv.evaluate(() => !!document.querySelector('[data-frescura-rancia]'))
+
+  await ctxViejo.close()
+
+  marca(11, 'frescura de datos (y el ensayo del dato rancio)', (horas <= 48 || confiesa) && confiesaEnsayo,
+    `manifest de hace ${horas.toFixed(1)} h · ${horas > 48 ? (confiesa ? 'la web lo confiesa' : 'LA WEB NO LO CONFIESA') : 'fresco (no procede confesar)'} · ensayo a 72 h: ${confiesaEnsayo ? 'confiesa' : 'NO CONFIESA'}`)
 
   // 12 · enlaces internos, og:image y sitemap
   const rotos = []

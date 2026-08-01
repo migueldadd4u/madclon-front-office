@@ -12,15 +12,18 @@ import AccordionDetails from '@mui/material/AccordionDetails'
 // Hook Imports
 import { useLang } from '@/lib/i18n'
 
+// Data Imports
+import { usePanelData, fmtCorto } from '@/lib/data'
+
 const PREGUNTAS = [
   {
     es: {
       q: '¿Qué es exactamente el Clon de MAD?',
-      a: 'Un equipo de programas de inteligencia artificial que trabaja para Miguel Ángel Delgado (MAD) las 24 horas. Lee lo que llega (correo, WhatsApp, notas), lo clasifica, prepara respuestas y dossieres, y deja las decisiones importantes listas para que el humano solo tenga que decir sí o no.'
+      a: 'Un equipo de programas de inteligencia artificial que trabaja para Miguel Ángel Domínguez (MAD) las 24 horas. Lee lo que llega (correo, WhatsApp, notas), lo clasifica, prepara respuestas y dossieres, y deja las decisiones importantes listas para que el humano solo tenga que decir sí o no.'
     },
     en: {
       q: 'What exactly is the MAD Clone?',
-      a: 'A team of artificial intelligence programs working for Miguel Ángel Delgado (MAD) 24 hours a day. It reads what arrives (mail, WhatsApp, notes), sorts it, prepares replies and dossiers, and leaves the important decisions ready so the human only has to say yes or no.'
+      a: 'A team of artificial intelligence programs working for Miguel Ángel Domínguez (MAD) 24 hours a day. It reads what arrives (mail, WhatsApp, notes), sorts it, prepares replies and dossiers, and leaves the important decisions ready so the human only has to say yes or no.'
     }
   },
   {
@@ -46,11 +49,15 @@ const PREGUNTAS = [
   {
     es: {
       q: '¿Cuánto trabaja realmente?',
-      a: 'Las cifras de esta web lo dicen en directo: cientos de millones de tokens al mes, una decena de rutinas automáticas cada día y una flota de siete clones especializados (correo, patrimonio, operaciones, ideas…). El panel se regenera solo cada noche.'
+
+      // Eje 7: las tres cifras salen de los JSON en tiempo de render, nunca escritas a mano.
+      a: 'Las cifras de esta web lo dicen en directo: {tokens} tokens en los últimos 30 días, {rutinas} rutinas automáticas cada día y una flota de {clones} clones especializados (correo, patrimonio, operaciones, ideas…). El panel se regenera solo cada noche.',
+      sinDatos: 'Las cifras de esta web lo dicen en directo, y se regeneran solas cada noche: míralas en las páginas de Tokens y de Salud.'
     },
     en: {
       q: 'How much does it actually work?',
-      a: 'The figures on this website say it live: hundreds of millions of tokens a month, about a dozen automatic routines every day and a fleet of seven specialized clones (mail, assets, operations, ideas…). The dashboard regenerates itself every night.'
+      a: 'The figures on this website say it live: {tokens} tokens over the last 30 days, {rutinas} automatic routines every day and a fleet of {clones} specialized clones (mail, assets, operations, ideas…). The dashboard regenerates itself every night.',
+      sinDatos: 'The figures on this website say it live, and they regenerate by themselves every night: see them on the Tokens and Health pages.'
     }
   },
   {
@@ -97,6 +104,19 @@ const PREGUNTAS = [
 
 const PreguntasPage = () => {
   const { lang, t } = useLang()
+  const { data } = usePanelData()
+
+  // Rellena los huecos con los JSON. Si aún no han llegado (o fallan), la respuesta
+  // usa su variante sin cifras: mejor decir dónde mirar que enseñar un número muerto.
+  const vivo = (p: { a: string; sinDatos?: string }) => {
+    if (!p.sinDatos) return p.a
+    if (!data) return p.sinDatos
+
+    return p.a
+      .replace('{tokens}', fmtCorto(data.tokens.contador.ventana_30d ?? 0))
+      .replace('{rutinas}', String(data.overview.crons.length))
+      .replace('{clones}', String(data.clones.clones.length))
+  }
 
   return (
     <Grid container spacing={6}>
@@ -117,7 +137,7 @@ const PreguntasPage = () => {
               <Typography fontWeight={600}>{p[lang].q}</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Typography color='text.secondary'>{p[lang].a}</Typography>
+              <Typography color='text.secondary'>{vivo(p[lang])}</Typography>
             </AccordionDetails>
           </Accordion>
         ))}

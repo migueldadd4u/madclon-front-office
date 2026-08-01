@@ -71,6 +71,10 @@ const FlotaPage = () => {
       const clonSel = clones.clones.find(c => c.perfil === perfilAbierto) ?? null
       const iSel = clones.clones.findIndex(c => c.perfil === perfilAbierto)
 
+      // Eje 7: cuántos clones hay lo dice clones.json, no el texto. Si mañana son
+      // ocho, el titular cambia solo esa noche.
+      const cifra = (texto: string) => texto.replaceAll('{n}', String(clones.clones.length))
+
       // Movimiento lateral DENTRO de la capa 2: cambia de clon sin volver a la capa 1.
       // Va con replaceState a propósito (ver arriba) y se anuncia con aria-live.
       const saltar = (paso: number) => {
@@ -90,9 +94,9 @@ const FlotaPage = () => {
       return (
         <Grid container spacing={6}>
           <Grid size={12}>
-            <Typography variant='h4' className='mbe-1'>{t('flota_titulo')}</Typography>
+            <Typography variant='h4' className='mbe-1'>{cifra(t('flota_titulo'))}</Typography>
             <Typography color='text.secondary' className='max-is-3xl'>
-              {t('flota_intro_1')} <em>{t('flota_intro_2')}</em>{t('flota_intro_3')}
+              {cifra(t('flota_intro_1'))} <em>{t('flota_intro_2')}</em>{t('flota_intro_3')}
             </Typography>
             <Typography variant='caption' color='text.secondary' className='flex items-center gap-1 mbs-2'>
               <i className='ri-cursor-line' aria-hidden />

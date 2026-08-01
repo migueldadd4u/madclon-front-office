@@ -22,26 +22,26 @@ import '@assets/iconify-icons/generated-icons.css'
 
 export const metadata = {
   metadataBase: new URL('https://migueldadd4u.github.io/madclon-front-office'),
-  title: 'MAD Clon — el Clon de Miguel Ángel Delgado',
+  title: 'MAD Clon — el Clon de Miguel Ángel Domínguez',
   description:
-    'Cuadro de mando público del Clon de Miguel Ángel Delgado (MAD): salud del sistema, flota de clones, consumo y eficiencia de la IA, explicados para personas.',
+    'Cuadro de mando público del Clon de Miguel Ángel Domínguez (MAD): salud del sistema, flota de clones, consumo y eficiencia de la IA, explicados para personas.',
   applicationName: 'MAD Clon',
   manifest: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/manifest.webmanifest`,
   openGraph: {
-    title: 'MAD Clon — el Clon de Miguel Ángel Delgado',
+    title: 'MAD Clon — el Clon de Miguel Ángel Domínguez',
     description:
-      'Un equipo de IA que trabaja mientras Miguel Ángel Delgado (MAD) vive su vida — los números del Clon de MAD, explicados para personas.',
+      'Un equipo de IA que trabaja mientras Miguel Ángel Domínguez (MAD) vive su vida — los números del Clon de MAD, explicados para personas.',
     url: 'https://migueldadd4u.github.io/madclon-front-office/',
     siteName: 'MAD Clon',
-    images: [{ url: '/images/og-madclon.png', width: 1200, height: 630, alt: 'MAD Clon — el Clon de Miguel Ángel Delgado' }],
+    images: [{ url: '/images/og-madclon.png', width: 1200, height: 630, alt: 'MAD Clon — el Clon de Miguel Ángel Domínguez' }],
     locale: 'es_ES',
     type: 'website'
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'MAD Clon — el Clon de Miguel Ángel Delgado',
+    title: 'MAD Clon — el Clon de Miguel Ángel Domínguez',
     description:
-      'Un equipo de IA que trabaja mientras Miguel Ángel Delgado (MAD) vive su vida — los números del Clon de MAD, explicados para personas.',
+      'Un equipo de IA que trabaja mientras Miguel Ángel Domínguez (MAD) vive su vida — los números del Clon de MAD, explicados para personas.',
     images: ['/images/og-madclon.png']
   }
 }

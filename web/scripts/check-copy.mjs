@@ -6,7 +6,7 @@
 //   node scripts/check-copy.mjs --deudas   → además lista las deudas abiertas
 //
 // REGLA 1 · identidad. Toda frase que nombre a «Miguel» debe llevar «Ángel» o «MAD»
-//   en la MISMA frase. Identidad canónica: «el Clon de Miguel Ángel Delgado (MAD)»,
+//   en la MISMA frase. Identidad canónica: «el Clon de Miguel Ángel Domínguez (MAD)»,
 //   abreviado «el Clon de MAD» tras la primera mención de cada página.
 // REGLA 2 · tecnicismos. Si una página usa una palabra técnica, esa MISMA página
 //   tiene que traerla traducida en algún punto (glosario al lado, no en otra web).
@@ -28,6 +28,12 @@ const TECNICISMOS = {
   pipeline: ['cadena de pasos', 'chain of steps']
 }
 
+// ── PROHIBIDAS ──────────────────────────────────────────────────────────────────
+// Errores de identidad que ya se cometieron una vez y no pueden repetirse.
+const PROHIBIDAS = [
+  { re: /Delgado/i, motivo: 'apellido equivocado: el titular es Miguel Ángel Domínguez (MAD)' }
+]
+
 // ── DEUDAS ABIERTAS ─────────────────────────────────────────────────────────────
 // Lista blanca EXPLÍCITA Y COMENTADA. Cada entrada es una deuda real, con el eje
 // y la entrega que debe borrarla. No se añade nada aquí sin anotarlo en MEJORAS.md.
@@ -42,6 +48,13 @@ export function comprobarCopy(base = process.cwd()) {
   const cadenas = cadenasDeCopy(base)
   const fallos = []
   const deudas = []
+
+  // Regla 0 — nada de identidades equivocadas
+  for (const { fichero, linea, texto } of cadenas) {
+    for (const p of PROHIBIDAS) {
+      if (p.re.test(texto)) fallos.push({ regla: 'identidad-prohibida', fichero, linea, evidencia: `${p.motivo} → «${texto.slice(0, 70)}»` })
+    }
+  }
 
   // Regla 1 — identidad
   for (const { fichero, linea, texto } of cadenas) {

@@ -37,7 +37,7 @@ const PLANTILLAS_ES: Plantilla[] = [
 
     if (!n) return null
 
-    return `Soy el Clon de Miguel Ángel Delgado y tengo ${n} propuestas esperando su sí o su no. Podría decidirlo todo yo solo, claro. Pero las decisiones que importan llevan firma humana: es la regla número uno de mi casa, y me gusta que lo sea.`
+    return `Soy el Clon de Miguel Ángel Domínguez y tengo ${n} propuestas esperando su sí o su no. Podría decidirlo todo yo solo, claro. Pero las decisiones que importan llevan firma humana: es la regla número uno de mi casa, y me gusta que lo sea.`
   },
   // 3 · la automejora
   d => {
@@ -82,7 +82,7 @@ const PLANTILLAS_EN: Plantilla[] = [
 
     if (!n) return null
 
-    return `I am Miguel Ángel Delgado's clone and I have ${n} proposals waiting for his yes or no. I could decide everything myself, of course. But the decisions that matter carry a human signature: that is house rule number one, and I like it that way.`
+    return `I am Miguel Ángel Domínguez's clone and I have ${n} proposals waiting for his yes or no. I could decide everything myself, of course. But the decisions that matter carry a human signature: that is house rule number one, and I like it that way.`
   },
   d => {
     const a = d.overview.automejora

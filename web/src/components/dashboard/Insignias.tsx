@@ -7,6 +7,7 @@ import Chip from '@mui/material/Chip'
 import Grid from '@mui/material/Grid'
 import LinearProgress from '@mui/material/LinearProgress'
 import Typography from '@mui/material/Typography'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 
 // Hook Imports
@@ -42,17 +43,20 @@ const Insignias = ({ data, diasVida }: Props) => {
   const puertas = overview.gateways?.length ?? 0
 
   const INSIGNIAS: Insignia[] = [
-    { id: 't300', icon: 'ri-brain-line', titulo: { es: '300 M pensados', en: '300 M thought' }, actual: tokens30d, objetivo: 300_000_000, formato: fmtCorto },
-    { id: 'd100', icon: 'ri-cake-2-line', titulo: { es: '100 días de vida', en: '100 days alive' }, actual: diasVida, objetivo: 100, formato: fmt },
-    { id: 'm100', icon: 'ri-hammer-line', titulo: { es: '100 mejoras aplicadas', en: '100 improvements applied' }, actual: mejoras, objetivo: 100, formato: fmt },
-    { id: 'p800', icon: 'ri-team-line', titulo: { es: '800 personas recordadas', en: '800 people remembered' }, actual: fichas, objetivo: 800, formato: fmt },
-    { id: 'c7', icon: 'ri-robot-2-line', titulo: { es: '7 oficios en la flota', en: '7 crafts in the fleet' }, actual: clones.clones.length, objetivo: 7, formato: fmt },
-    { id: 'g9', icon: 'ri-door-open-line', titulo: { es: '9 puertas abiertas', en: '9 open doors' }, actual: puertas, objetivo: 9, formato: fmt },
-    { id: 't500', icon: 'ri-rocket-2-line', titulo: { es: '500 M en 30 días', en: '500 M in 30 days' }, actual: tokens30d, objetivo: 500_000_000, formato: fmtCorto },
-    { id: 'p1000', icon: 'ri-group-line', titulo: { es: '1.000 personas', en: '1,000 people' }, actual: fichas, objetivo: 1000, formato: fmt },
-    { id: 'm1000', icon: 'ri-tools-line', titulo: { es: '1.000 mejoras', en: '1,000 improvements' }, actual: mejoras, objetivo: 1000, formato: fmt },
+    { id: 't300', icon: 'ri-brain-line', titulo: { es: '{n} pensados', en: '{n} thought' }, actual: tokens30d, objetivo: 300_000_000, formato: fmtCorto },
+    { id: 'd100', icon: 'ri-cake-2-line', titulo: { es: '{n} días de vida', en: '{n} days alive' }, actual: diasVida, objetivo: 100, formato: fmt },
+    { id: 'm100', icon: 'ri-hammer-line', titulo: { es: '{n} mejoras aplicadas', en: '{n} improvements applied' }, actual: mejoras, objetivo: 100, formato: fmt },
+    { id: 'p800', icon: 'ri-team-line', titulo: { es: '{n} personas recordadas', en: '{n} people remembered' }, actual: fichas, objetivo: 800, formato: fmt },
+    { id: 'c7', icon: 'ri-robot-2-line', titulo: { es: '{n} oficios en la flota', en: '{n} crafts in the fleet' }, actual: clones.clones.length, objetivo: 7, formato: fmt },
+    { id: 'g9', icon: 'ri-door-open-line', titulo: { es: '{n} puertas abiertas', en: '{n} open doors' }, actual: puertas, objetivo: 9, formato: fmt },
+    { id: 't500', icon: 'ri-rocket-2-line', titulo: { es: '{n} en 30 días', en: '{n} in 30 days' }, actual: tokens30d, objetivo: 500_000_000, formato: fmtCorto },
+    { id: 'p1000', icon: 'ri-group-line', titulo: { es: '{n} personas', en: '{n} people' }, actual: fichas, objetivo: 1000, formato: fmt },
+    { id: 'm1000', icon: 'ri-tools-line', titulo: { es: '{n} mejoras', en: '{n} improvements' }, actual: mejoras, objetivo: 1000, formato: fmt },
     { id: 'd365', icon: 'ri-calendar-todo-line', titulo: { es: 'un año de vida', en: 'one year alive' }, actual: diasVida, objetivo: 365, formato: fmt }
   ]
+
+  // El rótulo sale del propio umbral: el texto y el objetivo no pueden divergir.
+  const rotulo = (ins: Insignia) => ins.titulo[lang].replace('{n}', ins.formato(ins.objetivo))
 
   return (
     <Card>
@@ -87,7 +91,7 @@ const Insignias = ({ data, diasVida }: Props) => {
                         <Chip size='small' color='success' variant='tonal' icon={<i className='ri-check-line' />} label={t('ins_ok')} />
                       )}
                     </div>
-                    <Typography variant='subtitle1' fontWeight={600}>{ins.titulo[lang]}</Typography>
+                    <Typography variant='subtitle1' fontWeight={600}>{rotulo(ins)}</Typography>
                     {desbloqueada ? (
                       <Typography variant='caption' color='text.secondary' className='font-mono'>
                         {ins.formato(ins.actual)}
@@ -98,7 +102,7 @@ const Insignias = ({ data, diasVida }: Props) => {
                           variant='determinate'
                           value={Math.min(100, (ins.actual / ins.objetivo) * 100)}
                           color='primary'
-                          aria-label={`${ins.titulo[lang]}: ${ins.formato(ins.actual)} / ${ins.formato(ins.objetivo)}`}
+                          aria-label={`${rotulo(ins)}: ${ins.formato(ins.actual)} / ${ins.formato(ins.objetivo)}`}
                         />
                         <Typography variant='caption' color='text.disabled' className='font-mono'>
                           {ins.formato(ins.actual)} / {ins.formato(ins.objetivo)}

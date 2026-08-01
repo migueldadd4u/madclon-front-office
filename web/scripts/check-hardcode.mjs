@@ -35,19 +35,25 @@ const BLANCA = [
   { re: /\bde cada (diez|10)\b|\bout of (ten|10)\b/i, motivo: 'base fija de la proporción; el numerador sí sale del JSON' },
   { re: /\bcinco (nodos|preguntas)\b|\bfive (nodes|questions)\b/i, motivo: 'constante de la marca (M constelación) y del checklist' },
   { re: /\b30 (días|days|d)\b/i, motivo: 'ventana fija de medición del exportador, no una cifra medida' },
-  { re: /(^|[\s:])0\s?€|€0\b/, motivo: 'el cero es un hecho verificable, no una estimación que envejezca' }
+  { re: /(^|[\s:])0\s?€|€0\b/, motivo: 'el cero es un hecho verificable, no una estimación que envejezca' },
+  // Saldadas o justificadas en la entrega 4 (2026-08-01):
+  { fichero: 'src/app/(dashboard)/historia/page.tsx', motivo: 'línea de tiempo: cada hito cuenta lo que pasó ESE día; actualizarlo con los datos de hoy sería reescribir la historia' },
+  { re: /\b(dos|two) (voces|voices)\b/i, motivo: 'constante estructural del gráfico: siempre son dos series (piensa / termina)' },
+  { re: /\b(un aviso o dos|a warning or two)\b/i, motivo: 'modismo, no un recuento' },
+  { re: /\b(capa|layer) [12]\b/i, motivo: 'nombre de la capa de navegación, no una cifra medida' },
+  { re: /\b(de cada|out of every) (10|1\.000|1,000|diez|ten)\b/i, motivo: 'base fija de la proporción; el numerador sí sale del JSON' },
+  { re: /token ≈|un token|one token/i, motivo: 'definición de la unidad (≈3-4 letras, ~500 por página): constante del mundo' },
+  { re: /\b0?3:00\b/, motivo: 'hora del reloj a la que corre la rutina, no una medida' },
+  { re: /· 7 (días|days)\b/, motivo: 'ventana fija de la serie de automejora, igual que los 30 días del exportador' }
 ]
 
 // ── DEUDAS ABIERTAS ─────────────────────────────────────────────────────────────
 // Cifras a mano ya detectadas y aún no derivadas de los JSON. Las salda la entrega 4.
-const DEUDA = [
-  { fichero: 'src/lib/i18n.tsx', motivo: 'eje 7: «siete clones / octavo actor» a mano (entrega 4)' },
-  { fichero: 'src/app/(dashboard)/preguntas/page.tsx', motivo: 'eje 7: «cientos de millones / una decena / siete» a mano (entrega 4)' },
-  { fichero: 'src/app/(dashboard)/historia/page.tsx', motivo: 'eje 7: hitos narrativos con cifras a mano (entrega 4)' },
-  { fichero: 'src/components/dashboard/Insignias.tsx', motivo: 'eje 7: umbrales de insignia a mano (entrega 4)' }
-]
+// Vacía desde la entrega 4 (2026-08-01): las cifras que envejecían ya se derivan de los
+// JSON. Lo que queda en BLANCA no son medidas, son constantes; cualquier cifra nueva FALLA.
+const DEUDA = []
 
-const enBlanca = texto => BLANCA.find(b => b.re.test(texto))
+const enBlanca = (texto, fichero) => BLANCA.find(b => (b.re ? b.re.test(texto) : b.fichero === fichero))
 const enDeuda = fichero => DEUDA.find(d => d.fichero === fichero)
 
 export function comprobarHardcode(base = process.cwd()) {
@@ -59,7 +65,7 @@ export function comprobarHardcode(base = process.cwd()) {
   for (const { fichero, linea, texto } of cadenas) {
     // Los huecos de reemplaza() son la forma correcta: no cuentan como cifra.
     const limpio = texto.replace(/\{[a-z0-9_]+\}/gi, '§')
-    const blanca = enBlanca(limpio)
+    const blanca = enBlanca(limpio, fichero)
 
     if (blanca) continue
 

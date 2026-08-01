@@ -21,6 +21,7 @@ import DiaEnLaVida from '@/components/dashboard/DiaEnLaVida'
 import ProgresoDia from '@/components/dashboard/ProgresoDia'
 import ConsolaClon from '@/components/dashboard/ConsolaClon'
 import HeroAmbiental from '@/components/dashboard/HeroAmbiental'
+import DatoRancio from '@/components/dashboard/DatoRancio'
 
 // Hook Imports
 import { useLang } from '@/lib/i18n'
@@ -132,11 +133,17 @@ const InicioPage = () => {
           tokens: p.contexto?.tokens ?? 0,
           tareas: p.contexto?.tareas_hechas ?? 0
         }))
+
         const mediaTokens = pts.length > 0 ? pts.reduce((a, p) => a + p.tokens, 0) / pts.length : 0
         const pctDia = (v: number) => (mediaTokens > 0 ? Math.round((v / mediaTokens) * 100) : null)
 
         return (
           <Grid container spacing={6}>
+            {/* Si el refresco nocturno no ha corrido, la web lo confiesa (eje 7) */}
+            <Grid size={12} className='empty:hidden'>
+              <DatoRancio generado={manifest.generado} />
+            </Grid>
+
             {/* Cabecera de informe — solo aparece en papel */}
             <Grid size={12} className='fo-print-only'>
               <div className='flex flex-wrap items-baseline justify-between gap-2'>
@@ -239,7 +246,9 @@ const InicioPage = () => {
 
             {/* Qué es */}
             <Grid size={12}>
-              <Typography variant='h5' className='mbe-1'>{t('home_quees_titulo')}</Typography>
+              <Typography variant='h5' className='mbe-1'>
+                {t('home_quees_titulo').replace('{n}', String(PASOS.length))}
+              </Typography>
               <Typography color='text.secondary'>{t('home_quees_sub')}</Typography>
             </Grid>
             {PASOS.map((p, i) => (

@@ -162,7 +162,7 @@ def main():
     draw.text((303, 214), "Front Office · la sala de control, abierta", font=f_sub, fill=(255, 255, 255, 225))
     draw.text(
         (72, 330),
-        "Un equipo de IA que trabaja mientras Miguel Ángel Delgado (MAD) vive su vida —\nlos números del Clon de MAD, explicados para personas.",
+        "Un equipo de IA que trabaja mientras Miguel Ángel Domínguez (MAD) vive su vida —\nlos números del Clon de MAD, explicados para personas.",
         font=f_tag,
         fill=(255, 255, 255, 205),
         spacing=10,
