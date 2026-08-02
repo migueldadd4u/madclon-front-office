@@ -44,6 +44,8 @@
 
 ## 2026-07-31
 
+- **robots.txt con la puerta abierta** — Una web que enseña un clon de IA no puede esconderse de los bots de IA: `robots.txt` da paso a todo el mundo, nombra a los 12 agentes conocidos (GPTBot, ClaudeBot, PerplexityBot, Googlebot, Bingbot…) con bienvenida explícita y señala el sitemap para que nadie adivine la ruta. Mismo patrón que add4u-web. Commit `1f9c63a`.
+
 - **Sitemap que se fecha solo** — La web estrena `sitemap.xml` (las 8 páginas, `changefreq` daily porque los datos se regeneran cada noche, prioridad 1 en portada) con el `lastmod` derivado del sello de build — el mismo patrón que add4u-web: la fecha sale de `vAñoMesDiaHoraMinutoSegundo` en lugar de escribirse a mano, así que se actualiza sola en cada despliegue y nunca miente sobre la frescura del contenido. Verificado en producción: el `lastmod` del sitemap publicado (21:08:36) es el del build del CI, no el de ningún fichero. Commit `452b0a6`.
 
 - **Sello de versión en el footer** — El mismo esquema que la web de add4u: cada build queda estampado como `vAñoMesDiaHoraMinutoSegundo` + centésimas en hora de Madrid (`v2026073120583880` en este despliegue), visible en el pie en mono con tooltip bilingüe («generado el 31/07/2026 20:58 (hora de Madrid)» / «built on … (Madrid time)»). Lo genera `scripts/build-stamp.mjs` en `prebuild`/`predev`, así que el CI lo reestampa solo en cada despliegue: el sello publicado siempre corresponde al build que se subió, sin tocar números a mano. Se sabe al instante qué versión se está viendo — y si el CDN ya sirvió la nueva. Commit `70b73b6`.
