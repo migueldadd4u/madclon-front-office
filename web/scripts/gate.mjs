@@ -9,8 +9,9 @@
 //   node scripts/gate.mjs --rapido        → matriz reducida (para el bucle de bugfixing)
 //   node scripts/gate.mjs --saltar-build  → reutiliza web/out ya construido
 //
-// Playwright y axe-core se toman de /tmp/pwshot (convención del proyecto);
-// se puede apuntar a otro sitio con PW_HOME=/ruta/con/node_modules.
+// Playwright y axe-core se descubren en la ruta persistente compartida con el
+// panel privado. /tmp/pwshot queda solo como compatibilidad: macOS puede podarlo
+// dejando directorios a medias. PW_HOME sigue siendo la prioridad explícita.
 
 import { execSync } from 'node:child_process'
 import { createServer } from 'node:http'
@@ -19,9 +20,9 @@ import { readFileSync, existsSync, statSync } from 'node:fs'
 import { join, extname, resolve } from 'node:path'
 import { comprobarCopy } from './check-copy.mjs'
 import { comprobarHardcode } from './check-hardcode.mjs'
+import { resolverPlaywrightHome } from './playwright-home.mjs'
 
 const RAIZ = resolve(process.cwd())
-const PW_HOME = process.env.PW_HOME || '/tmp/pwshot'
 const BASE = '/madclon-front-office'
 const PUERTO = Number(process.env.GATE_PORT || 4173)
 const PAGINAS = ['', 'flota', 'salud', 'tokens', 'eficiencia', 'actividad', 'historia', 'preguntas']
@@ -192,6 +193,17 @@ function servir() {
 
 // ── 5-12 · comprobaciones en navegador ──────────────────────────────────────────
 async function navegador() {
+  let PW_HOME
+
+  try {
+    sh('node --test scripts/playwright-home.test.mjs')
+    ;({ directorio: PW_HOME } = resolverPlaywrightHome())
+  } catch (e) {
+    marca(5, 'axe / navegador', false, String(e.message || e).slice(0, 500))
+
+    return
+  }
+
   const req = createRequire(join(PW_HOME, 'noop.js'))
   let chromium, axeSrc
 
