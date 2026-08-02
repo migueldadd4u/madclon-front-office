@@ -1,12 +1,10 @@
 // MAD Clon — service worker mínimo (PWA de verdad)
 // Estáticos con hash: caché primero (offline total una vez vistos).
 // Páginas HTML: red primero (fresco); sin red, la última versión vista.
-// JSON de /data: caché de UN DÍA — fresco se sirve al instante; viejo o sin red, lo guardado.
-const VERSION = 'v2' // v2: los JSON se clonan antes de sellarlos en caché (arreglo del ERR_FAILED en frío)
+// JSON de /data: siempre red y no-store. Nunca entra en Cache Storage ni queda offline.
+const VERSION = 'v3-no-public-data-cache'
 const ESTATICA = `madclon-estatica-${VERSION}`
 const PAGINAS = `madclon-paginas-${VERSION}`
-const DATOS = `madclon-datos-${VERSION}`
-const DIA_MS = 24 * 60 * 60 * 1000
 
 // Subruta real del despliegue (p. ej. /madclon-front-office), derivada del scope
 const BASE = new URL(self.registration.scope).pathname.replace(/\/$/, '')
@@ -14,15 +12,14 @@ const BASE = new URL(self.registration.scope).pathname.replace(/\/$/, '')
 // Cachés pre-abiertas en el arranque: las respuestas no esperan aperturas en frío
 const ESTATICA_P = caches.open(ESTATICA)
 const PAGINAS_P = caches.open(PAGINAS)
-const DATOS_P = caches.open(DATOS)
 
 self.addEventListener('install', e => {
   // La primera carga llega antes de que el SW mande: en la instalación
-  // precacheamos la portada, sus chunks (leyendo el HTML), el manifiesto y
-  // los JSON del día — así el modo offline es completo desde la PRIMERA visita.
+  // precacheamos la portada, sus chunks (leyendo el HTML) y el manifiesto.
+  // Los JSON públicos quedan expresamente fuera del modo offline.
   e.waitUntil(
     (async () => {
-      const [paginas, estatica, datos] = await Promise.all([caches.open(PAGINAS), caches.open(ESTATICA), caches.open(DATOS)])
+      const [paginas, estatica] = await Promise.all([caches.open(PAGINAS), caches.open(ESTATICA)])
       const res = await fetch(`${BASE}/`)
 
       if (res.ok) {
@@ -35,9 +32,6 @@ self.addEventListener('install', e => {
         await Promise.allSettled([...urls].map(u => estatica.add(u)))
       }
 
-      const jsons = ['manifest', 'overview', 'serie', 'tokens', 'clones'].map(n => `${BASE}/data/${n}.json`)
-
-      await Promise.allSettled(jsons.map(u => datos.add(u)))
       await self.skipWaiting()
     })()
   )
@@ -48,7 +42,11 @@ self.addEventListener('activate', e => {
     (async () => {
       const claves = await caches.keys()
 
-      await Promise.all(claves.filter(c => c.startsWith('madclon-') && !c.endsWith(VERSION)).map(c => caches.delete(c)))
+      await Promise.all(
+        claves
+          .filter(c => c.startsWith('madclon-datos-') || (c.startsWith('madclon-') && !c.endsWith(VERSION)))
+          .map(c => caches.delete(c))
+      )
       await self.clients.claim()
     })()
   )
@@ -73,39 +71,9 @@ self.addEventListener('fetch', e => {
 
   if (url.origin !== self.location.origin) return
 
-  // JSON con caché de un día
+  // Los datos no se precachean, no se guardan y no tienen fallback offline.
   if (esDatos(url.pathname)) {
-    e.respondWith(
-      (async () => {
-        const cache = await DATOS_P
-        const guardada = await cache.match(req)
-        const fecha = guardada && Number(guardada.headers.get('sw-fecha'))
-
-        if (guardada && fecha && Date.now() - fecha < DIA_MS) return guardada
-
-        try {
-          const res = await fetch(req)
-
-          if (res.ok) {
-            const cabeceras = new Headers(res.headers)
-
-            cabeceras.set('sw-fecha', String(Date.now()))
-
-            // Ojo: hay que clonar ANTES de construir la copia sellada. Pasar `res.body`
-            // directamente deja la respuesta original sin cuerpo y la página recibe un
-            // ERR_FAILED en el primer arranque (era la causa del reintento a los 1,5 s).
-            const copia = res.clone()
-
-            cache.put(req, new Response(copia.body, { status: copia.status, statusText: copia.statusText, headers: cabeceras }))
-          }
-
-          return res
-        } catch (err) {
-          if (guardada) return guardada // sin red: sirve lo guardado aunque esté viejo
-          throw err
-        }
-      })()
-    )
+    e.respondWith(fetch(req, { cache: 'no-store' }))
 
     return
   }

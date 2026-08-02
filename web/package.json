@@ -5,9 +5,10 @@
   "private": true,
   "scripts": {
     "predev": "node scripts/build-stamp.mjs",
-    "prebuild": "node scripts/build-stamp.mjs",
+    "prebuild": "node scripts/public-safety.mjs --source && node scripts/build-stamp.mjs",
     "dev": "next dev --turbopack",
     "build": "next build",
+    "postbuild": "node scripts/public-safety.mjs --out",
     "start": "next start",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
@@ -16,7 +17,10 @@
     "postinstall": "npm run build:icons",
     "clean": "rm -rf .next",
     "clear": "rm -rf node_modules .next",
-    "gate": "node scripts/gate.mjs"
+    "gate": "node scripts/gate.mjs",
+    "check:public-safety": "node scripts/public-safety.mjs --source",
+    "check:public-safety:out": "node scripts/public-safety.mjs --out",
+    "test:public-safety": "node --test scripts/public-safety.test.mjs"
   },
   "dependencies": {
     "@emotion/cache": "11.14.0",

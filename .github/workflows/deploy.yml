@@ -32,9 +32,21 @@ jobs:
         working-directory: web
         run: yarn install --frozen-lockfile --non-interactive
 
+      - name: Public safety regressions
+        working-directory: web
+        run: yarn test:public-safety
+
+      - name: Public safety gate (source)
+        working-directory: web
+        run: yarn check:public-safety
+
       - name: Build (export estático)
         working-directory: web
         run: yarn build
+
+      - name: Public safety gate (export)
+        working-directory: web
+        run: yarn check:public-safety:out
 
       - uses: actions/configure-pages@v5
 

@@ -4,8 +4,8 @@
 // Regla dura: si algo se puede medir con un script, no lo decide un LLM.
 // Nada se publica sin pasar este gate ENTERO en verde, en local.
 //
-//   npx yarn@1.22.22 gate                 → las 12 comprobaciones
-//   node scripts/gate.mjs --sin-navegador → solo 1-4 (build, tipos, copy, cifras)
+//   npx yarn@1.22.22 gate                 → las 13 comprobaciones (0-12)
+//   node scripts/gate.mjs --sin-navegador → solo 0-4 (seguridad, build, tipos, copy, cifras)
 //   node scripts/gate.mjs --rapido        → matriz reducida (para el bucle de bugfixing)
 //   node scripts/gate.mjs --saltar-build  → reutiliza web/out ya construido
 //
@@ -18,9 +18,11 @@ import { createServer } from 'node:http'
 import { createRequire } from 'node:module'
 import { readFileSync, existsSync, statSync } from 'node:fs'
 import { join, extname, resolve } from 'node:path'
+
 import { comprobarCopy } from './check-copy.mjs'
 import { comprobarHardcode } from './check-hardcode.mjs'
 import { resolverPlaywrightHome } from './playwright-home.mjs'
+import { auditPublicSafety, formatFinding } from './public-safety.mjs'
 
 const RAIZ = resolve(process.cwd())
 const BASE = '/madclon-front-office'
@@ -75,9 +77,22 @@ function contarProblemas(salida) {
   return m ? Number(m[1]) : 0
 }
 
-// ── 1-4 · comprobaciones estáticas ──────────────────────────────────────────────
+// ── 0-4 · comprobaciones estáticas ──────────────────────────────────────────────
 function estaticas() {
   log('\n▸ Estáticas')
+
+  // 0 · privacidad y superficie pública: datos allowlisted, sin API/mutaciones
+  //     y service worker incapaz de guardar JSON.
+  const seguridad = auditPublicSafety({ webRoot: RAIZ, mode: 'source' })
+
+  marca(
+    0,
+    'public safety (allowlist + sólo GET same-origin + JSON no-store)',
+    seguridad.length === 0,
+    seguridad.length === 0
+      ? '0 hallazgos'
+      : `${seguridad.length} hallazgos · ${seguridad.slice(0, 3).map(formatFinding).join(' | ')}`
+  )
 
   // 1 · build
   if (process.argv.includes('--saltar-build')) {
@@ -90,6 +105,7 @@ function estaticas() {
         env: { ...process.env, BASEPATH: BASE },
         maxBuffer: 64 * 1024 * 1024
       })
+
       const warns = (out.match(/\bwarn(ing)?\b/gi) || []).length
 
       marca(1, 'build BASEPATH=/madclon-front-office', warns === 0, `0 errores, ${warns} warnings`)
@@ -106,7 +122,7 @@ function estaticas() {
   try {
     sh('npx tsc --noEmit')
     detalle.push('tsc limpio')
-  } catch (e) {
+  } catch {
     ok2 = false
     detalle.push('tsc CON ERRORES')
   }
@@ -124,6 +140,7 @@ function estaticas() {
     } catch (e) {
       salida = String(e.stdout || '') + String(e.stderr || '')
     }
+
     const n = contarProblemas(salida)
 
     if (n > base[clave]) ok2 = false
@@ -161,6 +178,7 @@ const MIME = {
 
 function servir() {
   const raizOut = join(RAIZ, 'out')
+
   const srv = createServer((req, res) => {
     let ruta = decodeURIComponent(req.url.split('?')[0])
 
@@ -169,6 +187,7 @@ function servir() {
 
       return
     }
+
     ruta = ruta.slice(BASE.length) || '/'
     let f = join(raizOut, ruta)
 
@@ -177,6 +196,7 @@ function servir() {
     } catch {
       if (existsSync(f + '.html')) f = f + '.html'
     }
+
     if (!existsSync(f)) {
       res.writeHead(404, { 'content-type': 'text/html; charset=utf-8' }).end(
         existsSync(join(raizOut, '404.html')) ? readFileSync(join(raizOut, '404.html')) : 'no está'
@@ -184,6 +204,7 @@ function servir() {
 
       return
     }
+
     res.writeHead(200, { 'content-type': MIME[extname(f)] || 'application/octet-stream' })
     res.end(readFileSync(f))
   })
@@ -210,7 +231,7 @@ async function navegador() {
   try {
     ;({ chromium } = req('playwright'))
     axeSrc = readFileSync(join(PW_HOME, 'node_modules/axe-core/axe.min.js'), 'utf8')
-  } catch (e) {
+  } catch {
     marca(5, 'axe / navegador', false, `no hay playwright+axe en ${PW_HOME} (PW_HOME=… para cambiarlo)`)
 
     return
@@ -222,14 +243,37 @@ async function navegador() {
   const violaciones = []
   const erroresJs = []
   const respuestasMalas = []
+  const metodosMutadores = []
+  const origenesExternos = []
   const overflow = []
   const tactiles = []
+  const origenLocal = new URL(url('')).origin
+
+  const vigilarSuperficie = (ctx, etiqueta) => {
+    ctx.on('request', request => {
+      const metodo = request.method().toUpperCase()
+
+      if (!['GET', 'HEAD'].includes(metodo)) metodosMutadores.push(`${etiqueta}: ${metodo}`)
+
+      try {
+        const destino = new URL(request.url())
+
+        if (['http:', 'https:'].includes(destino.protocol) && destino.origin !== origenLocal) {
+          origenesExternos.push(`${etiqueta}: origen externo`)
+        }
+      } catch {
+        origenesExternos.push(`${etiqueta}: URL no verificable`)
+      }
+    })
+  }
 
   log('\n▸ Navegador')
 
   for (const lang of IDIOMAS) {
     for (const contraste of CONTRASTES) {
       const ctx = await navegadorPw.newContext({ viewport: { width: 1440, height: 900 } })
+
+      vigilarSuperficie(ctx, `${lang}${contraste ? '/AC' : ''}`)
 
       await ctx.addInitScript(
         ([l, c]) => {
@@ -249,6 +293,7 @@ async function navegador() {
         }
       })
       pg.on('response', r => r.status() >= 400 && respuestasMalas.push(`${r.status()} ${r.url()}`))
+
       // ERR_ABORTED = prefetch de Next cancelado porque el gate navega/redimensiona
       // deprisa. Es un efecto del propio barrido, no un fallo de la web.
       pg.on('requestfailed', r => {
@@ -273,6 +318,7 @@ async function navegador() {
 
           if (ANCHOS_AXE.includes(w)) {
             await pg.evaluate(axeSrc)
+
             const r = await pg.evaluate(async () =>
               axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } })
             )
@@ -293,6 +339,7 @@ async function navegador() {
 
                 if (r.width === 0 || r.height === 0) continue
                 if (getComputedStyle(el).visibility === 'hidden') continue
+
                 if (r.width < 44 || r.height < 44) {
                   out.push(
                     `${el.tagName.toLowerCase()}${el.className && typeof el.className === 'string' ? '.' + el.className.split(' ')[0] : ''} ${Math.round(r.width)}×${Math.round(r.height)} «${(el.getAttribute('aria-label') || el.textContent || '').trim().slice(0, 24)}»`
@@ -307,6 +354,7 @@ async function navegador() {
           }
         }
       }
+
       // La capa 2 ABIERTA también se audita. Auditarla solo cerrada dejó pasar a
       // producción tres botones a 3.01:1 en la entrega 3: lo que no se abre, no se mide.
       for (const w of ANCHOS_AXE) {
@@ -319,6 +367,7 @@ async function navegador() {
         await abridor.click()
         await pg.waitForTimeout(700)
         await pg.evaluate(axeSrc)
+
         const r = await pg.evaluate(async () =>
           axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } })
         )
@@ -336,8 +385,12 @@ async function navegador() {
   const matriz = `${PAGINAS.length} páginas + capa 2 × ${ANCHOS_AXE.join('/')} × ${IDIOMAS.join('/')} × ${CONTRASTES.length === 2 ? 'normal+AC' : 'normal'}`
 
   marca(5, `axe wcag2a/2aa/21aa (${matriz})`, violaciones.length === 0, violaciones.slice(0, 6).join(' | ') || '0 serious, 0 critical')
-  marca(6, 'consola y red en el mismo barrido', erroresJs.length === 0 && respuestasMalas.length === 0,
-    `${erroresJs.length} errores JS · ${respuestasMalas.length} respuestas ≥400 ${[...erroresJs, ...respuestasMalas].slice(0, 3).join(' | ')}`)
+  marca(
+    6,
+    'consola + red GET/HEAD same-origin en el mismo barrido',
+    erroresJs.length === 0 && respuestasMalas.length === 0 && metodosMutadores.length === 0 && origenesExternos.length === 0,
+    `${erroresJs.length} errores JS · ${respuestasMalas.length} respuestas ≥400 · ${metodosMutadores.length} mutaciones · ${origenesExternos.length} orígenes externos ${[...erroresJs, ...respuestasMalas].slice(0, 3).join(' | ')}`
+  )
   marca(7, `overflow horizontal (${ANCHOS_OVERFLOW.join('/')})`, overflow.length === 0, overflow.slice(0, 5).join(' | ') || 'ninguna página desborda')
   marca(8, 'objetivos táctiles ≥ 44 px @390', tactiles.length === 0, tactiles.slice(0, 6).join(' | ') || `0 por debajo de 44 px`)
 
@@ -355,6 +408,7 @@ async function navegador() {
   const hayAbridor = (await abridor.count()) > 0
 
   pasosTeclado.push(`abridor de capa 2: ${hayAbridor ? 'sí' : 'NO'}`)
+
   if (hayAbridor) {
     // Con Tab de verdad: `.focus()` programático no dispara :focus-visible y daría
     // un «foco invisible» falso.
@@ -365,7 +419,9 @@ async function navegador() {
       await k.keyboard.press('Tab')
       llega = await k.evaluate(() => !!document.activeElement?.closest('[data-anatomia-abrir]'))
     }
+
     pasosTeclado.push(`Tab llega al abridor: ${llega ? 'sí' : 'NO'}`)
+
     const focoVisible =
       llega &&
       (await k.evaluate(() => {
@@ -461,10 +517,12 @@ async function navegador() {
     for (const h of [...hrefs, og].filter(Boolean)) {
       if (vistos.has(h)) continue
       vistos.add(h)
+
       if (/\/madclon-front-office\/madclon-front-office/.test(h)) {
         rotos.push(`subruta duplicada: ${h}`)
         continue
       }
+
       const abs = h.startsWith('http') ? h : `http://localhost:${PUERTO}${h.startsWith(BASE) ? h : BASE + h}`
       const r = await k.request.get(abs)
 
