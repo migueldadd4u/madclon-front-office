@@ -760,6 +760,11 @@ async function navegador() {
       })
     },
     {
+      nombre: 'sin-permiso-403',
+      fichero: 'manifest',
+      responder: route => route.fulfill({ status: 403, contentType: 'text/plain', body: 'PRIVATE_CANARY_NO_ECO' })
+    },
+    {
       nombre: 'fuente-503',
       fichero: 'manifest',
       responder: route => route.fulfill({ status: 503, contentType: 'text/plain', body: 'PRIVATE_CANARY_NO_ECO' })
@@ -813,7 +818,7 @@ async function navegador() {
     14,
     'retenido + incompleto/corrupto/fallo de fuente sin eco',
     problemasFuente.length === 0,
-    problemasFuente.slice(0, 6).join(' | ') || 'ES/EN+lang · 6 fallos cerrados · 0 eco · 0 error no controlado'
+    problemasFuente.slice(0, 6).join(' | ') || `ES/EN+lang · ${casosFuente.length} fallos cerrados · 0 eco · 0 error no controlado`
   )
 
   await ctxK.close()
