@@ -34,6 +34,21 @@ const ANCHOS_OVERFLOW = [320, 375, 390, 834, 1440]
 const IDIOMAS = rapido ? ['es'] : ['es', 'en']
 const CONTRASTES = rapido ? [false] : [false, true]
 
+const TITULOS_DOCUMENTO = {
+  es: 'MAD Clon — el Clon de Miguel Ángel Domínguez',
+  en: "MAD Clon — Miguel Ángel Domínguez's Clone"
+}
+
+const TITULOS_PORTADA = {
+  es: 'La sala de control del Clon de MAD',
+  en: 'The MAD Clone control room'
+}
+
+const TITULOS_404 = {
+  es: 'Esta página no existe… pero el Clon de MAD sigue trabajando',
+  en: "This page doesn't exist… but MAD's clone keeps working"
+}
+
 // ── DEUDAS ABIERTAS DEL GATE ────────────────────────────────────────────────────
 // Comprobaciones que hoy NO puede pasar la web porque miden una deuda todavía sin
 // saldar. Se ejecutan igual y se imprimen ALTO, pero no tumban el gate hasta que la
@@ -57,6 +72,17 @@ const TACTIL_BLANCA = [
 
 const log = (...a) => console.log(...a)
 const resultados = []
+
+const resumirViolacionAxe = v => {
+  const nodo = v.nodes?.[0]
+
+  if (!nodo) return ''
+
+  const objetivo = JSON.stringify(nodo.target?.[0] ?? nodo.target ?? 'nodo sin selector')
+  const causa = String(nodo.failureSummary || '').replace(/\s+/g, ' ').trim().slice(0, 280)
+
+  return ` · ${objetivo}${causa ? ` · ${causa}` : ''}`
+}
 
 function marca(n, nombre, ok, evidencia) {
   const deuda = DEUDAS[n]
@@ -259,6 +285,7 @@ async function navegador() {
   const origenesExternos = []
   const overflow = []
   const tactiles = []
+  const problemasIdioma = []
   const origenLocal = new URL(url('')).origin
 
   const vigilarSuperficie = (ctx, etiqueta) => {
@@ -318,6 +345,24 @@ async function navegador() {
         await pg.goto(url(p), { waitUntil: 'domcontentloaded' })
         await pg.waitForTimeout(1600)
 
+        const documento = await pg.evaluate(() => ({
+          lang: document.documentElement.lang,
+          title: document.title,
+          h1: [...document.querySelectorAll('h1')].map(item => item.textContent?.trim())
+        }))
+
+        if (documento.lang !== lang || documento.title !== TITULOS_DOCUMENTO[lang]) {
+          problemasIdioma.push(
+            `${p || 'portada'} ${lang}${contraste ? '/AC' : ''}: lang=${documento.lang} title=${JSON.stringify(documento.title)}`
+          )
+        }
+
+        if (!p && (documento.h1.length !== 1 || documento.h1[0] !== TITULOS_PORTADA[lang])) {
+          problemasIdioma.push(
+            `portada ${lang}${contraste ? '/AC' : ''}: h1=${JSON.stringify(documento.h1)}`
+          )
+        }
+
         for (const w of ANCHOS_OVERFLOW) {
           await pg.setViewportSize({ width: w, height: 900 })
           await pg.waitForTimeout(320)
@@ -336,7 +381,9 @@ async function navegador() {
             )
 
             r.violations.forEach(v =>
-              violaciones.push(`${p || 'portada'} @${w} ${lang}${contraste ? '/AC' : ''}: ${v.id} (${v.impact || 'sin impacto'}) (${v.nodes.length})`)
+              violaciones.push(
+                `${p || 'portada'} @${w} ${lang}${contraste ? '/AC' : ''}: ${v.id} (${v.impact || 'sin impacto'}) (${v.nodes.length})${resumirViolacionAxe(v)}`
+              )
             )
           }
 
@@ -385,7 +432,9 @@ async function navegador() {
         )
 
         r.violations.forEach(v =>
-          violaciones.push(`capa2 @${w} ${lang}${contraste ? '/AC' : ''}: ${v.id} (${v.impact || 'sin impacto'}) (${v.nodes.length})`)
+          violaciones.push(
+            `capa2 @${w} ${lang}${contraste ? '/AC' : ''}: ${v.id} (${v.impact || 'sin impacto'}) (${v.nodes.length})${resumirViolacionAxe(v)}`
+          )
         )
         await pg.keyboard.press('Escape')
       }
@@ -394,9 +443,94 @@ async function navegador() {
     }
   }
 
-  const matriz = `${PAGINAS.length} páginas + capa 2 × ${ANCHOS_AXE.join('/')} × ${IDIOMAS.join('/')} × ${CONTRASTES.length === 2 ? 'normal+AC' : 'normal'}`
+  // El 404 es parte de la superficie pública: conserva idioma, título, un único
+  // h1, navegación de vuelta, accesibilidad y anchura en los tres formatos.
+  for (const lang of IDIOMAS) {
+    for (const contraste of CONTRASTES) {
+      for (const w of ANCHOS_AXE) {
+        const variante = `${lang}${contraste ? '/AC' : ''}`
+        const etiqueta404 = `404/${variante}/${w}`
+        const ctx404 = await navegadorPw.newContext({ viewport: { width: w, height: 900 } })
 
-  marca(5, `axe wcag2a/2aa/21aa (${matriz})`, violaciones.length === 0, violaciones.slice(0, 6).join(' | ') || '0 violaciones')
+        vigilarSuperficie(ctx404, etiqueta404)
+        await ctx404.addInitScript(
+          ([l, c]) => {
+            localStorage.setItem('madclon-lang', l)
+            localStorage.setItem('madclon-contraste', c)
+          },
+          [lang, contraste ? '1' : '0']
+        )
+        const pg404 = await ctx404.newPage()
+        const destino404 = url('__gate-404__')
+
+        pg404.on('pageerror', e => erroresJs.push(`${etiqueta404} ${e.message}`))
+        pg404.on('console', m => {
+          if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) {
+            erroresJs.push(`${etiqueta404} consola: ${m.text().slice(0, 120)}`)
+          }
+        })
+        pg404.on('response', r => {
+          if (r.status() >= 400 && r.url() !== destino404) respuestasMalas.push(`${r.status()} ${r.url()}`)
+        })
+        pg404.on('requestfailed', r => {
+          const err = r.failure()?.errorText || ''
+
+          if (!/ERR_ABORTED/.test(err)) respuestasMalas.push(`${err} ${r.url().slice(0, 90)}`)
+        })
+
+        const respuesta404 = await pg404.goto(destino404, { waitUntil: 'domcontentloaded' })
+
+        await pg404.waitForTimeout(500)
+
+        const estado404 = await pg404.evaluate(() => ({
+          lang: document.documentElement.lang,
+          title: document.title,
+          h1: [...document.querySelectorAll('h1')].map(item => item.textContent?.trim()),
+          overflow: document.documentElement.scrollWidth - window.innerWidth
+        }))
+
+        if (
+          respuesta404?.status() !== 404 ||
+          estado404.lang !== lang ||
+          estado404.title !== TITULOS_DOCUMENTO[lang] ||
+          estado404.h1.length !== 1 ||
+          estado404.h1[0] !== TITULOS_404[lang]
+        ) {
+          problemasIdioma.push(
+            `${etiqueta404}: status=${respuesta404?.status()} lang=${estado404.lang} title=${JSON.stringify(estado404.title)} h1=${JSON.stringify(estado404.h1)}`
+          )
+        }
+
+        if (estado404.overflow > 1) overflow.push(`404 @${w} +${estado404.overflow}px (${variante})`)
+
+        const volver = await pg404.getByRole('link').getAttribute('href')
+
+        if (volver !== `${BASE}/`) problemasIdioma.push(`${etiqueta404}: volver=${JSON.stringify(volver)}`)
+
+        await pg404.evaluate(axeSrc)
+
+        const a11y404 = await pg404.evaluate(async () =>
+          axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } })
+        )
+
+        a11y404.violations.forEach(v =>
+          violaciones.push(
+            `404 @${w} ${variante}: ${v.id} (${v.impact || 'sin impacto'}) (${v.nodes.length})${resumirViolacionAxe(v)}`
+          )
+        )
+        await ctx404.close()
+      }
+    }
+  }
+
+  const matriz = `${PAGINAS.length} páginas + capa 2 + 404 × ${ANCHOS_AXE.join('/')} × ${IDIOMAS.join('/')} × ${CONTRASTES.length === 2 ? 'normal+AC' : 'normal'}`
+
+  marca(
+    5,
+    `axe + idioma semántico (${matriz})`,
+    violaciones.length === 0 && problemasIdioma.length === 0,
+    [...violaciones, ...problemasIdioma].slice(0, 6).join(' | ') || '0 violaciones · lang/title/h1 404 correctos'
+  )
   marca(
     6,
     'consola + red GET/HEAD same-origin en el mismo barrido',

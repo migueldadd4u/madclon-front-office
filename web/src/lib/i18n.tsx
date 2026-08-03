@@ -9,6 +9,11 @@ import type { ReactNode } from 'react'
 export type Lang = 'es' | 'en'
 
 const STR = {
+  document_title: {
+    es: 'MAD Clon — el Clon de Miguel Ángel Domínguez',
+    en: "MAD Clon — Miguel Ángel Domínguez's Clone"
+  },
+
   // ------------------------------------------------------------- navegación
   nav_panel: { es: 'Panel', en: 'Home' },
   nav_flota: { es: 'La flota', en: 'The fleet' },
@@ -604,6 +609,22 @@ export const LangProvider = ({ children }: { children: ReactNode }) => {
 
     if (guardado === 'en' || guardado === 'es') setLangState(guardado)
   }, [])
+
+  useEffect(() => {
+    const title = STR.document_title[lang]
+
+    const syncDocument = () => {
+      document.documentElement.lang = lang
+      if (document.title !== title) document.title = title
+    }
+
+    const observer = new MutationObserver(syncDocument)
+
+    syncDocument()
+    observer.observe(document.head, { childList: true, subtree: true, characterData: true })
+
+    return () => observer.disconnect()
+  }, [lang])
 
   const setLang = (l: Lang) => {
     setLangState(l)

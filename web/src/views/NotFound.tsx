@@ -39,15 +39,15 @@ const NotFound = ({ mode }: { mode: Mode }) => {
           >
             404
           </Typography>
-          <Typography variant='h5' color='text.primary'>
+          <Typography component='h1' variant='h5' color='text.primary'>
             {t('nf_titulo')}
           </Typography>
           <Typography color='text.secondary'>{t('nf_sub')}</Typography>
         </div>
-        <Button href='/' component={Link} variant='contained' size='large'>
+        <Button href='/' component={Link} variant='contained' size='large' sx={{ bgcolor: 'primary.dark' }}>
           {t('nf_boton')}
         </Button>
-        <Typography variant='caption' color='text.disabled'>
+        <Typography variant='caption' color='text.secondary'>
           {t('nf_pie')}
         </Typography>
       </div>

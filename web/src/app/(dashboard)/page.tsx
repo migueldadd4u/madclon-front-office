@@ -164,7 +164,7 @@ const InicioPage = () => {
                 <CardContent className='relative flex flex-col gap-3'>
                   <div className='flex flex-wrap items-center gap-3'>
                     <ConsolaClon data={data} diasVida={diasVida} />
-                    <Typography variant='h4'>{t('home_titulo')}</Typography>
+                    <Typography component='h1' variant='h4'>{t('home_titulo')}</Typography>
                     <Chip
                       size='small'
                       color={saludOk ? 'success' : 'warning'}
