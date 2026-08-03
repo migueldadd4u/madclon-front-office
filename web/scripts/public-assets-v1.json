@@ -10,8 +10,8 @@
       "sha256": "c169150707c24729c0ab6ecb8cdbd0c69e83ad3d06054f91ae70c4191deabaf7"
     },
     "manifest.webmanifest": {
-      "size": 689,
-      "sha256": "649f63d3dfd69a8b0fbbb5ed2d66d323da0783513abb301ac6611f2cb3c80b4e"
+      "size": 628,
+      "sha256": "1c79ffb8927dced8d98b36dbad384a786887b29ab52acbd238b3d5118724838b"
     },
     "sw.js": {
       "size": 3556,

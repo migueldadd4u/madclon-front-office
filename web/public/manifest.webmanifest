@@ -1,7 +1,7 @@
 {
-  "name": "MAD Clon — el Clon de Miguel Ángel Domínguez",
+  "name": "MAD Clon — vista pública protegida",
   "short_name": "MAD Clon",
-  "description": "Cuadro de mando público del Clon de Miguel Ángel Domínguez (MAD): los números del sistema, explicados para personas.",
+  "description": "Vista pública protegida y de solo lectura; no muestra datos internos.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
