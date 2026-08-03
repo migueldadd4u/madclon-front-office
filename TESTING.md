@@ -28,6 +28,7 @@ Contrato: el escaparate es estático y de solo lectura. Mientras no exista una p
 | 02:08–02:12 | Lint sobre repo real | Público · real local | PASA | `npm run lint` ya ignora `out/`; TypeScript 0 errores. | `2da215f` | Ninguno. |
 | 02:12–02:14 | Manifiesto PWA | Público · real local | PASA | Copy neutral de vista protegida; tamaño/hash repinneados; auditoría de activos 0 hallazgos. | `12f47ee` | Ninguno. |
 | 02:09–02:14 | Datos reales vigentes | Público · real local | FALLA BLOQUEANTE | `PUBLIC SAFETY BLOQUEADO · source · 21 hallazgos`, todos concentrados en `manifest/overview/clones/tokens/serie`. | `4608674` | MAD debe autorizar sustituirlos y adaptar el exportador; el job nocturno no se toca con esa autorización. |
+| 03:49–05:10 | Revalidación tras refresco nocturno | Público · real local | FALLA BLOQUEANTE | El refresco `46c6fe4` volvió a escribir exactamente los cinco JSON retenidos; el gate conserva **21 hallazgos** y no apareció una categoría nueva de exposición. | `46c6fe4` | La automatización de datos sigue activa aunque el workflow de Pages sea manual; contenerla o cambiarla exige autorización roja de MAD. |
 | 02:09–02:16 | HTTPS real y despliegue | Público · producción | PENDIENTE | No ejecutado: la propia puerta de producción está roja. Workflow reducido a `workflow_dispatch`. | `4608674` | Autoridad de zona roja + gate completo verde sobre el árbol real. |
 
 ## Bugs y regresiones
@@ -42,6 +43,7 @@ Contrato: el escaparate es estático y de solo lectura. Mientras no exista una p
 | `npm run lint` examinaba el build minificado | `out/` no figuraba en `ignorePatterns`. | Exclusión explícita de `out/**`. | Lint real exit 0 con el artefacto heredado presente. | `2da215f` |
 | El manifiesto PWA prometía métricas retenidas | Copy histórico incoherente con el estado seguro. | Nombre/descripción neutrales y hash actualizado. | Inventario de activos 0 hallazgos; 15/15 unitarias. | `12f47ee` |
 | No había caso literal de permiso denegado | El gate cubría 503 y timeout, pero no 403. | Caso 403 con canario y respuesta neutra. | Gate rápido 15/15; 7 fallos cerrados. | `31ba6db` |
+| El refresco nocturno repobló la frontera bloqueada | Desactivar el despliegue automático no desactiva el productor de datos; son dos mecanismos distintos. | Sin mutación: se mantuvo el bloqueo semántico y se registró el corte real. | Repetición del gate de fuente tras `46c6fe4`: 21 hallazgos, sin build ni despliegue. | Este commit |
 
 ## Límites conocidos
 
@@ -49,4 +51,4 @@ Contrato: el escaparate es estático y de solo lectura. Mientras no exista una p
 2. No se ha eliminado ni reescrito historial remoto, CDN, cachés ya instaladas ni releases anteriores.
 3. No se ha ejecutado la URL HTTPS real porque la fuente real sigue bloqueada.
 4. No se ha tocado cron, LaunchAgent, Funnel, integración o automatización.
-
+5. El workflow de publicación queda manual, pero el refresco de datos continúa activo y puede volver a escribir los cinco documentos bloqueados hasta que MAD autorice estabilizar esa frontera.
