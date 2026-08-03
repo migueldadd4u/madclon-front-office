@@ -24,7 +24,7 @@ import argparse
 import json
 import re
 import sys
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 # ---------------------------------------------------------------- utilidades
@@ -274,6 +274,63 @@ def parse_serie(tokens_dir: Path) -> dict:
                 pass
     return {"serie": serie, "linea_base": base, "intervenciones_raw": intervenciones}
 
+# ----------------------------------------------------- pulso.json (loquedigalaia)
+
+LANZAMIENTO_LQDIA = date(2026, 8, 2)  # lanzamiento público de Lo que diga la IA
+
+
+def build_pulso(tokens: dict, sistema: dict, serie: dict, hoy: date) -> dict:
+    """Pulso diario conforme al contrato público de loquedigalaia-web
+    (data/schema/pulso.schema.json): esquema cerrado, solo agregados, sin
+    identificadores internos. Lo consume su scripts/snapshot.mjs con gate de
+    calidad; el indicador obligatorio es tokens-consumidos-total (monotónico)."""
+    hoy_s = hoy.isoformat()
+    indicadores = []
+
+    total = tokens.get("contador", {}).get("total_tokens")
+    if total is not None:
+        indicadores.append({
+            "id": "tokens-consumidos-total",
+            "label": "Tokens consumidos (total acumulado)",
+            "value": total, "unit": "tokens", "asOf": hoy_s,
+            "source": "front-office", "monotonic": True,
+        })
+
+    indicadores.append({
+        "id": "dias-construyendo",
+        "label": "Días construyendo en público",
+        "value": max((hoy - LANZAMIENTO_LQDIA).days, 0), "unit": "días",
+        "asOf": hoy_s, "source": "front-office", "monotonic": True,
+    })
+
+    puntos = [p for p in serie.get("serie", [])
+              if isinstance(p.get("contexto"), dict)
+              and isinstance(p["contexto"].get("tareas_hechas"), (int, float))]
+    if puntos:
+        tareas7 = int(sum(p["contexto"]["tareas_hechas"] for p in puntos[-7:]))
+        indicadores.append({
+            "id": "tareas-despachadas-7d",
+            "label": "Tareas despachadas (últimos 7 días)",
+            "value": tareas7, "unit": "tareas",
+            "asOf": puntos[-1].get("fecha", hoy_s), "source": "front-office",
+        })
+
+    canales = sorted({c for clon in sistema.get("clones", [])
+                      for c in clon.get("canales", [])})
+    if canales:
+        indicadores.append({
+            "id": "canales-vigilados",
+            "label": "Canales de entrada vigilados",
+            "value": len(canales), "unit": "canales",
+            "asOf": hoy_s, "source": "front-office",
+        })
+
+    return {
+        "clone": "clonmadv3",
+        "asOf": datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"),
+        "indicators": indicadores,
+    }
+
 # ------------------------------------------------------------ privacidad
 
 PATRONES_PROHIBIDOS = [
@@ -347,6 +404,7 @@ def main() -> int:
         "clones.json": sistema,
         "tokens.json": tokens,
         "serie.json": serie,
+        "pulso.json": build_pulso(tokens, sistema, serie, datetime.now(timezone.utc).date()),
     }
 
     # --- auditoría de privacidad: cualquier hallazgo bloquea la escritura ---
