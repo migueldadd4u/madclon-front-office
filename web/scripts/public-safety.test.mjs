@@ -25,10 +25,11 @@ const SAFE_DOCUMENTS = {
   'overview.json': { schema: PUBLIC_SCHEMA, status: 'withheld' },
   'clones.json': { schema: PUBLIC_SCHEMA, status: 'withheld' },
   'tokens.json': { schema: PUBLIC_SCHEMA, status: 'withheld' },
-  'serie.json': { schema: PUBLIC_SCHEMA, status: 'withheld', points: [] }
+  'serie.json': { schema: PUBLIC_SCHEMA, status: 'withheld', points: [] },
+  'pulso.json': { schema: PUBLIC_SCHEMA, status: 'withheld' }
 }
 
-// Sólo conserva la forma mínima de los cinco formatos encontrados, nunca sus valores.
+// Sólo conserva la forma mínima de los seis formatos encontrados, nunca sus valores.
 // (Las formas legadas saneadas ahora son superficie aprobada: ver test de proyección.)
 
 const SAFE_SW = `
@@ -126,7 +127,7 @@ function writeDocuments(directory, documents) {
   }
 }
 
-test('la allowlist acepta únicamente los cinco documentos mínimos retenidos', () => {
+test('la allowlist acepta únicamente los seis documentos mínimos retenidos', () => {
   for (const name of PUBLIC_DATA_FILES) {
     assert.deepEqual(validatePublicDocument(name, SAFE_DOCUMENTS[name]), [], name)
   }
@@ -138,7 +139,22 @@ test('la proyección legada saneada pasa; la incompleta o sensible queda bloquea
     'overview.json': { gtd: {}, personas: {}, automejora: {}, crons: [] },
     'clones.json': { clones: [], integraciones: [] },
     'tokens.json': { contador: {}, kpis: {}, intervenciones: [] },
-    'serie.json': { serie: [], linea_base: {} }
+    'serie.json': { serie: [], linea_base: {} },
+    'pulso.json': {
+      clone: 'clonmadv3',
+      asOf: '2026-08-03T00:00:00Z',
+      indicators: [
+        {
+          id: 'tokens-consumidos-total',
+          label: 'Tokens',
+          value: 1,
+          unit: 'tokens',
+          asOf: '2026-08-03',
+          source: 'front-office',
+          monotonic: true
+        }
+      ]
+    }
   }
 
   for (const name of PUBLIC_DATA_FILES) {
@@ -228,7 +244,7 @@ test('el JSON público exige una única representación canónica y no hace eco'
   })
 })
 
-test('el directorio público es exacto: cinco nombres y ningún adjunto', () => {
+test('el directorio público es exacto: seis nombres y ningún adjunto', () => {
   withFixture(root => {
     const data = join(root, 'data')
 

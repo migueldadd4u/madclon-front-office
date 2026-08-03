@@ -15,7 +15,7 @@ import { extname, join, relative, resolve, sep } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 export const PUBLIC_SCHEMA = 'madclon.public-containment.v1'
-export const PUBLIC_DATA_FILES = ['manifest.json', 'overview.json', 'clones.json', 'tokens.json', 'serie.json']
+export const PUBLIC_DATA_FILES = ['manifest.json', 'overview.json', 'clones.json', 'tokens.json', 'serie.json', 'pulso.json']
 export const PUBLIC_PINNED_ASSET_FILES = [
   'images/avatars/1.png',
   'images/hero-ambiental.png',
@@ -137,7 +137,22 @@ const LEGACY_DATA_SHAPES = {
   'overview.json': v => isRecord(v.gtd) && isRecord(v.personas) && isRecord(v.automejora) && Array.isArray(v.crons),
   'clones.json': v => Array.isArray(v.clones) && Array.isArray(v.integraciones),
   'tokens.json': v => isRecord(v.contador) && isRecord(v.kpis) && Array.isArray(v.intervenciones),
-  'serie.json': v => Array.isArray(v.serie) && isRecord(v.linea_base)
+  'serie.json': v => Array.isArray(v.serie) && isRecord(v.linea_base),
+  // Contrato del pulso diario para loquedigalaia-web (su data/schema/pulso.schema.json):
+  // esquema cerrado, solo agregados numéricos, indicador obligatorio de tokens.
+  'pulso.json': v =>
+    ['clonmadv3', 'jarvis'].includes(v.clone) &&
+    typeof v.asOf === 'string' &&
+    Array.isArray(v.indicators) && v.indicators.length >= 1 &&
+    v.indicators.every(i =>
+      isRecord(i) &&
+      Object.keys(i).every(k => ['id', 'label', 'value', 'unit', 'asOf', 'source', 'monotonic'].includes(k)) &&
+      typeof i.id === 'string' && /^[a-z0-9-]+$/.test(i.id) &&
+      typeof i.label === 'string' &&
+      typeof i.value === 'number' && Number.isFinite(i.value) &&
+      typeof i.unit === 'string' &&
+      typeof i.asOf === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(i.asOf) &&
+      typeof i.source === 'string')
 }
 
 function isWithheldDocument(name, value) {
