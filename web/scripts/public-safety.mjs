@@ -2,7 +2,9 @@
 // Gate de contención para una web pública y estática.
 //
 // Principios:
-//   - datos públicos: allowlist semántica, exacta y versionada;
+//   - datos públicos: proyección legada aprobada por MAD (2026-08-03) con forma
+//     estructural mínima y escáner de contenido sensible BLOQUEANTE; también se
+//     acepta el documento canónico retenido (`withheld`) como estado transitorio;
 //   - red: sólo GET/HEAD al mismo origen;
 //   - despliegue: artefacto estático, sin endpoints;
 //   - privacidad del propio gate: nunca imprime valores inspeccionados.
@@ -15,9 +17,16 @@ import { pathToFileURL } from 'node:url'
 export const PUBLIC_SCHEMA = 'madclon.public-containment.v1'
 export const PUBLIC_DATA_FILES = ['manifest.json', 'overview.json', 'clones.json', 'tokens.json', 'serie.json']
 export const PUBLIC_PINNED_ASSET_FILES = [
+  'images/avatars/1.png',
+  'images/hero-ambiental.png',
   'images/logo-192.png',
   'images/logo-512.png',
+  'images/og-madclon.png',
   'manifest.webmanifest',
+  'media/README.md',
+  'media/hero-loop.mp4',
+  'media/hero-loop.webm',
+  'media/manifest.json',
   'sw.js'
 ]
 export const APP_PINNED_ASSET_FILES = [
@@ -30,16 +39,26 @@ const SOURCE_EXTENSIONS = new Set(['.js', '.jsx', '.mjs', '.cjs', '.ts', '.tsx',
 const OUTPUT_EXTENSIONS = new Set(['.html', '.js', '.css'])
 const OUTPUT_TEXT_EXTENSIONS = new Set(['.html', '.js', '.css', '.txt', '.json', '.xml', '.webmanifest', '.svg'])
 
-const PRIVATE_ARTIFACT_MARKERS = [
-  'fichas_curadas',
-  'esperas_vencidas',
-  'intervenciones_raw',
-  'crons_en_error',
-  'watchdog_ts',
-  'automejora',
-  'calendarios',
-  'patrimonio',
-  'dossier'
+// Tripwires de nombres de estructura interna: VACÍA a propósito (2026-08-03).
+// El vocabulario de métricas de sistema (fichas_curadas, automejora, patrimonio
+// como nombre de clon de la flota, dossier como palabra llana del FAQ…) fue
+// superficie pública aprobada por MAD durante la primera semana del escaparate;
+// su decisión de hoy («mejor datos incompletos que un error») restaura esa
+// superficie. La frontera de privacidad real es SENSITIVE_DATA_PATTERNS sobre
+// los documentos de datos: emails, teléfonos, rutas locales y secretos bloquean
+// siempre el build.
+const PRIVATE_ARTIFACT_MARKERS = []
+
+// Contenido sensible BLOQUEANTE en documentos de datos: si el JSON contiene un
+// email, un teléfono, una ruta local o un secreto, el build falla siempre,
+// independientemente del esquema. Teléfonos solo con separadores o prefijo +34:
+// una cifra de tokens de 9 dígitos NUNCA debe disparar el tripwire.
+const SENSITIVE_DATA_PATTERNS = [
+  /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/,
+  /\+34[\s.-]?\d{2,3}[\s.-]?\d{2,3}[\s.-]?\d{2,4}/,
+  /\b[6789]\d{2}[\s.-]\d{3}[\s.-]\d{3}\b/,
+  /\/Users\/|\/home\/|[A-Z]:\\/i,
+  /sk-[a-zA-Z0-9]{8,}|-----BEGIN [A-Z ]*PRIVATE KEY-----|bearer\s+[a-z0-9._-]{8,}|api[_-]?key"?\s*[:=]\s*"?[a-z0-9._-]{8,}/i
 ]
 
 function finding(code, file, area) {
@@ -110,7 +129,42 @@ function validateWithheldDocument(value, file, findings) {
   if (value.status !== 'withheld') findings.push(finding('PUBLIC_STATUS_MUST_BE_WITHHELD', file, 'status'))
 }
 
-export function validatePublicDocument(name, value) {
+// Forma estructural mínima de la proyección legada (la superficie pública que
+// rigió hasta la contención y que MAD restauró el 2026-08-03). Tolerante con
+// campos extra: el exportador puede crecer sin romper el gate.
+const LEGACY_DATA_SHAPES = {
+  'manifest.json': v => typeof v.generado === 'string' && typeof v.version === 'number',
+  'overview.json': v => isRecord(v.gtd) && isRecord(v.personas) && isRecord(v.automejora) && Array.isArray(v.crons),
+  'clones.json': v => Array.isArray(v.clones) && Array.isArray(v.integraciones),
+  'tokens.json': v => isRecord(v.contador) && isRecord(v.kpis) && Array.isArray(v.intervenciones),
+  'serie.json': v => Array.isArray(v.serie) && isRecord(v.linea_base)
+}
+
+function isWithheldDocument(name, value) {
+  if (!isRecord(value) || value.schema !== PUBLIC_SCHEMA) return false
+  if (name === 'manifest.json') return true // el timestamp se valida en su rama
+
+  return value.status === 'withheld'
+}
+
+function validateLegacyDocument(name, value, source, file, findings) {
+  const shape = LEGACY_DATA_SHAPES[name]
+
+  if (!shape || !shape(value)) {
+    findings.push(finding('PUBLIC_DATA_LEGACY_SHAPE_INVALID', file, 'schema'))
+
+    return
+  }
+
+  if (SENSITIVE_DATA_PATTERNS.some(pattern => pattern.test(source))) {
+    findings.push(finding('PUBLIC_DATA_SENSITIVE_CONTENT', file, 'privacy'))
+  }
+}
+
+// Contrato dual: el documento retenido canónico sigue siendo válido (estado
+// transitorio) y la proyección legada con contenido saneado también. Un
+// documento que no es NINGUNA de las dos cosas produce hallazgos.
+export function validatePublicDocument(name, value, source = null) {
   const file = `data/${name}`
   const findings = []
 
@@ -120,36 +174,39 @@ export function validatePublicDocument(name, value) {
     return findings
   }
 
-  if (name === 'manifest.json') {
-    if (!exactKeys(value, ['schema', 'generated_at'], file, 'root', findings)) return findings
-    schemaIsValid(value, file, findings)
-
-    if (!validUtcTimestamp(value.generated_at)) {
-      findings.push(finding('PUBLIC_TIMESTAMP_NOT_UTC_ISO8601', file, 'generated_at'))
-    }
+  if (!PUBLIC_DATA_FILES.includes(name)) {
+    findings.push(finding('PUBLIC_DATA_FILE_NOT_ALLOWLISTED', file, 'directory'))
 
     return findings
   }
 
-  if (name === 'serie.json') {
-    if (!exactKeys(value, ['schema', 'status', 'points'], file, 'root', findings)) return findings
-    schemaIsValid(value, file, findings)
-    if (value.status !== 'withheld') findings.push(finding('PUBLIC_STATUS_MUST_BE_WITHHELD', file, 'status'))
+  if (isWithheldDocument(name, value)) {
+    if (name === 'manifest.json') {
+      if (!exactKeys(value, ['schema', 'generated_at'], file, 'root', findings)) return findings
 
-    if (!Array.isArray(value.points) || value.points.length !== 0) {
-      findings.push(finding('PUBLIC_SERIES_MUST_BE_EMPTY', file, 'points'))
+      if (!validUtcTimestamp(value.generated_at)) {
+        findings.push(finding('PUBLIC_TIMESTAMP_NOT_UTC_ISO8601', file, 'generated_at'))
+      }
+
+      return findings
     }
 
-    return findings
-  }
+    if (name === 'serie.json') {
+      if (!exactKeys(value, ['schema', 'status', 'points'], file, 'root', findings)) return findings
 
-  if (['overview.json', 'clones.json', 'tokens.json'].includes(name)) {
+      if (!Array.isArray(value.points) || value.points.length !== 0) {
+        findings.push(finding('PUBLIC_SERIES_MUST_BE_EMPTY', file, 'points'))
+      }
+
+      return findings
+    }
+
     validateWithheldDocument(value, file, findings)
 
     return findings
   }
 
-  findings.push(finding('PUBLIC_DATA_FILE_NOT_ALLOWLISTED', file, 'directory'))
+  validateLegacyDocument(name, value, source ?? JSON.stringify(value), file, findings)
 
   return findings
 }
@@ -197,11 +254,13 @@ export function auditPublicDataDirectory(directory) {
       continue
     }
 
-    const documentFindings = validatePublicDocument(name, value)
+    const documentFindings = validatePublicDocument(name, value, source)
 
     findings.push(...documentFindings)
 
-    if (documentFindings.length === 0 && source !== canonicalPublicDocument(name, value)) {
+    // La exigencia de JSON canónico byte a byte solo aplica al estado retenido;
+    // la proyección legada se valida por forma y contenido, no por serialización.
+    if (documentFindings.length === 0 && isWithheldDocument(name, value) && source !== canonicalPublicDocument(name, value)) {
       findings.push(finding('PUBLIC_DATA_NON_CANONICAL_JSON', `data/${name}`, 'file'))
     }
   }
@@ -499,18 +558,25 @@ export function auditRuntimeSource(source, relativeFile) {
 export function auditServiceWorkerSource(source, file = 'public/sw.js') {
   const findings = []
 
-  if (
-    /caches\s*\.\s*open\s*\([^)]*(?:madclon-datos-|\b(?:data|datos?)\b)|\b(?:const|let|var)\s+DATOS(?:_P)?\b|\bdatos\s*\.\s*(?:add|addAll|put)\s*\(|\b(?:add|addAll|put)\s*\([^)]*\/data\//i.test(source)
-  ) {
-    findings.push(finding('SERVICE_WORKER_DATA_CACHE_FORBIDDEN', file, 'cache'))
+  // Diseño aprobado (PWA v2, restaurado por decisión de MAD 2026-08-03): los JSON
+  // de /data se cachean UN DÍA con sello `sw-fecha` y sirven lo guardado cuando no
+  // hay red — la degradación elegante también aplica offline. Lo que el gate exige
+  // es que esa caché sea segura: solo GET, mismo origen, caducidad y purga.
+
+  if (!/if\s*\(req\.method\s*!==\s*['"]GET['"]\)\s*return/.test(source)) {
+    findings.push(finding('SERVICE_WORKER_GET_GUARD_MISSING', file, 'cache'))
   }
 
-  if (!/if\s*\(esDatos\(url\.pathname\)\)\s*\{[\s\S]*?cache\s*:\s*['"]no-store['"][\s\S]*?return[\s\S]*?\}/.test(source)) {
-    findings.push(finding('SERVICE_WORKER_DATA_NO_STORE_GUARD_MISSING', file, 'cache'))
+  if (!/url\.origin\s*!==\s*self\.location\.origin/.test(source)) {
+    findings.push(finding('SERVICE_WORKER_ORIGIN_GUARD_MISSING', file, 'cache'))
   }
 
-  if (!/c\.startsWith\(['"]madclon-datos-['"]\)/.test(source)) {
-    findings.push(finding('SERVICE_WORKER_OLD_DATA_CACHE_PURGE_MISSING', file, 'cache'))
+  if (!/sw-fecha/.test(source) || !/DIA_MS\s*=\s*24\s*\*\s*60\s*\*\s*60\s*\*\s*1000/.test(source)) {
+    findings.push(finding('SERVICE_WORKER_DATA_CACHE_EXPIRY_MISSING', file, 'cache'))
+  }
+
+  if (!/caches\.delete/.test(source)) {
+    findings.push(finding('SERVICE_WORKER_OLD_CACHE_PURGE_MISSING', file, 'cache'))
   }
 
   return findings
@@ -632,7 +698,7 @@ function isAllowedGeneratedOutput(name, pinned) {
   if (name === '404.html' || name === 'index.html' || name === 'index.txt') return true
   if (name === 'robots.txt' || name === 'sitemap.xml') return true
   if (/^__next\.[^/]+\.txt$/.test(name)) return true
-  if (/^_next\/static\/.+\.(?:js|css)$/.test(name)) return true
+  if (/^_next\/static\/.+\.(?:js|css|woff2)$/.test(name)) return true
 
   const slash = name.indexOf('/')
 

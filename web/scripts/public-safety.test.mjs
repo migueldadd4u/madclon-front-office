@@ -29,32 +29,34 @@ const SAFE_DOCUMENTS = {
 }
 
 // Sólo conserva la forma mínima de los cinco formatos encontrados, nunca sus valores.
-const LEGACY_REDACTED_SHAPES = {
-  'manifest.json': { generado: 'redacted' },
-  'overview.json': { gtd: {} },
-  'clones.json': { clones: [] },
-  'tokens.json': { contador: {} },
-  'serie.json': { serie: [] }
-}
+// (Las formas legadas saneadas ahora son superficie aprobada: ver test de proyección.)
 
 const SAFE_SW = `
-const esDatos = () => true
+const DIA_MS = 24 * 60 * 60 * 1000
 if (req.method !== 'GET') return
 const url = new URL(req.url)
 if (url.origin !== self.location.origin) return
 if (esDatos(url.pathname)) {
-  e.respondWith(fetch(req, { cache: 'no-store' }))
+  const fecha = Number(guardada.headers.get('sw-fecha'))
+  if (guardada && fecha && Date.now() - fecha < DIA_MS) return guardada
   return
 }
-c.startsWith('madclon-datos-')
+await caches.delete(vieja)
 `
 
 const SAFETY_CLI = fileURLToPath(new URL('./public-safety.mjs', import.meta.url))
 
 const FIXTURE_PUBLIC_ASSETS = {
+  'images/avatars/1.png': 'fixture-avatar',
+  'images/hero-ambiental.png': 'fixture-hero',
   'images/logo-192.png': 'fixture-logo-192',
   'images/logo-512.png': 'fixture-logo-512',
+  'images/og-madclon.png': 'fixture-og',
   'manifest.webmanifest': '{}',
+  'media/README.md': 'fixture-media-readme',
+  'media/hero-loop.mp4': 'fixture-hero-mp4',
+  'media/hero-loop.webm': 'fixture-hero-webm',
+  'media/manifest.json': '{"hero":true}',
   'sw.js': SAFE_SW
 }
 
@@ -130,14 +132,49 @@ test('la allowlist acepta únicamente los cinco documentos mínimos retenidos', 
   }
 })
 
-test('regresión: las cinco formas actuales redacted quedan bloqueadas una por una', () => {
-  for (const name of PUBLIC_DATA_FILES) {
-    const findings = validatePublicDocument(name, LEGACY_REDACTED_SHAPES[name])
-
-    assert.ok(findings.length > 0, `${name} debía quedar bloqueado`)
-    assert.ok(findings.some(item => item.code === 'PUBLIC_SCHEMA_MISSING_OR_WRONG'), `${name} debía exigir schema`)
-    assert.ok(findings.some(item => item.code === 'PUBLIC_FIELD_NOT_ALLOWLISTED'), `${name} debía rechazar campos heredados`)
+test('la proyección legada saneada pasa; la incompleta o sensible queda bloqueada', () => {
+  const saneada = {
+    'manifest.json': { generado: 'redacted', version: 1 },
+    'overview.json': { gtd: {}, personas: {}, automejora: {}, crons: [] },
+    'clones.json': { clones: [], integraciones: [] },
+    'tokens.json': { contador: {}, kpis: {}, intervenciones: [] },
+    'serie.json': { serie: [], linea_base: {} }
   }
+
+  for (const name of PUBLIC_DATA_FILES) {
+    assert.deepEqual(validatePublicDocument(name, saneada[name]), [], `${name} saneado debía pasar`)
+  }
+
+  // Forma incompleta: falta una pieza estructural mínima
+  const incompleto = validatePublicDocument('overview.json', { gtd: {} })
+
+  assert.ok(incompleto.some(item => item.code === 'PUBLIC_DATA_LEGACY_SHAPE_INVALID'))
+
+  // Contenido sensible: bloquea aunque la forma sea correcta
+  const conEmail = validatePublicDocument(
+    'clones.json',
+    { clones: [], integraciones: [] },
+    '{"clones":[],"integraciones":[],"contacto":"persona@example.com"}'
+  )
+
+  assert.ok(conEmail.some(item => item.code === 'PUBLIC_DATA_SENSITIVE_CONTENT'))
+
+  const conRuta = validatePublicDocument(
+    'tokens.json',
+    { contador: {}, kpis: {}, intervenciones: [] },
+    '{"contador":{},"kpis":{},"intervenciones":[],"origen":"/Users/alguien/secreto"}'
+  )
+
+  assert.ok(conRuta.some(item => item.code === 'PUBLIC_DATA_SENSITIVE_CONTENT'))
+
+  // Una cifra de tokens de 9 dígitos NUNCA dispara el tripwire de teléfono
+  const cifraTokens = validatePublicDocument(
+    'tokens.json',
+    { contador: {}, kpis: {}, intervenciones: [] },
+    '{"contador":{"total":776511939},"kpis":{},"intervenciones":[]}'
+  )
+
+  assert.deepEqual(cifraTokens, [])
 })
 
 test('la allowlist rechaza contenido semántico añadido aunque use el schema correcto', () => {
@@ -284,11 +321,22 @@ test('la superficie runtime bloquea APIs, mutaciones y orígenes externos', () =
   }
 })
 
-test('el service worker exige no-store y purga toda caché JSON anterior', () => {
+test('el service worker exige caché de datos segura: GET, mismo origen, caducidad y purga', () => {
   assert.deepEqual(auditServiceWorkerSource(SAFE_SW), [])
+
   assert.ok(
-    auditServiceWorkerSource("caches.open('madclon-datos-v2')").some(
-      item => item.code === 'SERVICE_WORKER_DATA_CACHE_FORBIDDEN'
+    auditServiceWorkerSource('const DIA_MS = 24 * 60 * 60 * 1000\nfetch(req)\ncaches.delete(x)\nsw-fecha').some(
+      item => item.code === 'SERVICE_WORKER_GET_GUARD_MISSING'
+    )
+  )
+  assert.ok(
+    auditServiceWorkerSource("if (req.method !== 'GET') return\nfetch(req)").some(
+      item => item.code === 'SERVICE_WORKER_ORIGIN_GUARD_MISSING'
+    )
+  )
+  assert.ok(
+    auditServiceWorkerSource("if (req.method !== 'GET') return\nif (url.origin !== self.location.origin) return\ncaches.delete(x)").some(
+      item => item.code === 'SERVICE_WORKER_DATA_CACHE_EXPIRY_MISSING'
     )
   )
 })
@@ -317,12 +365,20 @@ test('el postbuild rechaza endpoints, mutaciones y orígenes externos', () => {
     assert.ok(findings.some(item => item.code === 'OUTPUT_EXTERNAL_FETCH_FORBIDDEN'))
     assert.ok(findings.some(item => item.code === 'OUTPUT_ENDPOINT_FORBIDDEN'))
 
+    // Vocabulario de sistema aprobado por MAD (2026-08-03): ya NO es tripwire
     writeFileSync(join(out, 'index.html'), '<main>fichas_curadas</main>')
-    assert.ok(auditOutputTree(webRoot).some(item => item.code === 'OUTPUT_PRIVATE_STRUCTURE_FORBIDDEN'))
+    assert.equal(
+      auditOutputTree(webRoot).some(item => item.code === 'OUTPUT_PRIVATE_STRUCTURE_FORBIDDEN'),
+      false
+    )
 
+    // La exención exacta de Remix Icon sigue funcionando sin abrir la puerta a CSS externo
     mkdirSync(join(out, '_next', 'static'), { recursive: true })
-    writeFileSync(join(out, '_next', 'static', 'private.css'), '.ri-dossier-fill{}body::before{content:"fichas_curadas"}')
-    assert.ok(auditOutputTree(webRoot).some(item => item.code === 'OUTPUT_PRIVATE_STRUCTURE_FORBIDDEN'))
+    writeFileSync(join(out, '_next', 'static', 'iconos.css'), '.ri-dossier-fill{}')
+    assert.equal(
+      auditOutputTree(webRoot).some(item => item.code === 'OUTPUT_PRIVATE_STRUCTURE_FORBIDDEN'),
+      false
+    )
   })
 })
 

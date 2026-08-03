@@ -153,113 +153,39 @@ export function fmtFecha(iso: string | null | undefined, conHora = true): string
 import { useEffect, useState } from 'react'
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
-const PUBLIC_SCHEMA = 'madclon.public-containment.v1'
-const MAX_PUBLIC_DOCUMENT_BYTES = 64 * 1024
-const PUBLIC_FETCH_TIMEOUT_MS = 2000
-const PUBLIC_FILES = ['manifest', 'overview', 'clones', 'tokens', 'serie'] as const
 
-type PublicLoadError = 'fuente-no-disponible'
+// ---------------------------------------------------------------- carga fail-soft
+// Decisión de MAD (2026-08-03): mejor datos incompletos que una página de error.
+// Cada documento se valida por separado; el que falla deja su sección «en revisión»
+// y el resto del panel sigue funcionando. Nunca hay fallo total por UN documento.
 
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  value !== null && typeof value === 'object' && !Array.isArray(value)
+export type DocNombre = 'manifest' | 'overview' | 'clones' | 'tokens' | 'serie'
 
-const hasExactKeys = (value: Record<string, unknown>, expected: string[]) => {
-  const actual = Object.keys(value).sort()
-  const wanted = [...expected].sort()
+export const DOCS: DocNombre[] = ['manifest', 'overview', 'clones', 'tokens', 'serie']
 
-  return actual.length === wanted.length && actual.every((key, index) => key === wanted[index])
+const MAX_DOC_BYTES = 128 * 1024
+const FETCH_TIMEOUT_MS = 5000
+
+// Esquema canónico del estado retenido (contención). Si el manifiesto lo
+// declara, la web entera muestra el estado protegido: no es un fallo, es una
+// decisión explícita de la fuente.
+const CONTAINMENT_SCHEMA = 'madclon.public-containment.v1'
+
+const esObjeto = (v: unknown): v is Record<string, unknown> => v !== null && typeof v === 'object' && !Array.isArray(v)
+
+// Validadores estructurales tolerantes: exigen la forma mínima que las páginas
+// necesitan y admiten campos extra (el exportador puede crecer sin romper la web).
+const validadores: Record<DocNombre, (v: unknown) => boolean> = {
+  manifest: v => esObjeto(v) && typeof v.generado === 'string' && typeof v.version === 'number',
+  overview: v => esObjeto(v) && esObjeto(v.gtd) && esObjeto(v.personas) && esObjeto(v.automejora) && Array.isArray(v.crons),
+  clones: v => esObjeto(v) && Array.isArray(v.clones) && Array.isArray(v.integraciones),
+  tokens: v => esObjeto(v) && esObjeto(v.contador) && esObjeto(v.kpis) && Array.isArray(v.intervenciones),
+  serie: v => esObjeto(v) && Array.isArray(v.serie) && esObjeto(v.linea_base)
 }
 
-function validUtcTimestamp(value: unknown): value is string {
-  if (typeof value !== 'string') return false
-  const match = value.match(/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d{1,3}))?Z$/)
-
-  if (!match) return false
-  const milliseconds = (match[2] || '').padEnd(3, '0')
-  const normalized = `${match[1]}.${milliseconds}Z`
-  const parsed = new Date(normalized)
-
-  return !Number.isNaN(parsed.getTime()) && parsed.toISOString() === normalized && parsed.getTime() <= Date.now() + 5 * 60 * 1000
-}
-
-function canonicalizarDocumentoPublico(nombre: (typeof PUBLIC_FILES)[number], value: unknown): string | null {
-  if (!isRecord(value)) return null
-
-  if (nombre === 'manifest') {
-    if (
-      !hasExactKeys(value, ['schema', 'generated_at']) ||
-      value.schema !== PUBLIC_SCHEMA ||
-      !validUtcTimestamp(value.generated_at)
-    ) {
-      return null
-    }
-
-    return `${JSON.stringify({ schema: value.schema, generated_at: value.generated_at })}\n`
-  }
-
-  if (nombre === 'serie') {
-    if (
-      !hasExactKeys(value, ['schema', 'status', 'points']) ||
-      value.schema !== PUBLIC_SCHEMA ||
-      value.status !== 'withheld' ||
-      !Array.isArray(value.points) ||
-      value.points.length !== 0
-    ) {
-      return null
-    }
-
-    return `${JSON.stringify({ schema: value.schema, status: value.status, points: value.points })}\n`
-  }
-
-  if (
-    !hasExactKeys(value, ['schema', 'status']) ||
-    value.schema !== PUBLIC_SCHEMA ||
-    value.status !== 'withheld'
-  ) {
-    return null
-  }
-
-  return `${JSON.stringify({ schema: value.schema, status: value.status })}\n`
-}
-
-function interpretarInstantaneaPublica(documentos: unknown[]): string | null {
-  if (documentos.length !== PUBLIC_FILES.length) return null
-  const [manifest, overview, clones, tokens, serie] = documentos
-
-  if (
-    !isRecord(manifest) ||
-    !hasExactKeys(manifest, ['schema', 'generated_at']) ||
-    manifest.schema !== PUBLIC_SCHEMA ||
-    !validUtcTimestamp(manifest.generated_at)
-  ) {
-    return null
-  }
-
-  const retenido = (value: unknown) =>
-    isRecord(value) &&
-    hasExactKeys(value, ['schema', 'status']) &&
-    value.schema === PUBLIC_SCHEMA &&
-    value.status === 'withheld'
-
-  if (!retenido(overview) || !retenido(clones) || !retenido(tokens)) return null
-
-  if (
-    !isRecord(serie) ||
-    !hasExactKeys(serie, ['schema', 'status', 'points']) ||
-    serie.schema !== PUBLIC_SCHEMA ||
-    serie.status !== 'withheld' ||
-    !Array.isArray(serie.points) ||
-    serie.points.length !== 0
-  ) {
-    return null
-  }
-
-  return manifest.generated_at
-}
-
-async function leerDocumentoPublico(nombre: (typeof PUBLIC_FILES)[number]): Promise<unknown> {
+async function leerDoc(nombre: DocNombre): Promise<unknown> {
   const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), PUBLIC_FETCH_TIMEOUT_MS)
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
   let respuesta: Response
 
   try {
@@ -268,60 +194,81 @@ async function leerDocumentoPublico(nombre: (typeof PUBLIC_FILES)[number]): Prom
     clearTimeout(timeout)
   }
 
-  if (!respuesta.ok) throw new Error('fuente-no-disponible')
-  const declarado = Number(respuesta.headers.get('content-length'))
-
-  if (Number.isFinite(declarado) && declarado > MAX_PUBLIC_DOCUMENT_BYTES) {
-    throw new Error('fuente-no-disponible')
-  }
+  if (!respuesta.ok) throw new Error(`${nombre}: HTTP ${respuesta.status}`)
 
   const texto = await respuesta.text()
 
-  if (new TextEncoder().encode(texto).byteLength > MAX_PUBLIC_DOCUMENT_BYTES) {
-    throw new Error('fuente-no-disponible')
+  if (new TextEncoder().encode(texto).byteLength > MAX_DOC_BYTES) throw new Error(`${nombre}: demasiado grande`)
+
+  const valor: unknown = JSON.parse(texto)
+
+  // Manifiesto retenido: pasa al estado protegido en lugar de validar la forma legada
+  if (nombre === 'manifest' && esObjeto(valor) && valor.schema === CONTAINMENT_SCHEMA && typeof valor.generated_at === 'string') {
+    return { __retenido: valor.generated_at }
   }
 
-  try {
-    const value: unknown = JSON.parse(texto)
+  if (!validadores[nombre](valor)) throw new Error(`${nombre}: forma inesperada`)
 
-    if (texto !== canonicalizarDocumentoPublico(nombre, value)) throw new Error('fuente-no-disponible')
-
-    return value
-  } catch {
-    throw new Error('fuente-no-disponible')
-  }
+  return valor
 }
 
-export function usePanelData(): {
-  data: PanelData | null
-  error: PublicLoadError | null
-  withheldAt: string | null
-} {
-  const data: PanelData | null = null
-  const [error, setError] = useState<PublicLoadError | null>(null)
-  const [withheldAt, setWithheldAt] = useState<string | null>(null)
+export type PanelDataCarga = {
+  data: Partial<PanelData>
+
+  /** Documentos que no cargaron o no validaron: su sección se muestra «en revisión». */
+  faltantes: DocNombre[]
+
+  /** true solo cuando NINGÚN documento cargó (sin red y sin caché): mensaje offline. */
+  sinNada: boolean
+
+  /** Sello UTC si la instantánea está retenida por la fuente: estado protegido, no error. */
+  retenido: string | null
+  cargando: boolean
+}
+
+export function usePanelData(): PanelDataCarga {
+  const [estado, setEstado] = useState<PanelDataCarga>({ data: {}, faltantes: [], sinNada: false, retenido: null, cargando: true })
 
   useEffect(() => {
     let cancelado = false
     let reintento: ReturnType<typeof setTimeout> | null = null
 
     const carga = async () => {
-      const documentos = await Promise.all(PUBLIC_FILES.map(leerDocumentoPublico))
-      const generado = interpretarInstantaneaPublica(documentos)
+      const resultados = await Promise.allSettled(DOCS.map(leerDoc))
 
-      if (!generado) throw new Error('fuente-no-disponible')
-      if (!cancelado) setWithheldAt(generado)
+      if (cancelado) return
+
+      const data: Partial<PanelData> = {}
+      const faltantes: DocNombre[] = []
+      let retenido: string | null = null
+
+      resultados.forEach((r, i) => {
+        const nombre = DOCS[i]
+
+        if (r.status === 'fulfilled') {
+          const valor = r.value as Record<string, unknown>
+
+          if (nombre === 'manifest' && typeof valor.__retenido === 'string') {
+            retenido = valor.__retenido
+          } else {
+            // El validador ya garantizó la forma mínima de cada documento.
+            ;(data as Record<string, unknown>)[nombre] = valor
+          }
+        } else {
+          faltantes.push(nombre)
+        }
+      })
+
+      setEstado({ data, faltantes, sinNada: !retenido && faltantes.length === DOCS.length, retenido, cargando: false })
     }
 
     // Un reintento a los 1,5 s: si el service worker acaba de despertar en frío
     // (offline), la primera ráfaga de peticiones puede llegar antes que él.
-    carga()
-      .catch(() => {
-        reintento = setTimeout(() => {
-          if (cancelado) return
-          carga().catch(() => !cancelado && setError('fuente-no-disponible'))
-        }, 1500)
-      })
+    carga().catch(() => {
+      reintento = setTimeout(() => {
+        if (!cancelado) carga().catch(() => !cancelado && setEstado(s => ({ ...s, cargando: false })))
+      }, 1500)
+    })
 
     return () => {
       cancelado = true
@@ -329,5 +276,5 @@ export function usePanelData(): {
     }
   }, [])
 
-  return { data, error, withheldAt }
+  return estado
 }

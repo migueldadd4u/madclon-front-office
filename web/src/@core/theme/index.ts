@@ -1,3 +1,6 @@
+// Next Imports
+import { Inter } from 'next/font/google'
+
 // MUI Imports
 import type { Theme } from '@mui/material/styles'
 
@@ -13,7 +16,7 @@ import shadows from './shadows'
 import customShadows from './customShadows'
 import typography from './typography'
 
-const fuenteSistema = 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+const inter = Inter({ subsets: ['latin'], weight: ['300', '400', '500', '600', '700', '800', '900'] })
 
 const theme = (settings: Settings, mode: SystemMode, direction: Theme['direction']): Theme => {
   return {
@@ -32,7 +35,7 @@ const theme = (settings: Settings, mode: SystemMode, direction: Theme['direction
       }
     },
     shadows: shadows(mode),
-    typography: typography(fuenteSistema),
+    typography: typography(inter.style.fontFamily),
     customShadows: customShadows(mode),
     mainColorChannels: {
       light: '38 43 67',

@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 // Hook Imports
-import { usePublicLang } from '@/lib/public-i18n'
+import { useLang } from '@/lib/i18n'
 
 // Modo presentación (kiosk): oculta sidebar, cabecera y pie, y pide pantalla
 // completa para enseñar el panel en una tele o proyector. Sale con Esc, con
@@ -14,7 +14,7 @@ import { usePublicLang } from '@/lib/public-i18n'
 // el trabajo visual (globals.css); el estado se sincroniza con
 // fullscreenchange para no quedar atrapado si el navegador cancela.
 const ModoPresentacion = () => {
-  const { t } = usePublicLang()
+  const { t } = useLang()
   const [activo, setActivo] = useState(false)
 
   useEffect(() => {

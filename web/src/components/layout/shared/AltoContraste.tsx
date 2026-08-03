@@ -4,14 +4,14 @@
 import { useEffect, useState } from 'react'
 
 // Hook Imports
-import { usePublicLang } from '@/lib/public-i18n'
+import { useLang } from '@/lib/i18n'
 
 // Modo alto contraste: sube la opacidad de los textos secundarios y atenuados
 // (globals.css, :root.fo-contraste). Persiste en localStorage y se aplica al
 // instante; la clase se precarga con un script inline en app/layout.tsx para
 // que no haya parpadeo al cargar.
 const AltoContraste = () => {
-  const { t } = usePublicLang()
+  const { t } = useLang()
   const [activo, setActivo] = useState(false)
 
   useEffect(() => {

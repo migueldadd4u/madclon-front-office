@@ -14,14 +14,14 @@ import type { Mode } from '@core/types'
 import MadClonLogoAnimado from '@/components/dashboard/MadClonLogoAnimado'
 
 // Hook Imports
-import { usePublicLang } from '@/lib/public-i18n'
+import { useLang } from '@/lib/i18n'
 
 // Página 404 con personalidad MAD Clon: mensaje llano, bilingüe y con el logo
 // constelación que se dibuja al cargar. El modo (claro/oscuro) lo da el tema;
 // `mode` se conserva en la firma por compatibilidad con not-found.tsx.
 const NotFound = ({ mode }: { mode: Mode }) => {
   void mode
-  const { t } = usePublicLang()
+  const { t } = useLang()
 
   return (
     <div className='flex items-center justify-center min-bs-[100dvh] relative p-6 overflow-x-hidden'>

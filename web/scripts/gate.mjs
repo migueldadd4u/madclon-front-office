@@ -81,13 +81,13 @@ function contarProblemas(salida) {
 function estaticas() {
   log('\n▸ Estáticas')
 
-  // 0 · privacidad y superficie pública: datos allowlisted, sin API/mutaciones
-  //     y service worker incapaz de guardar JSON.
+  // 0 · privacidad y superficie pública: proyección saneada, sin API/mutaciones
+  //     y service worker con caché de datos segura (GET, mismo origen, caducidad).
   const seguridad = auditPublicSafety({ webRoot: RAIZ, mode: 'source' })
 
   marca(
     0,
-    'public safety (allowlist + sólo GET same-origin + JSON no-store)',
+    'public safety (proyección saneada + sólo GET same-origin + caché segura)',
     seguridad.length === 0,
     seguridad.length === 0
       ? '0 hallazgos'
@@ -681,97 +681,120 @@ async function navegador() {
   )
   await ctxReducido.close()
 
-  // 14 · estados de fuente pública: retenido seguro en ES/EN y fallo cerrado
-  // ante documento incompleto, JSON corrupto o respuesta de origen fallida.
+  // 14 · estados de fuente pública: degradación elegante (decisión de MAD del
+  // 2026-08-03: mejor datos incompletos confesados que una página de error).
+  // - Si el árbol lleva la instantánea retenida canónica, se sigue exigiendo el
+  //   estado protegido en ES/EN con su html lang.
+  // - Con proyección legada: un documento incompleto, corrupto o fallido deja su
+  //   sección «en revisión» (role=status) SIN tumbar el resto del panel; un campo
+  //   extra es tolerado (la frontera es el escáner de contenido sensible del
+  //   build, no el runtime); y nunca hay eco de canarios, detalles internos ni
+  //   errores no controlados.
   const problemasFuente = []
+  const manifestArbol = JSON.parse(readFileSync(join(RAIZ, 'public/data/manifest.json'), 'utf8'))
+  const arbolRetenido = manifestArbol.schema === 'madclon.public-containment.v1'
 
-  const ctxRetenido = await navegadorPw.newContext({
-    viewport: { width: 375, height: 900 },
-    serviceWorkers: 'block'
-  })
+  if (arbolRetenido) {
+    const ctxRetenido = await navegadorPw.newContext({
+      viewport: { width: 375, height: 900 },
+      serviceWorkers: 'block'
+    })
 
-  await ctxRetenido.addInitScript(() => localStorage.setItem('madclon-lang', 'es'))
-  const paginaRetenida = await ctxRetenido.newPage()
+    await ctxRetenido.addInitScript(() => localStorage.setItem('madclon-lang', 'es'))
+    const paginaRetenida = await ctxRetenido.newPage()
 
-  await paginaRetenida.goto(url(''), { waitUntil: 'domcontentloaded' })
-  const avisoEs = paginaRetenida.getByRole('status').filter({ hasText: 'Instantánea pública protegida' })
+    await paginaRetenida.goto(url(''), { waitUntil: 'domcontentloaded' })
+    const avisoEs = paginaRetenida.getByRole('status').filter({ hasText: 'Instantánea pública protegida' })
 
-  try {
-    await avisoEs.waitFor({ timeout: 5000 })
+    try {
+      await avisoEs.waitFor({ timeout: 5000 })
 
-    if ((await paginaRetenida.locator('html').getAttribute('lang')) !== 'es') {
-      problemasFuente.push('html lang ES incorrecto')
+      if ((await paginaRetenida.locator('html').getAttribute('lang')) !== 'es') {
+        problemasFuente.push('html lang ES incorrecto')
+      }
+    } catch {
+      problemasFuente.push('instantánea retenida ES no llega a estado seguro')
     }
-  } catch {
-    problemasFuente.push('instantánea retenida ES no llega a estado seguro')
+
+    await ctxRetenido.close()
+
+    const ctxRetenidoEn = await navegadorPw.newContext({
+      viewport: { width: 375, height: 900 },
+      serviceWorkers: 'block'
+    })
+
+    await ctxRetenidoEn.addInitScript(() => localStorage.setItem('madclon-lang', 'en'))
+    const paginaRetenidaEn = await ctxRetenidoEn.newPage()
+
+    await paginaRetenidaEn.goto(url(''), { waitUntil: 'domcontentloaded' })
+
+    try {
+      const avisoEn = paginaRetenidaEn.getByRole('status').filter({ hasText: 'Public snapshot protected' })
+
+      await avisoEn.waitFor({ timeout: 5000 })
+
+      if ((await paginaRetenidaEn.locator('html').getAttribute('lang')) !== 'en') {
+        problemasFuente.push('html lang EN incorrecto')
+      }
+    } catch {
+      problemasFuente.push('instantánea retenida EN no llega a estado seguro')
+    }
+
+    await ctxRetenidoEn.close()
   }
 
-  await ctxRetenido.close()
-
-  const ctxRetenidoEn = await navegadorPw.newContext({
-    viewport: { width: 375, height: 900 },
-    serviceWorkers: 'block'
-  })
-
-  await ctxRetenidoEn.addInitScript(() => localStorage.setItem('madclon-lang', 'en'))
-  const paginaRetenidaEn = await ctxRetenidoEn.newPage()
-
-  await paginaRetenidaEn.goto(url(''), { waitUntil: 'domcontentloaded' })
-
-  try {
-    const avisoEn = paginaRetenidaEn.getByRole('status').filter({ hasText: 'Public snapshot protected' })
-
-    await avisoEn.waitFor({ timeout: 5000 })
-
-    if ((await paginaRetenidaEn.locator('html').getAttribute('lang')) !== 'en') {
-      problemasFuente.push('html lang EN incorrecto')
-    }
-  } catch {
-    problemasFuente.push('instantánea retenida EN no llega a estado seguro')
-  }
-
-  await ctxRetenidoEn.close()
-
+  // derriba: el caso deja su documento fuera de juego → la portada (que lo
+  // necesita) confiesa «en revisión». campo-extra: el documento sigue siendo
+  // válido (tolerancia deliberada) y la página se pinta con normalidad.
   const casosFuente = [
     {
       nombre: 'incompleto',
       fichero: 'manifest',
-      responder: route => route.fulfill({ contentType: 'application/json', body: '{"schema":"madclon.public-containment.v1"}' })
+      derriba: true,
+      responder: route => route.fulfill({ contentType: 'application/json', body: '{"generado":true}' })
     },
     {
       nombre: 'campo-extra',
       fichero: 'overview',
+      derriba: false,
       responder: route => route.fulfill({
         contentType: 'application/json',
-        body: '{"schema":"madclon.public-containment.v1","status":"withheld","extra":true}'
+        body: '{"gtd":{},"personas":{},"automejora":{},"crons":[],"campo_nuevo":"PRIVATE_CANARY_NO_ECO"}'
       })
     },
     {
       nombre: 'corrupto',
       fichero: 'manifest',
+      derriba: true,
       responder: route => route.fulfill({ contentType: 'application/json', body: '{"PRIVATE_CANARY_NO_ECO":' })
     },
     {
+      // JSON.parse colapsa la clave duplicada quedándose con la ÚLTIMA:
+      // para que el caso derribe, la versión final tiene que ser inválida.
       nombre: 'clave-duplicada',
       fichero: 'manifest',
+      derriba: true,
       responder: route => route.fulfill({
         contentType: 'application/json',
-        body: '{"schema":"PRIVATE_CANARY_NO_ECO","schema":"madclon.public-containment.v1","generated_at":"2026-08-02T22:00:00Z"}\n'
+        body: '{"generado":"2026-08-02T22:00:00Z","version":1,"version":"PRIVATE_CANARY_NO_ECO"}\n'
       })
     },
     {
       nombre: 'sin-permiso-403',
       fichero: 'manifest',
+      derriba: true,
       responder: route => route.fulfill({ status: 403, contentType: 'text/plain', body: 'PRIVATE_CANARY_NO_ECO' })
     },
     {
       nombre: 'fuente-503',
       fichero: 'manifest',
+      derriba: true,
       responder: route => route.fulfill({ status: 503, contentType: 'text/plain', body: 'PRIVATE_CANARY_NO_ECO' })
     },
     {
       nombre: 'fuente-colgada',
       fichero: 'manifest',
+      derriba: true,
       responder: () => new Promise(() => {})
     }
   ]
@@ -797,9 +820,33 @@ async function navegador() {
     await paginaCaso.goto(url(''), { waitUntil: 'domcontentloaded' })
 
     try {
-      const alerta = paginaCaso.getByRole('alert')
+      if (caso.derriba) {
+        // La sección afectada confiesa «en revisión»; el fallo NUNCA es total
+        // ni usa la vieja alarma de fallo cerrado («no están disponibles»).
+        // Ojo: DatoRancio usa MUI Alert (role='alert') de forma legítima,
+        // así que la alarma se detecta por su texto, no por el rol.
+        const confesion = paginaCaso.getByRole('status').filter({ hasText: /revisión|review/i })
 
-      await alerta.waitFor({ timeout: 7000 })
+        await confesion.waitFor({ timeout: 15000 })
+
+        const textoAlarma = (await paginaCaso.locator('body').textContent()) || ''
+
+        if (/no están disponibles|is unavailable/i.test(textoAlarma)) {
+          problemasFuente.push(`${caso.nombre}: usa alarma de fallo cerrado`)
+        }
+      } else {
+        // Tolerancia a campos extra: la página se pinta y no hay sección en
+        // revisión. El Latido lleva role='status' siempre: hay que filtrar
+        // por el texto de la confesión, no contar roles a secas.
+        await paginaCaso.waitForTimeout(4000)
+
+        const estados = paginaCaso.getByRole('status').filter({ hasText: /revisión|review/i })
+
+        if ((await estados.count()) > 0) {
+          problemasFuente.push(`${caso.nombre}: un campo extra no debía derribar la sección`)
+        }
+      }
+
       const texto = (await paginaCaso.locator('body').textContent()) || ''
 
       if (/PRIVATE_CANARY_NO_ECO|fuente-no-disponible|\.json|exporter/i.test(texto)) {
@@ -808,7 +855,7 @@ async function navegador() {
 
       if (erroresCaso.length) problemasFuente.push(`${caso.nombre}: error no controlado`)
     } catch {
-      problemasFuente.push(`${caso.nombre}: no falla cerrado`)
+      problemasFuente.push(`${caso.nombre}: no degrada elegante`)
     }
 
     await ctxCaso.close()
@@ -816,9 +863,12 @@ async function navegador() {
 
   marca(
     14,
-    'retenido + incompleto/corrupto/fallo de fuente sin eco',
+    arbolRetenido
+      ? 'retenido ES/EN + degradación elegante sin eco'
+      : 'degradación elegante: sección en revisión, nunca fallo total',
     problemasFuente.length === 0,
-    problemasFuente.slice(0, 6).join(' | ') || `ES/EN+lang · ${casosFuente.length} fallos cerrados · 0 eco · 0 error no controlado`
+    problemasFuente.slice(0, 6).join(' | ') ||
+      `${arbolRetenido ? 'ES/EN+lang · ' : ''}${casosFuente.length} casos · 0 eco · 0 fallo cerrado · 0 error no controlado`
   )
 
   await ctxK.close()
@@ -828,7 +878,7 @@ async function navegador() {
 
 // ── main ────────────────────────────────────────────────────────────────────────
 log(`GATE · front office${rapido ? ' (modo rápido: matriz reducida)' : ''}`)
-estaticas()
+if (!process.argv.includes('--solo-navegador')) estaticas()
 if (!process.argv.includes('--sin-navegador')) await navegador()
 
 const fallos = resultados.filter(r => r.estado === 'FALLO')

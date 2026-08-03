@@ -192,6 +192,21 @@ const STR = {
     en: 'Open the site once while online: from then on, the dashboard and its numbers work offline too.'
   },
 
+  // sección «en revisión» — un documento no cargó o no validó; el resto sigue vivo
+  revision_titulo: { es: 'Este bloque está en revisión', en: 'This section is under review' },
+  revision_texto: {
+    es: 'Sus datos no llegaron completos en el último refresco y preferimos no enseñarlos a medias. El resto del panel sigue disponible; este bloque vuelve solo con el próximo refresco.',
+    en: 'Its data did not arrive complete in the last refresh and we would rather not show it half-baked. The rest of the dashboard is still available; this section returns on its own with the next refresh.'
+  },
+
+  // instantánea retenida por la fuente — estado protegido, no un error
+  retenido_titulo: { es: 'Instantánea pública protegida', en: 'Public snapshot protected' },
+  retenido_texto: {
+    es: 'Los datos permanecen retenidos hasta que exista una proyección pública mínima y segura.',
+    en: 'Data remains withheld until a minimal, safe public projection is available.'
+  },
+  retenido_fecha: { es: 'Comprobación de seguridad: {fecha}', en: 'Safety check: {fecha}' },
+
   // un día en la vida del clon
   dia_titulo: { es: 'Un día en la vida del clon', en: 'A day in the life of the clone' },
   dia_caption: {
@@ -435,6 +450,14 @@ const STR = {
     es: 'lo que el sistema hace solo cada día o cada semana',
     en: 'what the system does by itself every day or week'
   },
+  salud_tabla_accesos: {
+    es: 'tabla de accesos vigilados, desliza horizontalmente para verla entera',
+    en: 'watched accesses table, swipe horizontally to see it all'
+  },
+  salud_tabla_rutinas: {
+    es: 'tabla de rutinas automáticas, desliza horizontalmente para verla entera',
+    en: 'automatic routines table, swipe horizontally to see it all'
+  },
 
   // ------------------------------------------------------------- tokens
   tokens_titulo: { es: '¿Cuánto trabaja y quién lo hace?', en: 'How much work, and who does it?' },
@@ -464,6 +487,10 @@ const STR = {
   tokens_por_modelo: { es: '¿De qué cerebros depende? · 30 d', en: 'Which brains does it rely on? · 30 d' },
   tokens_por_modelo_sub: { es: 'los modelos de IA que hicieron el trabajo', en: 'the AI models that did the work' },
   tokens_modelo: { es: 'Modelo', en: 'Model' },
+  tokens_tabla_region: {
+    es: 'tabla de modelos, desliza horizontalmente para verla entera',
+    en: 'models table, swipe horizontally to see it all'
+  },
 
   // ------------------------------------------------------------- eficiencia
   ef_titulo: { es: '¿Está mejorando el clon?', en: 'Is the clone improving?' },

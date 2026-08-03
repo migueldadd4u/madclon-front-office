@@ -1,6 +1,14 @@
 {
   "schema": "madclon.public-assets.v1",
   "assets": {
+    "images/avatars/1.png": {
+      "size": 8032,
+      "sha256": "08a2c8d8d736f8e74e45f562d1acd061f66c5e4fa74a92814749102354f8eed0"
+    },
+    "images/hero-ambiental.png": {
+      "size": 181781,
+      "sha256": "1bd2d026285438793600fe6d8ca3a72e40c76b7515ad4d93a231a91bffaca3b7"
+    },
     "images/logo-192.png": {
       "size": 13672,
       "sha256": "ea389beb45b1b9b8cefaf956edb2a45adf0eed2c0c169032e4cb2054add46f71"
@@ -9,13 +17,33 @@
       "size": 76030,
       "sha256": "c169150707c24729c0ab6ecb8cdbd0c69e83ad3d06054f91ae70c4191deabaf7"
     },
+    "images/og-madclon.png": {
+      "size": 116796,
+      "sha256": "f172e5b8d1136f2a359515784117418d3afd5357af9d8a5c31ddca7007e4098e"
+    },
     "manifest.webmanifest": {
-      "size": 628,
-      "sha256": "1c79ffb8927dced8d98b36dbad384a786887b29ab52acbd238b3d5118724838b"
+      "size": 689,
+      "sha256": "649f63d3dfd69a8b0fbbb5ed2d66d323da0783513abb301ac6611f2cb3c80b4e"
+    },
+    "media/README.md": {
+      "size": 2142,
+      "sha256": "7cb1bf98f0308f3c0826e8ceb93f944cc9a9064a7e3df326483fbdb0731858ab"
+    },
+    "media/hero-loop.mp4": {
+      "size": 766861,
+      "sha256": "8c9a8febabf3a1ec7bea603ce0ff22895f29df3130393ef4ae786b603adc31b2"
+    },
+    "media/hero-loop.webm": {
+      "size": 457957,
+      "sha256": "5fe5c85b396bf24266471a92e9e7c3ef37010389e4d5545bbea7f71ba337c188"
+    },
+    "media/manifest.json": {
+      "size": 19,
+      "sha256": "6de949686d9b0e343d666d7d5ae111131c1782b3c00898fdb75c84a3172a45ac"
     },
     "sw.js": {
-      "size": 3556,
-      "sha256": "9c8580037a75aeff100ca0a6a2dd899706f88c5619bbbb731257e3fb2febc12a"
+      "size": 4890,
+      "sha256": "02640859d926a358bcd53977f6209d8a7dd51d44e84c4524521230c13b0c9d53"
     }
   },
   "app_assets": {

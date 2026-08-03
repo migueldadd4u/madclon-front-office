@@ -7,8 +7,8 @@ import ButtonBase from '@mui/material/ButtonBase'
 import Typography from '@mui/material/Typography'
 
 // Hook Imports
-import { usePublicLang } from '@/lib/public-i18n'
-import type { Lang } from '@/lib/public-i18n'
+import { useLang } from '@/lib/i18n'
+import type { Lang } from '@/lib/i18n'
 
 const OPCIONES: { codigo: Lang; etiqueta: string }[] = [
   { codigo: 'es', etiqueta: 'ES' },
@@ -16,7 +16,7 @@ const OPCIONES: { codigo: Lang; etiqueta: string }[] = [
 ]
 
 const LangToggle = () => {
-  const { lang, setLang } = usePublicLang()
+  const { lang, setLang } = useLang()
 
   return (
     <div className='flex items-center gap-1 border border-solid border-divider rounded-full p-0.5 mie-1'>
