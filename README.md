@@ -1,6 +1,12 @@
 # MAD Clon — Front Office
 
-**El cuadro de mando público del Clon de MAD, con el estilo visual de GestDocAI.**
+**Escaparate público estático del Clon de MAD, actualmente retenido por seguridad.**
+
+> **NO-GO de producción (2026-08-03):** las ocho rutas solo muestran un estado
+> protegido y de solo lectura. Los cinco JSON reales no cumplen todavía el contrato
+> público mínimo y el gate bloquea build y despliegue con 21 hallazgos. No ejecutes
+> el exportador ni el workflow hasta la autorización y saneado descritos en
+> `TESTING.md`.
 
 El Clon de MAD vive en un vault privado de Obsidian (`MAD-brain/`) lleno de paneles en
 Markdown que solo entiende quien conoce el sistema. Este proyecto es su **front office**:
@@ -19,9 +25,12 @@ corporativa de los demás servicios** (GestDocAI usa este mismo tema Materialize
 | Gráficas | recharts |
 | Despliegue | GitHub Pages (`output: 'export'` → `web/out`) |
 
-## Qué muestra
+## Qué mostrará tras aprobar una proyección
 
-| Página | Contenido | Fuente en el vault |
+La tabla siguiente conserva la intención histórica de navegación; **ninguna de esas
+métricas se muestra en el estado retenido actual**.
+
+| Página | Contenido previsto | Fuente privada, nunca accesible desde el navegador |
 |---|---|---|
 | `/` Panel | Bienvenida, cifras de cabecera, «qué es» en 4 ideas | todos |
 | `/flota` | Los 7 clones, oficio, canales y consumo | `cuadros-de-mando/` + `subclones/` |
@@ -37,35 +46,39 @@ Todo es **responsive**: el panel se administra igual desde un portátil que desd
 
 ```
 MAD-brain/  (vault privado, SOLO LECTURA)
-   │  exporter/export_panel.py
+   │  exporter/export_panel.py  ← ZONA ROJA, pendiente de adaptación
    ▼
-web/public/data/*.json   ← datos agregados, commiteados, público-safe
+web/public/data/*.json   ← cinco documentos heredados; hoy BLOQUEADOS por el gate
    │  Next.js (React) + Materialize MUI + recharts
    ▼
-web/out/  →  GitHub Pages  (Actions: .github/workflows/deploy.yml)
+web/out/  →  GitHub Pages  (workflow exclusivamente manual)
 ```
 
-- **`exporter/export_panel.py`** — lee los paneles vivos del vault y genera 5 JSON
-  (`manifest`, `overview`, `clones`, `tokens`, `serie`). Incluye una **auditoría de
-  privacidad bloqueante**: si la salida contiene emails, teléfonos, rutas locales o
-  credenciales, la exportación falla y no escribe nada.
+- **`exporter/export_panel.py`** — fuente heredada en zona roja. Genera los cinco JSON,
+  pero su contrato actual no basta: el gate semántico los rechaza. No se modifica ni
+  ejecuta hasta autorización de MAD.
 - **`web/`** — starter-kit TypeScript del tema Materialize (Next.js), adaptado:
-  `serverHelpers` sin cookies (export estático), menú y marca MAD Clon, 6 páginas.
+  export estático, menú y marca MAD Clon. El runtime actual solo acepta la proyección
+  canónica `madclon.public-containment.v1` en estado `withheld`.
 
 ## Regla de privacidad (innegociable)
 
-Solo se exportan **métricas agregadas de sistema**: tokens, conteos, estados, nombres de
-crons e integraciones. **Nunca** textos de esperas, correos, decisiones, personas,
-rutas del disco ni secretos. El exportador se autobloquea si detecta un patrón sensible.
+El navegador solo acepta una allowlist exacta y versionada. Mientras no se apruebe otro
+esquema, los documentos de datos no contienen métricas: únicamente `schema`, `status:
+"withheld"`, una fecha UTC de comprobación y una serie vacía. **Nunca** personas ni sus
+recuentos, GTD, encargos, nombres internos, rutas, texto libre, credenciales o telemetría
+privada. El build falla ante cualquier campo o activo adicional.
 
 ## Uso diario
 
 ```bash
-make install   # primera vez (yarn install + bundle de iconos)
-make data      # regenera los JSON desde el vault (solo lectura)
-make dev       # desarrollo local (next dev)
-make build     # datos frescos + export estático en web/out
+cd web
+npm run test:public-safety   # regresiones herméticas
+npm run check:public-safety  # debe quedar verde antes de construir
+npm run gate                 # build nuevo + matriz completa local
 ```
+
+`make data` y el exportador permanecen fuera del flujo autorizado actual.
 
 ## Despliegue en GitHub Pages
 
@@ -77,13 +90,14 @@ git remote add origin git@github.com:<usuario>/madclon-front-office.git
 git push -u origin main
 ```
 
-Luego, en GitHub: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-El workflow compila con `BASEPATH=/<nombre-del-repo>` y publica `web/out`.
-La web quedará en `https://<usuario>.github.io/<nombre-del-repo>/`.
+El workflow solo admite `workflow_dispatch`. No debe ejecutarse mientras `TESTING.md`
+mantenga la fila de datos reales en **FALLA BLOQUEANTE**. Cuando el contrato sea verde,
+compilará con `BASEPATH=/<nombre-del-repo>` y publicará `web/out`.
 
 > ⚠️ **Licencia**: el tema Materialize es de pago (Envato/Pixinvent). Publicar su código
 > fuente en un repo **público** incumple la licencia — usa un repo **privado**
 > (GitHub Pages funciona en repos privados con plan Pro/Team) o confirma la licencia
 > antes de hacerlo público.
 
-Para refrescar los datos: `make data`, commit de los JSON y push.
+No hay refresco autorizado hasta adaptar el exportador y sustituir los cinco JSON con
+aprobación expresa de MAD; el job nocturno queda fuera de este cambio.
