@@ -1,5 +1,31 @@
 # Front Office · pruebas de contención pública
 
+> **Addendum 2026-08-03 (tarde) — decisión de MAD: «mejor datos incompletos que un
+> error».** La contención total documentada abajo queda **levantada** y este archivo
+> pasa a ser registro histórico de aquella campaña. Lo que cambió:
+>
+> - La superficie aprobada (8 rutas con datos reales saneados) se restauró desde el
+>   último despliegue bueno (`29735b6`) y está **en producción** (`33d04ed`).
+> - La capa de datos es ahora **fail-soft por documento**: validadores estructurales
+>   tolerantes (campos extra no derriban), y cada sección que pierde su documento
+>   confiesa «en revisión» con `role=status`. Nunca fallo total, nunca dato inventado.
+> - La frontera de privacidad se mantiene con el **escáner de contenido sensible**
+>   (emails, teléfonos con separadores, rutas `/Users/·/home/·C:\`, secretos
+>   `sk-·PRIVATE KEY·bearer·api_key`) que **bloquea build y despliegue**. El contrato
+>   de datos es dual: withheld canónico **o** legado saneado.
+> - `PRIVATE_ARTIFACT_MARKERS` quedó vacío: el vocabulario de sistema («fichas
+>   curadas», etc.) era superficie de texto aprobada por MAD, no un filtro de datos.
+> - Activos: 11 ficheros pineados por SHA-256 (se readmiten `media/*`, `og-madclon.png`,
+>   `hero-ambiental.png`, `avatars/1.png`, `woff2`). Service worker con auditoría v2
+>   (guard GET, guard de origen, caducidad `sw-fecha`/`DIA_MS`, purga `caches.delete`).
+> - Veredicto: tests **15/15**, build 0 errores/0 warnings, gate **estáticas 5 OK +
+>   navegador 10 OK · 0 FALLO** (incluidos los 7 casos de degradación: incompleto,
+>   campo-extra, corrupto, clave-duplicada, 403, 503, fuente colgada). Despliegue
+>   manual `workflow_dispatch` verificado en HTTPS: la home sirve el panel real y
+>   `data/manifest.json` lleva `generado` del mismo día.
+
+---
+
 Campaña: `Arquitectura del Clon mejorada para crecer y escalar sano`  
 Fecha: 2026-08-03 · zona horaria Europe/Madrid  
 Contrato: el escaparate es estático y de solo lectura. Mientras no exista una proyección pública aprobada, únicamente admite cinco documentos canónicos `madclon.public-containment.v1` en estado `withheld`.

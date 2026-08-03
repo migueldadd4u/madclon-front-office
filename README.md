@@ -1,12 +1,13 @@
 # MAD Clon — Front Office
 
-**Escaparate público estático del Clon de MAD, actualmente retenido por seguridad.**
+**Escaparate público estático del Clon de MAD, en producción con degradación elegante.**
 
-> **NO-GO de producción (2026-08-03):** las ocho rutas solo muestran un estado
-> protegido y de solo lectura. Los cinco JSON reales no cumplen todavía el contrato
-> público mínimo y el gate bloquea build y despliegue con 21 hallazgos. No ejecutes
-> el exportador ni el workflow hasta la autorización y saneado descritos en
-> `TESTING.md`.
+> **Estado (2026-08-03):** GO de producción por decisión de MAD. La superficie
+> aprobada (ocho rutas con datos reales saneados) vuelve a estar en el aire y,
+> ante cualquier documento que falte o llegue roto, la sección afectada confiesa
+> «en revisión» en lugar de tumbar la página: **mejor incompleto que un error**.
+> La frontera de privacidad la vigila el escáner de contenido sensible del gate
+> (emails, teléfonos, rutas, secretos), que sigue bloqueando build y despliegue.
 
 El Clon de MAD vive en un vault privado de Obsidian (`MAD-brain/`) lleno de paneles en
 Markdown que solo entiende quien conoce el sistema. Este proyecto es su **front office**:
@@ -25,12 +26,9 @@ corporativa de los demás servicios** (GestDocAI usa este mismo tema Materialize
 | Gráficas | recharts |
 | Despliegue | GitHub Pages (`output: 'export'` → `web/out`) |
 
-## Qué mostrará tras aprobar una proyección
+## Qué muestra
 
-La tabla siguiente conserva la intención histórica de navegación; **ninguna de esas
-métricas se muestra en el estado retenido actual**.
-
-| Página | Contenido previsto | Fuente privada, nunca accesible desde el navegador |
+| Página | Contenido | Fuente privada, nunca accesible desde el navegador |
 |---|---|---|
 | `/` Panel | Bienvenida, cifras de cabecera, «qué es» en 4 ideas | todos |
 | `/flota` | Los 7 clones, oficio, canales y consumo | `cuadros-de-mando/` + `subclones/` |
@@ -46,28 +44,31 @@ Todo es **responsive**: el panel se administra igual desde un portátil que desd
 
 ```
 MAD-brain/  (vault privado, SOLO LECTURA)
-   │  exporter/export_panel.py  ← ZONA ROJA, pendiente de adaptación
+   │  exporter/export_panel.py  ← refresco nocturno automático
    ▼
-web/public/data/*.json   ← cinco documentos heredados; hoy BLOQUEADOS por el gate
+web/public/data/*.json   ← cinco documentos saneados; el gate los audita en cada build
    │  Next.js (React) + Materialize MUI + recharts
    ▼
 web/out/  →  GitHub Pages  (workflow exclusivamente manual)
 ```
 
-- **`exporter/export_panel.py`** — fuente heredada en zona roja. Genera los cinco JSON,
-  pero su contrato actual no basta: el gate semántico los rechaza. No se modifica ni
-  ejecuta hasta autorización de MAD.
+- **`exporter/export_panel.py`** — genera los cinco JSON cada noche desde los paneles
+  privados. El gate semántico decide si el lote es publicable.
 - **`web/`** — starter-kit TypeScript del tema Materialize (Next.js), adaptado:
-  export estático, menú y marca MAD Clon. El runtime actual solo acepta la proyección
-  canónica `madclon.public-containment.v1` en estado `withheld`.
+  export estático, menú y marca MAD Clon. La capa de datos es **fail-soft**: cada
+  documento se valida por separado y, si uno falta o llega roto, solo su sección
+  confiesa «en revisión»; el resto de la página se pinta con normalidad.
 
 ## Regla de privacidad (innegociable)
 
-El navegador solo acepta una allowlist exacta y versionada. Mientras no se apruebe otro
-esquema, los documentos de datos no contienen métricas: únicamente `schema`, `status:
-"withheld"`, una fecha UTC de comprobación y una serie vacía. **Nunca** personas ni sus
-recuentos, GTD, encargos, nombres internos, rutas, texto libre, credenciales o telemetría
-privada. El build falla ante cualquier campo o activo adicional.
+El gate acepta un **contrato dual**: la proyección canónica
+`madclon.public-containment.v1` en estado `withheld` (contención total, por si algún
+día hay que cerrar el grifo) o los cinco documentos legados saneados de la superficie
+aprobada. En ambos casos, un **escáner de contenido sensible bloquea el build** ante
+cualquier email, teléfono, ruta de disco o secreto que se cuele a los datos o a los
+activos. **Nunca** personas identificables, nombres internos privados, credenciales o
+telemetría privada. Los activos públicos van pineados por SHA-256 y el service worker
+pasa una auditoría propia (solo GET, mismo origen, caché con caducidad y purga).
 
 ## Uso diario
 
@@ -78,7 +79,8 @@ npm run check:public-safety  # debe quedar verde antes de construir
 npm run gate                 # build nuevo + matriz completa local
 ```
 
-`make data` y el exportador permanecen fuera del flujo autorizado actual.
+`make data` refresca los cinco JSON desde el vault; el gate decide si el lote sale
+o se queda en local.
 
 ## Despliegue en GitHub Pages
 

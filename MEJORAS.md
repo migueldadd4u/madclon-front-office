@@ -2,6 +2,10 @@
 
 > Una línea por mejora desplegada: qué se añadió y por qué alucina.
 
+## 2026-08-03
+
+- **Degradación elegante: mejor incompleto que un error** — Decisión de MAD tras ver la pantalla de contención: la web pública vuelve a lucir su superficie aprobada completa (las ocho páginas con sus animaciones, el cielo ambiental en vídeo, el latido en vivo) y estrena una capa de datos **fail-soft**: cada uno de los cinco documentos JSON se valida por separado con tolerancia a campos nuevos, y si uno falta, llega roto, se cuelga o responde 403/503, **solo su sección confiesa «estamos revisando esta sección»** mientras el resto de la página se pinta con normalidad. Nunca más un fallo total; nunca un dato inventado. La privacidad no se relaja: un escáner de contenido sensible (emails, teléfonos, rutas de disco, secretos) sigue **bloqueando el build** si algo privado se cuela, los 11 activos públicos van pineados por SHA-256 y el service worker pasa su propia auditoría (solo GET, mismo origen, caché con caducidad y purga de versiones viejas). De regalo, las tablas de Tokens y Salud se vuelven regiones deslizables accesibles por teclado (axe vuelve a 0 violaciones). Todo juzgado por el gate: 15/15 en verde antes de despegar. Commit `33d04ed`.
+
 ## 2026-07-28
 
 - **Contadores animados (count-up)** — Las cifras de cabecera (304 M tokens, clones, gateways, rutinas y los tres totales de la página Tokens) suben desde 0 hasta su valor real al cargar, con ease-out suave. El número más grande del panel crece ante tus ojos: convierte una cifra estática en un pequeño momento «wow». Accesible: respeta `prefers-reduced-motion` (salta al valor final) y expone `aria-label` con la cifra completa para lectores de pantalla. Commit `6c5b328`.
