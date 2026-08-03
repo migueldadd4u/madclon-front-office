@@ -31,6 +31,7 @@ const EstaNoche = ({ data }: { data: PanelData }) => {
   const llamadas = fmt(ultimo.contexto.llamadas ?? 0)
   const tareas = fmt(ultimo.contexto.tareas_hechas ?? 0)
   const saludRaw = data.overview.salud_global ?? ''
+
   const salud = saludRaw.includes('🟢')
     ? t('noche_salud_verde')
     : saludRaw.includes('🟡')

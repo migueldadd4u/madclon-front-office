@@ -26,8 +26,8 @@ type Props = { data: PanelData; diasVida: number }
  * con prefers-reduced-motion.
  */
 const ConsolaClon = ({ data, diasVida }: Props) => {
-  const { lang, t } = useLang()
-  const [clics, setClics] = useState(0)
+  const { t } = useLang()
+  const [, setClics] = useState(0)
   const [abierta, setAbierta] = useState(false)
   const [lineasVisibles, setLineasVisibles] = useState(0)
   const temporizador = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -57,6 +57,7 @@ const ConsolaClon = ({ data, diasVida }: Props) => {
 
         return 0
       }
+
       temporizador.current = setTimeout(() => setClics(0), 1600)
 
       return siguiente
@@ -70,6 +71,7 @@ const ConsolaClon = ({ data, diasVida }: Props) => {
 
       return
     }
+
     const quieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
     if (quieto) {
@@ -77,8 +79,10 @@ const ConsolaClon = ({ data, diasVida }: Props) => {
 
       return
     }
+
     setLineasVisibles(1)
     let i = 1
+
     const id = setInterval(() => {
       i += 1
       setLineasVisibles(i)

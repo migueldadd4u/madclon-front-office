@@ -7,14 +7,14 @@ import { useEffect, useRef, useState } from 'react'
 import Button from '@mui/material/Button'
 
 // Hook Imports
-import { useLang } from '@/lib/i18n'
+import { usePublicLang } from '@/lib/public-i18n'
 
 // «Compartir bonito» — copia la dirección de la página actual al portapapeles
 // y lo celebra con un check durante 2 s. Botón real (teclado y lector de
 // pantalla), bilingüe, sin animaciones que respetar.
 
 const CopiarEnlace = () => {
-  const { t } = useLang()
+  const { t } = usePublicLang()
   const [copiado, setCopiado] = useState(false)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -37,6 +37,7 @@ const CopiarEnlace = () => {
       document.execCommand('copy')
       area.remove()
     }
+
     setCopiado(true)
     if (timer.current) clearTimeout(timer.current)
     timer.current = setTimeout(() => setCopiado(false), 2000)

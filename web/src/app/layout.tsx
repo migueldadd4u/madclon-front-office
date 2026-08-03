@@ -11,7 +11,7 @@ import type { ChildrenType } from '@core/types'
 import { getSystemMode } from '@core/utils/serverHelpers'
 
 // Component Imports
-import { LangProvider } from '@/lib/i18n'
+import { PublicLangProvider } from '@/lib/public-i18n'
 import RegistraSW from '@/components/layout/shared/RegistraSW'
 
 // Style Imports
@@ -22,27 +22,22 @@ import '@assets/iconify-icons/generated-icons.css'
 
 export const metadata = {
   metadataBase: new URL('https://migueldadd4u.github.io/madclon-front-office'),
-  title: 'MAD Clon — el Clon de Miguel Ángel Domínguez',
-  description:
-    'Cuadro de mando público del Clon de Miguel Ángel Domínguez (MAD): salud del sistema, flota de clones, consumo y eficiencia de la IA, explicados para personas.',
+  title: 'MAD Clon — vista pública protegida',
+  description: 'Vista pública protegida y de solo lectura. Los datos permanecen retenidos hasta disponer de una proyección segura.',
   applicationName: 'MAD Clon',
   manifest: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/manifest.webmanifest`,
   openGraph: {
-    title: 'MAD Clon — el Clon de Miguel Ángel Domínguez',
-    description:
-      'Un equipo de IA que trabaja mientras Miguel Ángel Domínguez (MAD) vive su vida — los números del Clon de MAD, explicados para personas.',
+    title: 'MAD Clon — vista pública protegida',
+    description: 'Vista pública protegida y de solo lectura; no muestra datos internos.',
     url: 'https://migueldadd4u.github.io/madclon-front-office/',
     siteName: 'MAD Clon',
-    images: [{ url: '/images/og-madclon.png', width: 1200, height: 630, alt: 'MAD Clon — el Clon de Miguel Ángel Domínguez' }],
     locale: 'es_ES',
     type: 'website'
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'MAD Clon — el Clon de Miguel Ángel Domínguez',
-    description:
-      'Un equipo de IA que trabaja mientras Miguel Ángel Domínguez (MAD) vive su vida — los números del Clon de MAD, explicados para personas.',
-    images: ['/images/og-madclon.png']
+    card: 'summary',
+    title: 'MAD Clon — vista pública protegida',
+    description: 'Vista pública protegida y de solo lectura; no muestra datos internos.'
   }
 }
 
@@ -67,7 +62,7 @@ const RootLayout = async (props: ChildrenType) => {
               "try{if(localStorage.getItem('madclon-contraste')==='1')document.documentElement.classList.add('fo-contraste')}catch(e){}"
           }}
         />
-        <LangProvider>{children}</LangProvider>
+        <PublicLangProvider>{children}</PublicLangProvider>
         <RegistraSW />
       </body>
     </html>

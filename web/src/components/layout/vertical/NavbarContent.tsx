@@ -12,13 +12,13 @@ import ModoPresentacion from '@/components/dashboard/ModoPresentacion'
 import AtajosTeclado from '@/components/dashboard/AtajosTeclado'
 
 // Hook Imports
-import { useLang } from '@/lib/i18n'
+import { usePublicLang } from '@/lib/public-i18n'
 
 // Util Imports
 import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
 
 const NavbarContent = () => {
-  const { t } = useLang()
+  const { t } = usePublicLang()
 
   return (
     <div className={classnames(verticalLayoutClasses.navbarContent, 'flex items-center justify-between gap-4 is-full')}>

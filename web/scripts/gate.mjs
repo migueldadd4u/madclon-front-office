@@ -4,10 +4,10 @@
 // Regla dura: si algo se puede medir con un script, no lo decide un LLM.
 // Nada se publica sin pasar este gate ENTERO en verde, en local.
 //
-//   npx yarn@1.22.22 gate                 → las 13 comprobaciones (0-12)
+//   npm run gate                           → las 15 comprobaciones (0-14)
 //   node scripts/gate.mjs --sin-navegador → solo 0-4 (seguridad, build, tipos, copy, cifras)
 //   node scripts/gate.mjs --rapido        → matriz reducida (para el bucle de bugfixing)
-//   node scripts/gate.mjs --saltar-build  → reutiliza web/out ya construido
+//   node scripts/gate.mjs --rapido --saltar-build → reutiliza web/out sólo en el bucle local
 //
 // Playwright y axe-core se descubren en la ruta persistente compartida con el
 // panel privado. /tmp/pwshot queda solo como compatibilidad: macOS puede podarlo
@@ -29,8 +29,8 @@ const BASE = '/madclon-front-office'
 const PUERTO = Number(process.env.GATE_PORT || 4173)
 const PAGINAS = ['', 'flota', 'salud', 'tokens', 'eficiencia', 'actividad', 'historia', 'preguntas']
 const rapido = process.argv.includes('--rapido')
-const ANCHOS_AXE = rapido ? [390, 1440] : [390, 834, 1440]
-const ANCHOS_OVERFLOW = [320, 390, 834, 1440]
+const ANCHOS_AXE = rapido ? [375, 1440] : [375, 390, 834, 1440]
+const ANCHOS_OVERFLOW = [320, 375, 390, 834, 1440]
 const IDIOMAS = rapido ? ['es'] : ['es', 'en']
 const CONTRASTES = rapido ? [false] : [false, true]
 
@@ -96,10 +96,22 @@ function estaticas() {
 
   // 1 · build
   if (process.argv.includes('--saltar-build')) {
-    marca(1, 'build', existsSync(join(RAIZ, 'out/index.html')), 'reutiliza web/out (--saltar-build)')
+    const existe = existsSync(join(RAIZ, 'out/index.html'))
+    const seguridadOut = existe ? auditPublicSafety({ webRoot: RAIZ, mode: 'out' }) : []
+
+    marca(
+      1,
+      'build',
+      rapido && existe && seguridadOut.length === 0,
+      !rapido
+        ? '--saltar-build no es válido en el gate completo'
+        : existe && seguridadOut.length === 0
+          ? 'reutiliza web/out con integridad verificada (sólo bugfix local)'
+          : `${seguridadOut.length} hallazgos en web/out`
+    )
   } else {
     try {
-      const out = execSync('npx yarn@1.22.22 build', {
+      const out = execSync('npm run build', {
         cwd: RAIZ,
         encoding: 'utf8',
         env: { ...process.env, BASEPATH: BASE },
@@ -120,7 +132,7 @@ function estaticas() {
   let ok2 = true
 
   try {
-    sh('npx tsc --noEmit')
+    sh('./node_modules/.bin/tsc --noEmit')
     detalle.push('tsc limpio')
   } catch {
     ok2 = false
@@ -130,8 +142,8 @@ function estaticas() {
   const base = JSON.parse(readFileSync(join(RAIZ, 'scripts/lint-baseline.json'), 'utf8'))
 
   for (const [clave, cmd] of [
-    ['eslint', 'npx eslint src/app src/components src/lib --ext .ts,.tsx'],
-    ['stylelint', 'npx stylelint "src/**/*.{css,tsx}"']
+    ['eslint', './node_modules/.bin/eslint src/app src/components src/lib --ext .ts,.tsx'],
+    ['stylelint', './node_modules/.bin/stylelint "src/**/*.{css,tsx}"']
   ]) {
     let salida = ''
 
@@ -209,10 +221,10 @@ function servir() {
     res.end(readFileSync(f))
   })
 
-  return new Promise(ok => srv.listen(PUERTO, () => ok(srv)))
+  return new Promise(ok => srv.listen(PUERTO, '127.0.0.1', () => ok(srv)))
 }
 
-// ── 5-12 · comprobaciones en navegador ──────────────────────────────────────────
+// ── 5-13 · comprobaciones en navegador ──────────────────────────────────────────
 async function navegador() {
   let PW_HOME
 
@@ -238,7 +250,7 @@ async function navegador() {
   }
 
   const srv = await servir()
-  const url = p => `http://localhost:${PUERTO}${BASE}/${p}`
+  const url = p => `http://127.0.0.1:${PUERTO}${BASE}/${p}`
   const navegadorPw = await chromium.launch()
   const violaciones = []
   const erroresJs = []
@@ -323,13 +335,13 @@ async function navegador() {
               axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } })
             )
 
-            r.violations
-              .filter(v => v.impact === 'serious' || v.impact === 'critical')
-              .forEach(v => violaciones.push(`${p || 'portada'} @${w} ${lang}${contraste ? '/AC' : ''}: ${v.id} (${v.nodes.length})`))
+            r.violations.forEach(v =>
+              violaciones.push(`${p || 'portada'} @${w} ${lang}${contraste ? '/AC' : ''}: ${v.id} (${v.impact || 'sin impacto'}) (${v.nodes.length})`)
+            )
           }
 
           // 8 · objetivos táctiles, solo en móvil
-          if (w === 390 && !contraste && lang === 'es') {
+          if (w === 375 && !contraste && lang === 'es') {
             const chicos = await pg.evaluate(blanca => {
               const out = []
 
@@ -372,9 +384,9 @@ async function navegador() {
           axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } })
         )
 
-        r.violations
-          .filter(v => v.impact === 'serious' || v.impact === 'critical')
-          .forEach(v => violaciones.push(`capa2 @${w} ${lang}${contraste ? '/AC' : ''}: ${v.id} (${v.nodes.length})`))
+        r.violations.forEach(v =>
+          violaciones.push(`capa2 @${w} ${lang}${contraste ? '/AC' : ''}: ${v.id} (${v.impact || 'sin impacto'}) (${v.nodes.length})`)
+        )
         await pg.keyboard.press('Escape')
       }
 
@@ -384,7 +396,7 @@ async function navegador() {
 
   const matriz = `${PAGINAS.length} páginas + capa 2 × ${ANCHOS_AXE.join('/')} × ${IDIOMAS.join('/')} × ${CONTRASTES.length === 2 ? 'normal+AC' : 'normal'}`
 
-  marca(5, `axe wcag2a/2aa/21aa (${matriz})`, violaciones.length === 0, violaciones.slice(0, 6).join(' | ') || '0 serious, 0 critical')
+  marca(5, `axe wcag2a/2aa/21aa (${matriz})`, violaciones.length === 0, violaciones.slice(0, 6).join(' | ') || '0 violaciones')
   marca(
     6,
     'consola + red GET/HEAD same-origin en el mismo barrido',
@@ -392,7 +404,7 @@ async function navegador() {
     `${erroresJs.length} errores JS · ${respuestasMalas.length} respuestas ≥400 · ${metodosMutadores.length} mutaciones · ${origenesExternos.length} orígenes externos ${[...erroresJs, ...respuestasMalas].slice(0, 3).join(' | ')}`
   )
   marca(7, `overflow horizontal (${ANCHOS_OVERFLOW.join('/')})`, overflow.length === 0, overflow.slice(0, 5).join(' | ') || 'ninguna página desborda')
-  marca(8, 'objetivos táctiles ≥ 44 px @390', tactiles.length === 0, tactiles.slice(0, 6).join(' | ') || `0 por debajo de 44 px`)
+  marca(8, 'objetivos táctiles ≥ 44 px @375', tactiles.length === 0, tactiles.slice(0, 6).join(' | ') || `0 por debajo de 44 px`)
 
   // 9 · teclado: Flota → capa 2 → volver
   const ctxK = await navegadorPw.newContext({ viewport: { width: 1440, height: 900 } })
@@ -406,6 +418,7 @@ async function navegador() {
   const pasosTeclado = []
   const abridor = k.locator('[data-anatomia-abrir], button:has-text("ver qué hay debajo")').first()
   const hayAbridor = (await abridor.count()) > 0
+  const retenidoK = (await k.getByRole('status').count()) > 0
 
   pasosTeclado.push(`abridor de capa 2: ${hayAbridor ? 'sí' : 'NO'}`)
 
@@ -447,6 +460,32 @@ async function navegador() {
 
     pasosTeclado.push(`Esc cierra: ${cerrada ? 'sí' : 'NO'}`, `foco vuelve: ${focoVuelve ? 'sí' : 'NO'}`)
     marca(9, 'teclado: flota → capa 2 → volver', abierta && cerrada && focoVisible && lateral, pasosTeclado.join(' · '))
+  } else if (retenidoK) {
+    await k.evaluate(() => document.body.focus())
+    let llegaControl = false
+
+    for (let i = 0; i < 80 && !llegaControl; i++) {
+      await k.keyboard.press('Tab')
+      llegaControl = await k.evaluate(() => ['A', 'BUTTON'].includes(document.activeElement?.tagName || ''))
+    }
+
+    const focoVisible =
+      llegaControl &&
+      (await k.evaluate(() => {
+        const el = document.activeElement
+        const s = getComputedStyle(el)
+
+        return el.matches(':focus-visible') && (s.outlineStyle !== 'none' || s.boxShadow !== 'none')
+      }))
+
+    const sinDialogo = await k.evaluate(() => !document.querySelector('[role="dialog"], [data-capa="2"]'))
+
+    marca(
+      9,
+      'teclado en estado público retenido',
+      llegaControl && focoVisible && sinDialogo,
+      `Tab llega a control ${llegaControl ? 'sí' : 'NO'} · foco visible ${focoVisible ? 'sí' : 'NO'} · sin diálogo ${sinDialogo ? 'sí' : 'NO'}`
+    )
   } else {
     marca(9, 'teclado: flota → capa 2 → volver', false, pasosTeclado.join(' · '))
   }
@@ -470,39 +509,73 @@ async function navegador() {
     capa.atras = await k.evaluate(() => !document.querySelector('[role="dialog"], [data-capa="2"]'))
   }
 
-  marca(10, 'capas: migas + distintivo sticky + «atrás» cierra', capa.migas && capa.distintivo && capa.atras,
-    `migas ${capa.migas ? 'sí' : 'NO'} · distintivo sticky ${capa.distintivo ? 'sí' : 'NO'} · atrás cierra ${capa.atras ? 'sí' : 'NO'}`)
+  if (hayAbridor) {
+    marca(10, 'capas: migas + distintivo sticky + «atrás» cierra', capa.migas && capa.distintivo && capa.atras,
+      `migas ${capa.migas ? 'sí' : 'NO'} · distintivo sticky ${capa.distintivo ? 'sí' : 'NO'} · atrás cierra ${capa.atras ? 'sí' : 'NO'}`)
+  } else if (retenidoK) {
+    await k.goto(url('tokens'), { waitUntil: 'domcontentloaded' })
+    await k.goBack()
+    await k.waitForTimeout(700)
+    const atrasRetenido = new URL(k.url()).pathname.endsWith('/flota')
+    const estadoRetenido = (await k.getByRole('status').count()) > 0
+    const sinCapa = await k.evaluate(() => !document.querySelector('[role="dialog"], [data-capa="2"], [data-anatomia-abrir]'))
+
+    marca(
+      10,
+      'estado retenido sin capa privada + «atrás»',
+      atrasRetenido && estadoRetenido && sinCapa,
+      `atrás ${atrasRetenido ? 'sí' : 'NO'} · retenido ${estadoRetenido ? 'sí' : 'NO'} · capa privada ausente ${sinCapa ? 'sí' : 'NO'}`
+    )
+  } else {
+    marca(10, 'capas: migas + distintivo sticky + «atrás» cierra', false, 'sin capa interactiva ni estado retenido válido')
+  }
 
   // 11 · frescura del dato: si el manifest tiene > 48 h, la web lo tiene que confesar
   const manifest = JSON.parse(readFileSync(join(RAIZ, 'public/data/manifest.json'), 'utf8'))
-  const sello = new Date(manifest.generado || manifest.generado_utc || manifest.fecha)
+  const esRetenido = manifest.schema === 'madclon.public-containment.v1'
+  const sello = new Date(manifest.generated_at || manifest.generado || manifest.generado_utc || manifest.fecha)
   const horas = (Date.now() - sello.getTime()) / 36e5
 
   await k.goto(url(''), { waitUntil: 'domcontentloaded' })
   await k.waitForTimeout(1600)
-  const confiesa = await k.evaluate(() => !!document.querySelector('[data-frescura-rancia]'))
+
+  const confiesa = await k.evaluate(
+    retenido => !!document.querySelector(retenido ? '[role="status"]' : '[data-frescura-rancia]'),
+    esRetenido
+  )
 
   // Y el ensayo: se sirve un manifest de hace 3 días para comprobar que la confesión
   // aparece de verdad. Si solo se mirase el dato real, esta rama no se probaría nunca.
   // Contexto aparte con el service worker BLOQUEADO: si no, el SW sirve el manifest
   // de su propia caché y la interceptación no llega a la página.
-  const viejo = { ...manifest, generado: new Date(Date.now() - 72 * 36e5).toISOString() }
+  const fechaVieja = new Date(Date.now() - 72 * 36e5).toISOString()
+  const viejo = esRetenido ? { ...manifest, generated_at: fechaVieja } : { ...manifest, generado: fechaVieja }
   const ctxViejo = await navegadorPw.newContext({ viewport: { width: 1440, height: 900 }, serviceWorkers: 'block' })
 
   await ctxViejo.addInitScript(() => localStorage.setItem('madclon-lang', 'es'))
   await ctxViejo.route(`**${BASE}/data/manifest.json`, r =>
-    r.fulfill({ contentType: 'application/json', body: JSON.stringify(viejo) })
+    r.fulfill({ contentType: 'application/json', body: `${JSON.stringify(viejo)}\n` })
   )
   const pv = await ctxViejo.newPage()
 
   await pv.goto(url(''), { waitUntil: 'domcontentloaded' })
   await pv.waitForTimeout(2200)
-  const confiesaEnsayo = await pv.evaluate(() => !!document.querySelector('[data-frescura-rancia]'))
+
+  const confiesaEnsayo = await pv.evaluate(
+    retenido => !!document.querySelector(retenido ? '[role="status"]' : '[data-frescura-rancia]'),
+    esRetenido
+  )
 
   await ctxViejo.close()
 
-  marca(11, 'frescura de datos (y el ensayo del dato rancio)', (horas <= 48 || confiesa) && confiesaEnsayo,
-    `manifest de hace ${horas.toFixed(1)} h · ${horas > 48 ? (confiesa ? 'la web lo confiesa' : 'LA WEB NO LO CONFIESA') : 'fresco (no procede confesar)'} · ensayo a 72 h: ${confiesaEnsayo ? 'confiesa' : 'NO CONFIESA'}`)
+  marca(
+    11,
+    esRetenido ? 'fecha y estado de instantánea retenida' : 'frescura de datos (y el ensayo del dato rancio)',
+    Number.isFinite(horas) && horas >= -5 / 60 && (esRetenido ? confiesa : horas <= 48 || confiesa) && confiesaEnsayo,
+    esRetenido
+      ? `sello válido · retenido visible ${confiesa ? 'sí' : 'NO'} · ensayo a 72 h retenido ${confiesaEnsayo ? 'sí' : 'NO'}`
+      : `manifest de hace ${horas.toFixed(1)} h · ${horas > 48 ? (confiesa ? 'la web lo confiesa' : 'LA WEB NO LO CONFIESA') : 'fresco (no procede confesar)'} · ensayo a 72 h: ${confiesaEnsayo ? 'confiesa' : 'NO CONFIESA'}`
+  )
 
   // 12 · enlaces internos, og:image y sitemap
   const rotos = []
@@ -523,17 +596,225 @@ async function navegador() {
         continue
       }
 
-      const abs = h.startsWith('http') ? h : `http://localhost:${PUERTO}${h.startsWith(BASE) ? h : BASE + h}`
+      const abs = h.startsWith('http') ? h : `http://127.0.0.1:${PUERTO}${h.startsWith(BASE) ? h : BASE + h}`
       const r = await k.request.get(abs)
 
       if (!r.ok()) rotos.push(`${r.status()} ${h}`)
     }
   }
 
-  const sm = await k.request.get(`http://localhost:${PUERTO}${BASE}/sitemap.xml`)
+  const sm = await k.request.get(`http://127.0.0.1:${PUERTO}${BASE}/sitemap.xml`)
 
   if (!sm.ok()) rotos.push(`sitemap.xml ${sm.status()}`)
   marca(12, 'enlaces internos + og:image + sitemap', rotos.length === 0, rotos.slice(0, 5).join(' | ') || `${vistos.size} destinos, todos 200`)
+
+  // 13 · movimiento reducido: la preferencia del sistema llega a la app y no
+  // queda movimiento, vídeo, error de consola ni tráfico distinto de GET/HEAD
+  // al mismo origen en ninguna de las ocho páginas.
+  const ctxReducido = await navegadorPw.newContext({
+    viewport: { width: 375, height: 900 },
+    reducedMotion: 'reduce'
+  })
+
+  const problemasReducido = []
+
+  ctxReducido.on('request', request => {
+    const metodo = request.method().toUpperCase()
+
+    if (!['GET', 'HEAD'].includes(metodo)) problemasReducido.push(`petición ${metodo}`)
+
+    try {
+      const destino = new URL(request.url())
+
+      if (['http:', 'https:'].includes(destino.protocol) && destino.origin !== origenLocal) {
+        problemasReducido.push('petición a origen externo')
+      }
+    } catch {
+      problemasReducido.push('URL no verificable')
+    }
+  })
+  await ctxReducido.addInitScript(() => localStorage.setItem('madclon-lang', 'es'))
+  const pr = await ctxReducido.newPage()
+
+  pr.on('pageerror', error => problemasReducido.push(`error JS: ${error.message}`))
+  pr.on('console', mensaje => {
+    if (mensaje.type() === 'error' && !/Failed to load resource/.test(mensaje.text())) {
+      problemasReducido.push(`consola: ${mensaje.text().slice(0, 80)}`)
+    }
+  })
+  pr.on('response', respuesta => {
+    if (respuesta.status() >= 400) problemasReducido.push(`respuesta ${respuesta.status()}`)
+  })
+  pr.on('requestfailed', request => {
+    const error = request.failure()?.errorText || ''
+
+    if (!/ERR_ABORTED/.test(error)) problemasReducido.push(`red: ${error || 'fallo'}`)
+  })
+
+  for (const p of PAGINAS) {
+    await pr.goto(url(p), { waitUntil: 'domcontentloaded' })
+    await pr.waitForTimeout(1600)
+
+    const estado = await pr.evaluate(() => ({
+      preferencia: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+      animaciones: document.getAnimations()
+        .filter(animacion => animacion.playState === 'running')
+        .map(animacion => {
+          const elemento = animacion.effect instanceof KeyframeEffect ? animacion.effect.target : null
+
+          return elemento instanceof Element ? elemento.tagName.toLowerCase() : 'animación'
+        })
+        .slice(0, 8),
+      videosActivos: [...document.querySelectorAll('video')].filter(video => !video.paused).length
+    }))
+
+    if (!estado.preferencia) problemasReducido.push(`${p || 'portada'}: preferencia no aplicada`)
+    if (estado.animaciones.length) problemasReducido.push(`${p || 'portada'}: ${estado.animaciones.join(', ')}`)
+    if (estado.videosActivos) problemasReducido.push(`${p || 'portada'}: ${estado.videosActivos} vídeo(s) activo(s)`)
+  }
+
+  marca(
+    13,
+    'prefers-reduced-motion + consola/red @375',
+    problemasReducido.length === 0,
+    problemasReducido.slice(0, 6).join(' | ') || 'preferencia aplicada · 0 movimiento · 0 vídeos · 0 errores/red externa'
+  )
+  await ctxReducido.close()
+
+  // 14 · estados de fuente pública: retenido seguro en ES/EN y fallo cerrado
+  // ante documento incompleto, JSON corrupto o respuesta de origen fallida.
+  const problemasFuente = []
+
+  const ctxRetenido = await navegadorPw.newContext({
+    viewport: { width: 375, height: 900 },
+    serviceWorkers: 'block'
+  })
+
+  await ctxRetenido.addInitScript(() => localStorage.setItem('madclon-lang', 'es'))
+  const paginaRetenida = await ctxRetenido.newPage()
+
+  await paginaRetenida.goto(url(''), { waitUntil: 'domcontentloaded' })
+  const avisoEs = paginaRetenida.getByRole('status').filter({ hasText: 'Instantánea pública protegida' })
+
+  try {
+    await avisoEs.waitFor({ timeout: 5000 })
+
+    if ((await paginaRetenida.locator('html').getAttribute('lang')) !== 'es') {
+      problemasFuente.push('html lang ES incorrecto')
+    }
+  } catch {
+    problemasFuente.push('instantánea retenida ES no llega a estado seguro')
+  }
+
+  await ctxRetenido.close()
+
+  const ctxRetenidoEn = await navegadorPw.newContext({
+    viewport: { width: 375, height: 900 },
+    serviceWorkers: 'block'
+  })
+
+  await ctxRetenidoEn.addInitScript(() => localStorage.setItem('madclon-lang', 'en'))
+  const paginaRetenidaEn = await ctxRetenidoEn.newPage()
+
+  await paginaRetenidaEn.goto(url(''), { waitUntil: 'domcontentloaded' })
+
+  try {
+    const avisoEn = paginaRetenidaEn.getByRole('status').filter({ hasText: 'Public snapshot protected' })
+
+    await avisoEn.waitFor({ timeout: 5000 })
+
+    if ((await paginaRetenidaEn.locator('html').getAttribute('lang')) !== 'en') {
+      problemasFuente.push('html lang EN incorrecto')
+    }
+  } catch {
+    problemasFuente.push('instantánea retenida EN no llega a estado seguro')
+  }
+
+  await ctxRetenidoEn.close()
+
+  const casosFuente = [
+    {
+      nombre: 'incompleto',
+      fichero: 'manifest',
+      responder: route => route.fulfill({ contentType: 'application/json', body: '{"schema":"madclon.public-containment.v1"}' })
+    },
+    {
+      nombre: 'campo-extra',
+      fichero: 'overview',
+      responder: route => route.fulfill({
+        contentType: 'application/json',
+        body: '{"schema":"madclon.public-containment.v1","status":"withheld","extra":true}'
+      })
+    },
+    {
+      nombre: 'corrupto',
+      fichero: 'manifest',
+      responder: route => route.fulfill({ contentType: 'application/json', body: '{"PRIVATE_CANARY_NO_ECO":' })
+    },
+    {
+      nombre: 'clave-duplicada',
+      fichero: 'manifest',
+      responder: route => route.fulfill({
+        contentType: 'application/json',
+        body: '{"schema":"PRIVATE_CANARY_NO_ECO","schema":"madclon.public-containment.v1","generated_at":"2026-08-02T22:00:00Z"}\n'
+      })
+    },
+    {
+      nombre: 'fuente-503',
+      fichero: 'manifest',
+      responder: route => route.fulfill({ status: 503, contentType: 'text/plain', body: 'PRIVATE_CANARY_NO_ECO' })
+    },
+    {
+      nombre: 'fuente-colgada',
+      fichero: 'manifest',
+      responder: () => new Promise(() => {})
+    }
+  ]
+
+  for (const caso of casosFuente) {
+    const ctxCaso = await navegadorPw.newContext({
+      viewport: { width: 375, height: 900 },
+      serviceWorkers: 'block'
+    })
+
+    const erroresCaso = []
+
+    await ctxCaso.addInitScript(() => localStorage.setItem('madclon-lang', 'es'))
+    await ctxCaso.route(`**${BASE}/data/${caso.fichero}.json`, caso.responder)
+    const paginaCaso = await ctxCaso.newPage()
+
+    paginaCaso.on('pageerror', error => erroresCaso.push(error.message))
+    paginaCaso.on('console', mensaje => {
+      if (mensaje.type() === 'error' && !/Failed to load resource/.test(mensaje.text())) {
+        erroresCaso.push(mensaje.text())
+      }
+    })
+    await paginaCaso.goto(url(''), { waitUntil: 'domcontentloaded' })
+
+    try {
+      const alerta = paginaCaso.getByRole('alert')
+
+      await alerta.waitFor({ timeout: 7000 })
+      const texto = (await paginaCaso.locator('body').textContent()) || ''
+
+      if (/PRIVATE_CANARY_NO_ECO|fuente-no-disponible|\.json|exporter/i.test(texto)) {
+        problemasFuente.push(`${caso.nombre}: eco o detalle interno`)
+      }
+
+      if (erroresCaso.length) problemasFuente.push(`${caso.nombre}: error no controlado`)
+    } catch {
+      problemasFuente.push(`${caso.nombre}: no falla cerrado`)
+    }
+
+    await ctxCaso.close()
+  }
+
+  marca(
+    14,
+    'retenido + incompleto/corrupto/fallo de fuente sin eco',
+    problemasFuente.length === 0,
+    problemasFuente.slice(0, 6).join(' | ') || 'ES/EN+lang · 6 fallos cerrados · 0 eco · 0 error no controlado'
+  )
 
   await ctxK.close()
   await navegadorPw.close()

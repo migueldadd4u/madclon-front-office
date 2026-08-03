@@ -7,15 +7,40 @@
 //   - despliegue: artefacto estático, sin endpoints;
 //   - privacidad del propio gate: nunca imprime valores inspeccionados.
 
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
+import { createHash } from 'node:crypto'
+import { existsSync, lstatSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { extname, join, relative, resolve, sep } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 export const PUBLIC_SCHEMA = 'madclon.public-containment.v1'
 export const PUBLIC_DATA_FILES = ['manifest.json', 'overview.json', 'clones.json', 'tokens.json', 'serie.json']
+export const PUBLIC_PINNED_ASSET_FILES = [
+  'images/logo-192.png',
+  'images/logo-512.png',
+  'manifest.webmanifest',
+  'sw.js'
+]
+export const APP_PINNED_ASSET_FILES = [
+  'src/app/apple-icon.png',
+  'src/app/favicon.ico',
+  'src/app/icon.svg'
+]
 
 const SOURCE_EXTENSIONS = new Set(['.js', '.jsx', '.mjs', '.cjs', '.ts', '.tsx', '.css', '.html'])
 const OUTPUT_EXTENSIONS = new Set(['.html', '.js', '.css'])
+const OUTPUT_TEXT_EXTENSIONS = new Set(['.html', '.js', '.css', '.txt', '.json', '.xml', '.webmanifest', '.svg'])
+
+const PRIVATE_ARTIFACT_MARKERS = [
+  'fichas_curadas',
+  'esperas_vencidas',
+  'intervenciones_raw',
+  'crons_en_error',
+  'watchdog_ts',
+  'automejora',
+  'calendarios',
+  'patrimonio',
+  'dossier'
+]
 
 function finding(code, file, area) {
   return { code, file, area }
@@ -55,6 +80,30 @@ function schemaIsValid(value, file, findings) {
   return true
 }
 
+function validUtcTimestamp(value) {
+  if (typeof value !== 'string') return false
+  const match = value.match(/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d{1,3}))?Z$/)
+
+  if (!match) return false
+  const milliseconds = (match[2] || '').padEnd(3, '0')
+  const normalized = `${match[1]}.${milliseconds}Z`
+  const parsed = new Date(normalized)
+
+  return !Number.isNaN(parsed.getTime()) && parsed.toISOString() === normalized && parsed.getTime() <= Date.now() + 5 * 60 * 1000
+}
+
+function canonicalPublicDocument(name, value) {
+  if (name === 'manifest.json') {
+    return `${JSON.stringify({ schema: value.schema, generated_at: value.generated_at })}\n`
+  }
+
+  if (name === 'serie.json') {
+    return `${JSON.stringify({ schema: value.schema, status: value.status, points: value.points })}\n`
+  }
+
+  return `${JSON.stringify({ schema: value.schema, status: value.status })}\n`
+}
+
 function validateWithheldDocument(value, file, findings) {
   if (!exactKeys(value, ['schema', 'status'], file, 'root', findings)) return
   schemaIsValid(value, file, findings)
@@ -75,7 +124,7 @@ export function validatePublicDocument(name, value) {
     if (!exactKeys(value, ['schema', 'generated_at'], file, 'root', findings)) return findings
     schemaIsValid(value, file, findings)
 
-    if (typeof value.generated_at !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/.test(value.generated_at)) {
+    if (!validUtcTimestamp(value.generated_at)) {
       findings.push(finding('PUBLIC_TIMESTAMP_NOT_UTC_ISO8601', file, 'generated_at'))
     }
 
@@ -137,16 +186,24 @@ export function auditPublicDataDirectory(directory) {
     }
 
     let value
+    let source
 
     try {
-      value = JSON.parse(readFileSync(path, 'utf8'))
+      source = readFileSync(path, 'utf8')
+      value = JSON.parse(source)
     } catch {
       findings.push(finding('PUBLIC_DATA_INVALID_JSON', `data/${name}`, 'file'))
 
       continue
     }
 
-    findings.push(...validatePublicDocument(name, value))
+    const documentFindings = validatePublicDocument(name, value)
+
+    findings.push(...documentFindings)
+
+    if (documentFindings.length === 0 && source !== canonicalPublicDocument(name, value)) {
+      findings.push(finding('PUBLIC_DATA_NON_CANONICAL_JSON', `data/${name}`, 'file'))
+    }
   }
 
   return findings
@@ -166,6 +223,137 @@ function walkFiles(directory, extensions, output = []) {
   }
 
   return output
+}
+
+function walkEntries(directory, root = directory, output = []) {
+  if (!existsSync(directory)) return output
+
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const path = join(directory, entry.name)
+    const name = relative(root, path).split(sep).join('/')
+
+    if (entry.isDirectory()) walkEntries(path, root, output)
+    else output.push({ path, name, regular: entry.isFile() && lstatSync(path).isFile() })
+  }
+
+  return output
+}
+
+function loadAssetManifest(webRoot) {
+  const path = join(webRoot, 'scripts', 'public-assets-v1.json')
+
+  if (!existsSync(path)) {
+    return { findings: [finding('PUBLIC_ASSET_MANIFEST_MISSING', 'scripts/public-assets-v1.json', 'configuration')] }
+  }
+
+  try {
+    const manifest = JSON.parse(readFileSync(path, 'utf8'))
+
+    if (
+      !isRecord(manifest) ||
+      manifest.schema !== 'madclon.public-assets.v1' ||
+      !isRecord(manifest.assets) ||
+      !isRecord(manifest.app_assets) ||
+      !sameStringSet(Object.keys(manifest.assets), PUBLIC_PINNED_ASSET_FILES) ||
+      !sameStringSet(Object.keys(manifest.app_assets), APP_PINNED_ASSET_FILES)
+    ) {
+      throw new Error('invalid')
+    }
+
+    for (const [name, metadata] of [...Object.entries(manifest.assets), ...Object.entries(manifest.app_assets)]) {
+      if (
+        name !== name.normalize('NFC') ||
+        name.startsWith('/') ||
+        name.split('/').includes('..') ||
+        !isRecord(metadata) ||
+        !Number.isSafeInteger(metadata.size) ||
+        metadata.size < 0 ||
+        typeof metadata.sha256 !== 'string' ||
+        !/^[a-f0-9]{64}$/.test(metadata.sha256)
+      ) {
+        throw new Error('invalid')
+      }
+    }
+
+    for (const metadata of Object.values(manifest.app_assets)) {
+      if (
+        typeof metadata.output !== 'string' ||
+        metadata.output.startsWith('/') ||
+        metadata.output.split('/').includes('..')
+      ) {
+        throw new Error('invalid')
+      }
+    }
+
+    return { manifest, findings: [] }
+  } catch {
+    return { findings: [finding('PUBLIC_ASSET_MANIFEST_INVALID', 'scripts/public-assets-v1.json', 'configuration')] }
+  }
+}
+
+function sameStringSet(actual, expected) {
+  return actual.length === expected.length && actual.every(name => expected.includes(name))
+}
+
+function hashFile(path) {
+  return createHash('sha256').update(readFileSync(path)).digest('hex')
+}
+
+function verifyPinnedFile(path, metadata, file, findings) {
+  if (!existsSync(path) || !lstatSync(path).isFile() || lstatSync(path).nlink !== 1) {
+    findings.push(finding('PUBLIC_PINNED_ASSET_MISSING_OR_UNSAFE', file, 'asset'))
+
+    return
+  }
+
+  if (lstatSync(path).size !== metadata.size || hashFile(path) !== metadata.sha256) {
+    findings.push(finding('PUBLIC_PINNED_ASSET_MISMATCH', file, 'asset'))
+  }
+}
+
+export function auditPublicAssetTree(webRoot) {
+  const loaded = loadAssetManifest(webRoot)
+
+  if (!loaded.manifest) return loaded.findings
+  const findings = [...loaded.findings]
+  const publicRoot = join(webRoot, 'public')
+
+  if (!existsSync(publicRoot)) return [finding('PUBLIC_DIRECTORY_MISSING', 'public', 'directory')]
+
+  const expected = new Set([
+    ...PUBLIC_DATA_FILES.map(name => `data/${name}`),
+    ...Object.keys(loaded.manifest.assets)
+  ])
+
+  const seenFolded = new Set()
+  const entries = walkEntries(publicRoot)
+
+  for (const entry of entries) {
+    const folded = entry.name.normalize('NFC').toLocaleLowerCase('en-US')
+
+    if (seenFolded.has(folded)) findings.push(finding('PUBLIC_ASSET_PATH_COLLISION', 'public', 'directory'))
+    seenFolded.add(folded)
+
+    if (!entry.regular || !expected.has(entry.name)) {
+      findings.push(finding('PUBLIC_ASSET_NOT_ALLOWLISTED', 'public', 'directory'))
+    }
+  }
+
+  for (const name of expected) {
+    if (!entries.some(entry => entry.regular && entry.name === name)) {
+      findings.push(finding('PUBLIC_ASSET_MISSING', `public/${name}`, 'asset'))
+    }
+  }
+
+  for (const [name, metadata] of Object.entries(loaded.manifest.assets)) {
+    verifyPinnedFile(join(publicRoot, name), metadata, `public/${name}`, findings)
+  }
+
+  for (const [name, metadata] of Object.entries(loaded.manifest.app_assets)) {
+    verifyPinnedFile(join(webRoot, name), metadata, name, findings)
+  }
+
+  return findings
 }
 
 function firstArgument(body) {
@@ -280,15 +468,28 @@ export function auditRuntimeSource(source, relativeFile) {
   const externalElement = /(?:\bsrc\b|\bposter\b)\s*=\s*(?:\{\s*)?['"`]https?:\/\//i.test(source)
   const externalCss = extname(file) === '.css' && /url\(\s*['"]?https?:\/\//i.test(source)
 
-  if (externalElement || externalCss) {
+  const externalNavigation =
+    /\bhref\s*=\s*(?:\{\s*)?['"`]https?:\/\//i.test(source) ||
+    /\b(?:window\.)?location\s*(?:=|\.(?:assign|replace)\s*\()\s*['"`]https?:\/\//i.test(source) ||
+    /\bwindow\.open\s*\(\s*['"`]https?:\/\//i.test(source)
+
+  if (externalElement || externalCss || externalNavigation) {
     findings.push(finding('RUNTIME_EXTERNAL_SUBRESOURCE_FORBIDDEN', file, 'origin'))
   }
 
   for (const call of fetchCalls(source)) {
     const argument = firstArgument(call)
 
+    const unsafeDynamicMethod = [...call.matchAll(/\bmethod\s*:\s*([^,}\n]+)/gi)].some(
+      match => !/^['"`](?:GET|HEAD)['"`]$/i.test(match[1].trim())
+    ) || /(?:^|[{,])\s*method\s*(?:[,}])/.test(call) || /\.\.\./.test(call)
+
     if (!isAllowlistedFetchTarget(argument, file, source)) {
       findings.push(finding('RUNTIME_FETCH_TARGET_NOT_ALLOWLISTED', file, 'origin'))
+    }
+
+    if (unsafeDynamicMethod) {
+      findings.push(finding('RUNTIME_MUTATING_METHOD_FORBIDDEN', file, 'mutation'))
     }
   }
 
@@ -371,7 +572,27 @@ function auditOutputCode(source, file) {
     findings.push(finding('OUTPUT_EXTERNAL_FETCH_FORBIDDEN', file, 'origin'))
   }
 
-  if (/\bfetch\s*\([^)]{0,500}\bmethod\s*:\s*['"`](?!GET['"`]|HEAD['"`])[A-Z]+['"`]/i.test(source)) {
+  // Next incluye un transporte genérico de Server Actions aunque la exportación
+  // estática no declare acciones ni endpoints. Eximimos sólo ESA llamada exacta,
+  // nunca el chunk entero: otra mutación co-bundleada sigue bloqueando el build.
+  const mutaciones = [...source.matchAll(/\bfetch\s*\([^)]{0,500}\bmethod\s*:\s*['"`](?!GET['"`]|HEAD['"`])[A-Z]+['"`]/gi)]
+
+  const mutacionReal = mutaciones.some(match => {
+    const start = Math.max(0, (match.index || 0) - 2000)
+    const end = Math.min(source.length, (match.index || 0) + match[0].length + 2000)
+    const context = source.slice(start, end)
+
+    const transporteNext =
+      /^out\/_next\/static\/chunks\/[^/]+\.js$/.test(file) &&
+      /^fetch\([\w$.]+,\{method:['"]POST['"]$/i.test(match[0]) &&
+      /NEXT_ACTION_NOT_FOUND_HEADER/.test(context) &&
+      /UnrecognizedActionError/.test(context) &&
+      /RSC_CONTENT_TYPE_HEADER/.test(context)
+
+    return !transporteNext
+  })
+
+  if (mutacionReal) {
     findings.push(finding('OUTPUT_MUTATING_FETCH_FORBIDDEN', file, 'mutation'))
   }
 
@@ -382,22 +603,98 @@ function auditOutputCode(source, file) {
   return findings
 }
 
+function auditOutputPrivacyText(source, file) {
+  // Remix Icon incluye dos nombres de clase legítimos con «dossier». Se retiran
+  // únicamente esos selectores; el resto del CSS (incluido `content:`) se audita.
+  const normalized = source
+    .replace(/\.ri-dossier-(?:fill|line)\b/gi, '')
+    .toLocaleLowerCase('es-ES')
+
+  return PRIVATE_ARTIFACT_MARKERS.some(marker => normalized.includes(marker))
+    ? [finding('OUTPUT_PRIVATE_STRUCTURE_FORBIDDEN', file, 'privacy')]
+    : []
+}
+
+const OUTPUT_ROUTE_DIRECTORIES = new Set([
+  '404',
+  '_not-found',
+  'actividad',
+  'eficiencia',
+  'flota',
+  'historia',
+  'preguntas',
+  'salud',
+  'tokens'
+])
+
+function isAllowedGeneratedOutput(name, pinned) {
+  if (pinned.has(name) || PUBLIC_DATA_FILES.some(file => name === `data/${file}`)) return true
+  if (name === '404.html' || name === 'index.html' || name === 'index.txt') return true
+  if (name === 'robots.txt' || name === 'sitemap.xml') return true
+  if (/^__next\.[^/]+\.txt$/.test(name)) return true
+  if (/^_next\/static\/.+\.(?:js|css)$/.test(name)) return true
+
+  const slash = name.indexOf('/')
+
+  if (slash < 0) return false
+  const directory = name.slice(0, slash)
+  const nested = name.slice(slash + 1)
+
+  if (!OUTPUT_ROUTE_DIRECTORIES.has(directory)) return false
+
+  return nested === 'index.html' || nested === 'index.txt' || /^__next\.[^/]+\.txt$/.test(nested)
+}
+
+function auditPinnedOutputAssets(webRoot, manifest) {
+  const findings = []
+  const out = join(webRoot, 'out')
+
+  for (const [name, metadata] of Object.entries(manifest.assets)) {
+    verifyPinnedFile(join(out, name), metadata, `out/${name}`, findings)
+  }
+
+  for (const metadata of Object.values(manifest.app_assets)) {
+    verifyPinnedFile(join(out, metadata.output), metadata, `out/${metadata.output}`, findings)
+  }
+
+  return findings
+}
+
 export function auditOutputTree(webRoot) {
   const out = join(webRoot, 'out')
 
   if (!existsSync(out)) return [finding('STATIC_OUTPUT_MISSING', 'out', 'output')]
 
-  const findings = []
+  const loaded = loadAssetManifest(webRoot)
+  const findings = [...loaded.findings]
+  const pinned = new Set()
 
-  for (const path of walkFiles(out, null)) {
-    const file = relative(webRoot, path).split(sep).join('/')
+  if (loaded.manifest) {
+    Object.keys(loaded.manifest.assets).forEach(name => pinned.add(name))
+    Object.values(loaded.manifest.app_assets).forEach(metadata => pinned.add(metadata.output))
+    findings.push(...auditPinnedOutputAssets(webRoot, loaded.manifest))
+  }
 
-    if (/(?:^|\/)api(?:\/|$)/.test(file) || /\.(?:php|cgi|py)$/.test(file)) {
-      findings.push(finding('OUTPUT_ENDPOINT_FORBIDDEN', file, 'api'))
+  for (const entry of walkEntries(out)) {
+    const file = `out/${entry.name}`
+    const allowlisted = entry.regular && isAllowedGeneratedOutput(entry.name, pinned)
+    const reportedFile = allowlisted ? file : 'out'
+
+    if (!allowlisted) {
+      findings.push(finding('OUTPUT_FILE_NOT_ALLOWLISTED', 'out', 'output'))
     }
 
-    if (extname(path) === '.html') findings.push(...auditOutputHtml(readFileSync(path, 'utf8'), file))
-    if (OUTPUT_EXTENSIONS.has(extname(path))) findings.push(...auditOutputCode(readFileSync(path, 'utf8'), file))
+    if (/(?:^|\/)api(?:\/|$)/.test(file) || /\.(?:php|cgi|py)$/.test(file)) {
+      findings.push(finding('OUTPUT_ENDPOINT_FORBIDDEN', reportedFile, 'api'))
+    }
+
+    if (!entry.regular) continue
+    const extension = extname(entry.path)
+    const source = OUTPUT_TEXT_EXTENSIONS.has(extension) ? readFileSync(entry.path, 'utf8') : null
+
+    if (extension === '.html') findings.push(...auditOutputHtml(source, reportedFile))
+    if (OUTPUT_EXTENSIONS.has(extension)) findings.push(...auditOutputCode(source, reportedFile))
+    if (source !== null) findings.push(...auditOutputPrivacyText(source, reportedFile))
   }
 
   const swPath = join(out, 'sw.js')
@@ -414,6 +711,7 @@ export function auditPublicSafety({ webRoot = process.cwd(), mode = 'source' } =
   if (mode === 'source') {
     return [
       ...auditPublicDataDirectory(join(root, 'public', 'data')),
+      ...auditPublicAssetTree(root),
       ...auditRuntimeTree(root)
     ]
   }
@@ -421,6 +719,7 @@ export function auditPublicSafety({ webRoot = process.cwd(), mode = 'source' } =
   if (mode === 'out') {
     return [
       ...auditPublicDataDirectory(join(root, 'out', 'data')),
+      ...auditPublicAssetTree(root),
       ...auditOutputTree(root)
     ]
   }

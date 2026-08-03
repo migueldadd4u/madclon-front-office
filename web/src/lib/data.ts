@@ -127,11 +127,13 @@ export function fmt(n: number | null | undefined): string {
 /** 451.208.022 -> "451 M" · 76.511.939 -> "76,5 M" */
 export function fmtCorto(n: number | null | undefined): string {
   if (n === null || n === undefined) return '—'
+
   if (Math.abs(n) >= 1_000_000) {
     const v = n / 1_000_000
 
     return `${v >= 100 ? Math.round(v) : v.toFixed(1).replace('.', ',')} M`
   }
+
   if (Math.abs(n) >= 10_000) return `${Math.round(n / 1000)} mil`
 
   return fmt(n)
@@ -151,43 +153,181 @@ export function fmtFecha(iso: string | null | undefined, conHora = true): string
 import { useEffect, useState } from 'react'
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+const PUBLIC_SCHEMA = 'madclon.public-containment.v1'
+const MAX_PUBLIC_DOCUMENT_BYTES = 64 * 1024
+const PUBLIC_FETCH_TIMEOUT_MS = 2000
+const PUBLIC_FILES = ['manifest', 'overview', 'clones', 'tokens', 'serie'] as const
 
-export function usePanelData(): { data: PanelData | null; error: string | null } {
-  const [data, setData] = useState<PanelData | null>(null)
-  const [error, setError] = useState<string | null>(null)
+type PublicLoadError = 'fuente-no-disponible'
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  value !== null && typeof value === 'object' && !Array.isArray(value)
+
+const hasExactKeys = (value: Record<string, unknown>, expected: string[]) => {
+  const actual = Object.keys(value).sort()
+  const wanted = [...expected].sort()
+
+  return actual.length === wanted.length && actual.every((key, index) => key === wanted[index])
+}
+
+function validUtcTimestamp(value: unknown): value is string {
+  if (typeof value !== 'string') return false
+  const match = value.match(/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d{1,3}))?Z$/)
+
+  if (!match) return false
+  const milliseconds = (match[2] || '').padEnd(3, '0')
+  const normalized = `${match[1]}.${milliseconds}Z`
+  const parsed = new Date(normalized)
+
+  return !Number.isNaN(parsed.getTime()) && parsed.toISOString() === normalized && parsed.getTime() <= Date.now() + 5 * 60 * 1000
+}
+
+function canonicalizarDocumentoPublico(nombre: (typeof PUBLIC_FILES)[number], value: unknown): string | null {
+  if (!isRecord(value)) return null
+
+  if (nombre === 'manifest') {
+    if (
+      !hasExactKeys(value, ['schema', 'generated_at']) ||
+      value.schema !== PUBLIC_SCHEMA ||
+      !validUtcTimestamp(value.generated_at)
+    ) {
+      return null
+    }
+
+    return `${JSON.stringify({ schema: value.schema, generated_at: value.generated_at })}\n`
+  }
+
+  if (nombre === 'serie') {
+    if (
+      !hasExactKeys(value, ['schema', 'status', 'points']) ||
+      value.schema !== PUBLIC_SCHEMA ||
+      value.status !== 'withheld' ||
+      !Array.isArray(value.points) ||
+      value.points.length !== 0
+    ) {
+      return null
+    }
+
+    return `${JSON.stringify({ schema: value.schema, status: value.status, points: value.points })}\n`
+  }
+
+  if (
+    !hasExactKeys(value, ['schema', 'status']) ||
+    value.schema !== PUBLIC_SCHEMA ||
+    value.status !== 'withheld'
+  ) {
+    return null
+  }
+
+  return `${JSON.stringify({ schema: value.schema, status: value.status })}\n`
+}
+
+function interpretarInstantaneaPublica(documentos: unknown[]): string | null {
+  if (documentos.length !== PUBLIC_FILES.length) return null
+  const [manifest, overview, clones, tokens, serie] = documentos
+
+  if (
+    !isRecord(manifest) ||
+    !hasExactKeys(manifest, ['schema', 'generated_at']) ||
+    manifest.schema !== PUBLIC_SCHEMA ||
+    !validUtcTimestamp(manifest.generated_at)
+  ) {
+    return null
+  }
+
+  const retenido = (value: unknown) =>
+    isRecord(value) &&
+    hasExactKeys(value, ['schema', 'status']) &&
+    value.schema === PUBLIC_SCHEMA &&
+    value.status === 'withheld'
+
+  if (!retenido(overview) || !retenido(clones) || !retenido(tokens)) return null
+
+  if (
+    !isRecord(serie) ||
+    !hasExactKeys(serie, ['schema', 'status', 'points']) ||
+    serie.schema !== PUBLIC_SCHEMA ||
+    serie.status !== 'withheld' ||
+    !Array.isArray(serie.points) ||
+    serie.points.length !== 0
+  ) {
+    return null
+  }
+
+  return manifest.generated_at
+}
+
+async function leerDocumentoPublico(nombre: (typeof PUBLIC_FILES)[number]): Promise<unknown> {
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), PUBLIC_FETCH_TIMEOUT_MS)
+  let respuesta: Response
+
+  try {
+    respuesta = await fetch(`${BASE}/data/${nombre}.json`, { method: 'GET', signal: controller.signal })
+  } finally {
+    clearTimeout(timeout)
+  }
+
+  if (!respuesta.ok) throw new Error('fuente-no-disponible')
+  const declarado = Number(respuesta.headers.get('content-length'))
+
+  if (Number.isFinite(declarado) && declarado > MAX_PUBLIC_DOCUMENT_BYTES) {
+    throw new Error('fuente-no-disponible')
+  }
+
+  const texto = await respuesta.text()
+
+  if (new TextEncoder().encode(texto).byteLength > MAX_PUBLIC_DOCUMENT_BYTES) {
+    throw new Error('fuente-no-disponible')
+  }
+
+  try {
+    const value: unknown = JSON.parse(texto)
+
+    if (texto !== canonicalizarDocumentoPublico(nombre, value)) throw new Error('fuente-no-disponible')
+
+    return value
+  } catch {
+    throw new Error('fuente-no-disponible')
+  }
+}
+
+export function usePanelData(): {
+  data: PanelData | null
+  error: PublicLoadError | null
+  withheldAt: string | null
+} {
+  const data: PanelData | null = null
+  const [error, setError] = useState<PublicLoadError | null>(null)
+  const [withheldAt, setWithheldAt] = useState<string | null>(null)
 
   useEffect(() => {
-    const ficheros = ['manifest', 'overview', 'clones', 'tokens', 'serie'] as const
     let cancelado = false
+    let reintento: ReturnType<typeof setTimeout> | null = null
 
-    const carga = () =>
-      Promise.all(
-        ficheros.map(f =>
-          fetch(`${BASE}/data/${f}.json`).then(r => {
-            if (!r.ok) throw new Error(`${f}.json: HTTP ${r.status}`)
+    const carga = async () => {
+      const documentos = await Promise.all(PUBLIC_FILES.map(leerDocumentoPublico))
+      const generado = interpretarInstantaneaPublica(documentos)
 
-            return r.json()
-          })
-        )
-      ).then(([manifest, overview, clones, tokens, serie]) => ({ manifest, overview, clones, tokens, serie }))
+      if (!generado) throw new Error('fuente-no-disponible')
+      if (!cancelado) setWithheldAt(generado)
+    }
 
     // Un reintento a los 1,5 s: si el service worker acaba de despertar en frío
     // (offline), la primera ráfaga de peticiones puede llegar antes que él.
     carga()
-      .then(d => !cancelado && setData(d))
       .catch(() => {
-        setTimeout(() => {
+        reintento = setTimeout(() => {
           if (cancelado) return
-          carga()
-            .then(d => !cancelado && setData(d))
-            .catch(e => !cancelado && setError(String(e)))
+          carga().catch(() => !cancelado && setError('fuente-no-disponible'))
         }, 1500)
       })
 
     return () => {
       cancelado = true
+      if (reintento) clearTimeout(reintento)
     }
   }, [])
 
-  return { data, error }
+  return { data, error, withheldAt }
 }

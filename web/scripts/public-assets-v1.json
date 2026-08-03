@@ -1,0 +1,38 @@
+{
+  "schema": "madclon.public-assets.v1",
+  "assets": {
+    "images/logo-192.png": {
+      "size": 13672,
+      "sha256": "ea389beb45b1b9b8cefaf956edb2a45adf0eed2c0c169032e4cb2054add46f71"
+    },
+    "images/logo-512.png": {
+      "size": 76030,
+      "sha256": "c169150707c24729c0ab6ecb8cdbd0c69e83ad3d06054f91ae70c4191deabaf7"
+    },
+    "manifest.webmanifest": {
+      "size": 689,
+      "sha256": "649f63d3dfd69a8b0fbbb5ed2d66d323da0783513abb301ac6611f2cb3c80b4e"
+    },
+    "sw.js": {
+      "size": 3556,
+      "sha256": "9c8580037a75aeff100ca0a6a2dd899706f88c5619bbbb731257e3fb2febc12a"
+    }
+  },
+  "app_assets": {
+    "src/app/apple-icon.png": {
+      "output": "apple-icon.png",
+      "size": 12159,
+      "sha256": "d4bb7f47e81dd1037bd249719e08c130b5e59207ce14b868f74838ff87b4237c"
+    },
+    "src/app/favicon.ico": {
+      "output": "favicon.ico",
+      "size": 4688,
+      "sha256": "83eb493c8eb1081bb7ab605838cd2e139e913d4a1e5a5fd5eda1f908fc880743"
+    },
+    "src/app/icon.svg": {
+      "output": "icon.svg",
+      "size": 904,
+      "sha256": "1a8237cff5f09e2dee8c8c05bf8442815abb1e301f4788ad5dc930aed2df45b4"
+    }
+  }
+}

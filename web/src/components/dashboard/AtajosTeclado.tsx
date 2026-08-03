@@ -14,8 +14,8 @@ import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 
 // Hook Imports
-import { useLang } from '@/lib/i18n'
-import type { StrKey } from '@/lib/i18n'
+import { usePublicLang } from '@/lib/public-i18n'
+import type { StrKey } from '@/lib/public-i18n'
 
 // Atajos de teclado — «g» seguida de una letra navega a cada sección; «?» abre
 // la ayuda. Nunca actúa dentro de campos de texto ni con modificadores, para no
@@ -38,7 +38,7 @@ const esCampoTexto = (el: EventTarget | null) =>
   (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || el.isContentEditable)
 
 const AtajosTeclado = () => {
-  const { t } = useLang()
+  const { t } = usePublicLang()
   const router = useRouter()
   const [ayuda, setAyuda] = useState(false)
   const armado = useRef(0)

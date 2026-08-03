@@ -1,15 +1,19 @@
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import test from 'node:test'
 import { fileURLToPath } from 'node:url'
 
 import {
+  APP_PINNED_ASSET_FILES,
   PUBLIC_DATA_FILES,
+  PUBLIC_PINNED_ASSET_FILES,
   PUBLIC_SCHEMA,
   auditOutputTree,
+  auditPublicAssetTree,
   auditPublicDataDirectory,
   auditRuntimeSource,
   auditServiceWorkerSource,
@@ -17,7 +21,7 @@ import {
 } from './public-safety.mjs'
 
 const SAFE_DOCUMENTS = {
-  'manifest.json': { schema: PUBLIC_SCHEMA, generated_at: '2026-08-03T00:00:00Z' },
+  'manifest.json': { schema: PUBLIC_SCHEMA, generated_at: '2026-08-02T22:00:00Z' },
   'overview.json': { schema: PUBLIC_SCHEMA, status: 'withheld' },
   'clones.json': { schema: PUBLIC_SCHEMA, status: 'withheld' },
   'tokens.json': { schema: PUBLIC_SCHEMA, status: 'withheld' },
@@ -47,10 +51,65 @@ c.startsWith('madclon-datos-')
 
 const SAFETY_CLI = fileURLToPath(new URL('./public-safety.mjs', import.meta.url))
 
+const FIXTURE_PUBLIC_ASSETS = {
+  'images/logo-192.png': 'fixture-logo-192',
+  'images/logo-512.png': 'fixture-logo-512',
+  'manifest.webmanifest': '{}',
+  'sw.js': SAFE_SW
+}
+
+const FIXTURE_APP_ASSETS = {
+  'src/app/apple-icon.png': { output: 'apple-icon.png', content: 'fixture-apple-icon' },
+  'src/app/favicon.ico': { output: 'favicon.ico', content: 'fixture-favicon' },
+  'src/app/icon.svg': { output: 'icon.svg', content: '<svg></svg>' }
+}
+
+function metadata(content, output) {
+  return {
+    ...(output ? { output } : {}),
+    size: Buffer.byteLength(content),
+    sha256: createHash('sha256').update(content).digest('hex')
+  }
+}
+
+function writeFixtureFile(root, name, content) {
+  const path = join(root, name)
+
+  mkdirSync(join(path, '..'), { recursive: true })
+  writeFileSync(path, content)
+}
+
 function withFixture(fn) {
   const root = mkdtempSync(join(tmpdir(), 'public-safety-test-'))
 
   try {
+    assert.deepEqual(Object.keys(FIXTURE_PUBLIC_ASSETS).sort(), [...PUBLIC_PINNED_ASSET_FILES].sort())
+    assert.deepEqual(Object.keys(FIXTURE_APP_ASSETS).sort(), [...APP_PINNED_ASSET_FILES].sort())
+
+    for (const [name, content] of Object.entries(FIXTURE_PUBLIC_ASSETS)) {
+      writeFixtureFile(join(root, 'public'), name, content)
+      writeFixtureFile(join(root, 'out'), name, content)
+    }
+
+    for (const [name, asset] of Object.entries(FIXTURE_APP_ASSETS)) {
+      writeFixtureFile(root, name, asset.content)
+      writeFixtureFile(join(root, 'out'), asset.output, asset.content)
+    }
+
+    mkdirSync(join(root, 'scripts'), { recursive: true })
+    writeFileSync(
+      join(root, 'scripts', 'public-assets-v1.json'),
+      JSON.stringify({
+        schema: 'madclon.public-assets.v1',
+        assets: Object.fromEntries(
+          Object.entries(FIXTURE_PUBLIC_ASSETS).map(([name, content]) => [name, metadata(content)])
+        ),
+        app_assets: Object.fromEntries(
+          Object.entries(FIXTURE_APP_ASSETS).map(([name, asset]) => [name, metadata(asset.content, asset.output)])
+        )
+      })
+    )
+
     return fn(root)
   } finally {
     rmSync(root, { recursive: true, force: true })
@@ -61,7 +120,7 @@ function writeDocuments(directory, documents) {
   mkdirSync(directory, { recursive: true })
 
   for (const [name, value] of Object.entries(documents)) {
-    writeFileSync(join(directory, name), JSON.stringify(value))
+    writeFileSync(join(directory, name), `${JSON.stringify(value)}\n`)
   }
 }
 
@@ -98,6 +157,40 @@ test('la allowlist rechaza contenido semántico añadido aunque use el schema co
   assert.ok(series.some(item => item.code === 'PUBLIC_SERIES_MUST_BE_EMPTY'))
 })
 
+test('el timestamp exige una fecha UTC real', () => {
+  const findings = validatePublicDocument('manifest.json', {
+    schema: PUBLIC_SCHEMA,
+    generated_at: '2026-99-99T99:99:99Z'
+  })
+
+  assert.ok(findings.some(item => item.code === 'PUBLIC_TIMESTAMP_NOT_UTC_ISO8601'))
+
+  const future = validatePublicDocument('manifest.json', {
+    schema: PUBLIC_SCHEMA,
+    generated_at: '9999-01-01T00:00:00Z'
+  })
+
+  assert.ok(future.some(item => item.code === 'PUBLIC_TIMESTAMP_NOT_UTC_ISO8601'))
+})
+
+test('el JSON público exige una única representación canónica y no hace eco', () => {
+  withFixture(root => {
+    const data = join(root, 'data')
+    const canary = 'PRIVATE_CANARY_DUPLICATE_KEY_6f91'
+
+    writeDocuments(data, SAFE_DOCUMENTS)
+    writeFileSync(
+      join(data, 'tokens.json'),
+      `{"schema":"${PUBLIC_SCHEMA}","status":"${canary}","status":"withheld"}\n`
+    )
+    const findings = auditPublicDataDirectory(data)
+    const transcript = findings.map(item => `${item.file}:${item.code}:${item.area}`).join('\n')
+
+    assert.ok(findings.some(item => item.code === 'PUBLIC_DATA_NON_CANONICAL_JSON'))
+    assert.equal(transcript.includes(canary), false)
+  })
+})
+
 test('el directorio público es exacto: cinco nombres y ningún adjunto', () => {
   withFixture(root => {
     const data = join(root, 'data')
@@ -109,14 +202,43 @@ test('el directorio público es exacto: cinco nombres y ningún adjunto', () => 
   })
 })
 
+test('la raíz pública rechaza activos arbitrarios sin hacer eco del nombre', () => {
+  withFixture(webRoot => {
+    const publicRoot = join(webRoot, 'public')
+    const canary = 'PRIVATE_FILENAME_CANARY_8b4e.txt'
+
+    writeDocuments(join(publicRoot, 'data'), SAFE_DOCUMENTS)
+    writeFileSync(join(publicRoot, canary), 'contenido privado')
+    const findings = auditPublicAssetTree(webRoot)
+    const transcript = findings.map(item => `${item.file}:${item.code}:${item.area}`).join('\n')
+
+    assert.ok(findings.some(item => item.code === 'PUBLIC_ASSET_NOT_ALLOWLISTED'))
+    assert.equal(transcript.includes(canary), false)
+  })
+})
+
+test('un hash no convierte un raster heredado en activo público aprobado', () => {
+  withFixture(webRoot => {
+    const manifestPath = join(webRoot, 'scripts', 'public-assets-v1.json')
+    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
+
+    manifest.assets['images/metrics.png'] = metadata('private-raster-with-valid-hash')
+    writeFileSync(manifestPath, JSON.stringify(manifest))
+    writeFixtureFile(join(webRoot, 'public'), 'images/metrics.png', 'private-raster-with-valid-hash')
+
+    const findings = auditPublicAssetTree(webRoot)
+
+    assert.ok(findings.some(item => item.code === 'PUBLIC_ASSET_MANIFEST_INVALID'))
+    assert.equal(findings.some(item => item.file.includes('metrics')), false)
+  })
+})
+
 test('no-eco: un canario en JSON inválido nunca aparece en stdout ni stderr', () => {
   withFixture(webRoot => {
     const canary = 'PRIVATE_CANARY_DO_NOT_ECHO_7f2d9c'
 
     writeDocuments(join(webRoot, 'public', 'data'), SAFE_DOCUMENTS)
     writeFileSync(join(webRoot, 'public', 'data', 'tokens.json'), `{"sensitive":"${canary}"`)
-    writeFileSync(join(webRoot, 'public', 'sw.js'), SAFE_SW)
-
     const result = spawnSync(process.execPath, [SAFETY_CLI, '--source'], {
       cwd: webRoot,
       encoding: 'utf8'
@@ -149,9 +271,12 @@ test('la superficie runtime bloquea APIs, mutaciones y orígenes externos', () =
     ["'use server'\nexport async function save() {}", 'src/app/action.ts', 'RUNTIME_SERVER_ACTION_FORBIDDEN'],
     ['export const DELETE = () => {}', 'src/app/delete.ts', 'RUNTIME_MUTATING_HANDLER_FORBIDDEN'],
     ["fetch('/x', { method: 'POST' })", 'src/lib/post.ts', 'RUNTIME_MUTATING_METHOD_FORBIDDEN'],
+    ["fetch('/x', { method })", 'src/lib/dynamic-method.ts', 'RUNTIME_MUTATING_METHOD_FORBIDDEN'],
     ["fetch('https://example.invalid/x')", 'src/lib/external.ts', 'RUNTIME_FETCH_TARGET_NOT_ALLOWLISTED'],
     ['fetch(target)', 'src/lib/dynamic.ts', 'RUNTIME_FETCH_TARGET_NOT_ALLOWLISTED'],
-    ["new WebSocket('wss://example.invalid')", 'src/lib/socket.ts', 'RUNTIME_EGRESS_CLIENT_FORBIDDEN']
+    ["new WebSocket('wss://example.invalid')", 'src/lib/socket.ts', 'RUNTIME_EGRESS_CLIENT_FORBIDDEN'],
+    ["<a href='https://example.invalid'>x</a>", 'src/app/link.tsx', 'RUNTIME_EXTERNAL_SUBRESOURCE_FORBIDDEN'],
+    ["window.location='https://example.invalid'", 'src/lib/location.ts', 'RUNTIME_EXTERNAL_SUBRESOURCE_FORBIDDEN']
   ]
 
   for (const [source, file, code] of cases) {
@@ -191,5 +316,57 @@ test('el postbuild rechaza endpoints, mutaciones y orígenes externos', () => {
     assert.ok(findings.some(item => item.code === 'OUTPUT_MUTATING_FETCH_FORBIDDEN'))
     assert.ok(findings.some(item => item.code === 'OUTPUT_EXTERNAL_FETCH_FORBIDDEN'))
     assert.ok(findings.some(item => item.code === 'OUTPUT_ENDPOINT_FORBIDDEN'))
+
+    writeFileSync(join(out, 'index.html'), '<main>fichas_curadas</main>')
+    assert.ok(auditOutputTree(webRoot).some(item => item.code === 'OUTPUT_PRIVATE_STRUCTURE_FORBIDDEN'))
+
+    mkdirSync(join(out, '_next', 'static'), { recursive: true })
+    writeFileSync(join(out, '_next', 'static', 'private.css'), '.ri-dossier-fill{}body::before{content:"fichas_curadas"}')
+    assert.ok(auditOutputTree(webRoot).some(item => item.code === 'OUTPUT_PRIVATE_STRUCTURE_FORBIDDEN'))
+  })
+})
+
+test('el postbuild rechaza un fichero arbitrario sin hacer eco del nombre', () => {
+  withFixture(webRoot => {
+    const out = join(webRoot, 'out')
+    const canary = 'PRIVATE_OUTPUT_FILENAME_CANARY_5cc7.txt'
+
+    writeDocuments(join(out, 'data'), SAFE_DOCUMENTS)
+    writeFileSync(join(out, 'sw.js'), SAFE_SW)
+    writeFileSync(join(out, 'index.html'), '<main>seguro</main>')
+    writeFileSync(join(out, canary), 'contenido privado')
+    const findings = auditOutputTree(webRoot)
+    const transcript = findings.map(item => `${item.file}:${item.code}:${item.area}`).join('\n')
+
+    assert.ok(findings.some(item => item.code === 'OUTPUT_FILE_NOT_ALLOWLISTED'))
+    assert.equal(transcript.includes(canary), false)
+  })
+})
+
+test('el postbuild distingue el transporte inerte de Next de una mutación de aplicación', () => {
+  withFixture(webRoot => {
+    const out = join(webRoot, 'out')
+    const chunks = join(out, '_next', 'static', 'chunks')
+
+    writeDocuments(join(out, 'data'), SAFE_DOCUMENTS)
+    mkdirSync(chunks, { recursive: true })
+    writeFileSync(join(out, 'sw.js'), SAFE_SW)
+    writeFileSync(join(out, 'index.html'), '<main>seguro</main>')
+    writeFileSync(
+      join(chunks, '123-runtime.js'),
+      'const RSC_CONTENT_TYPE_HEADER=1,NEXT_ACTION_NOT_FOUND_HEADER=1;' +
+        'class UnrecognizedActionError extends Error{};' +
+        'fetch(e.canonicalUrl,{method:"POST",headers:j,body:S})'
+    )
+    assert.deepEqual(auditOutputTree(webRoot), [])
+
+    writeFileSync(
+      join(chunks, '123-runtime.js'),
+      'const RSC_CONTENT_TYPE_HEADER=1,NEXT_ACTION_NOT_FOUND_HEADER=1;' +
+        'class UnrecognizedActionError extends Error{};' +
+        'fetch(e.canonicalUrl,{method:"POST",headers:j,body:S});' +
+        "fetch('/write',{method:'POST'})"
+    )
+    assert.ok(auditOutputTree(webRoot).some(item => item.code === 'OUTPUT_MUTATING_FETCH_FORBIDDEN'))
   })
 })

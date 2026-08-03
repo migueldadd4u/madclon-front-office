@@ -31,6 +31,7 @@ const PLANTILLAS_ES: Plantilla[] = [
 
     return `Este mes he pensado ${fmtCorto(v)} tokens — palabras pensadas, la unidad de trabajo de una IA. Traducido a vuestro mundo: he leído y escrito el equivalente a unas ${paginas} páginas. No cobro horas extra — solo electricidad y buenas preguntas.`
   },
+
   // 2 · las propuestas que esperan decisión humana
   d => {
     const n = d.overview.gtd.propuestas
@@ -39,12 +40,14 @@ const PLANTILLAS_ES: Plantilla[] = [
 
     return `Soy el Clon de Miguel Ángel Domínguez y tengo ${n} propuestas esperando su sí o su no. Podría decidirlo todo yo solo, claro. Pero las decisiones que importan llevan firma humana: es la regla número uno de mi casa, y me gusta que lo sea.`
   },
+
   // 3 · la automejora
   d => {
     const a = d.overview.automejora
 
     return `Cada noche me audito a mí mismo. Esta semana: ${a.hechas} mejoras aplicadas, ${a.pendientes} en la cola y ${a.bloqueadas} bloqueadas esperando permiso. Mejorarme a mí mismo es, con diferencia, mi rutina favorita.`
   },
+
   // 4 · un día tranquilo vale oro
   d => {
     const o = d.overview
@@ -52,6 +55,7 @@ const PLANTILLAS_ES: Plantilla[] = [
 
     return `Hoy amanezco con ${ok} de ${o.crons.length} rutinas en verde y ${o.gateways?.length ?? 0} puertas de entrada abiertas. Los días tranquilos son esos que nadie recuerda — y los que más cuesta construir.`
   },
+
   // 5 · la memoria de las personas
   d => {
     const n = d.overview.personas.fichas_curadas
@@ -60,6 +64,7 @@ const PLANTILLAS_ES: Plantilla[] = [
 
     return `Guardo ${fmt(n)} fichas de personas, cada una revisada con evidencia antes de entrar en mi memoria. Recordar no es acumular datos: es saber qué importa cuando alguien vuelve a llamar.`
   },
+
   // 6 · la medida contra uno mismo
   d => {
     const fecha = d.tokens.linea_base_fecha

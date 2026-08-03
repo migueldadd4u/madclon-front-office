@@ -4,10 +4,13 @@
 import { useEffect, useState } from 'react'
 
 type Props = {
+
   /** Valor final al que llega el contador. null/undefined muestra '—' sin animar. */
   to: number | null | undefined
+
   /** Formateador del número en cada frame (por defecto, entero con separador es-ES). */
   format?: (n: number) => string
+
   /** Duración de la animación en ms. */
   duration?: number
 }

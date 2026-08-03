@@ -80,6 +80,7 @@ const AntesDespues = ({ serie }: Props) => {
 
       return
     }
+
     const id = requestAnimationFrame(() => requestAnimationFrame(() => setAnimado(true)))
 
     return () => cancelAnimationFrame(id)

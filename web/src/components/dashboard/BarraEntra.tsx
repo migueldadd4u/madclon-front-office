@@ -7,9 +7,11 @@ import { useEffect, useState } from 'react'
 import LinearProgress from '@mui/material/LinearProgress'
 
 type Props = {
+
   /** Porcentaje final (0–100). */
   value: number
   color?: 'primary' | 'success' | 'warning' | 'error' | 'info' | 'secondary'
+
   /** Nombre accesible de la barra (lectores de pantalla). */
   label?: string
 }

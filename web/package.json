@@ -7,7 +7,7 @@
     "predev": "node scripts/build-stamp.mjs",
     "prebuild": "node scripts/public-safety.mjs --source && node scripts/build-stamp.mjs",
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "next build --webpack",
     "postbuild": "node scripts/public-safety.mjs --out",
     "start": "next start",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",

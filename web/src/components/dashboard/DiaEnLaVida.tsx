@@ -35,7 +35,7 @@ type Props = { crons: Cron[] }
  * textual para lectores de pantalla.
  */
 const DiaEnLaVida = ({ crons }: Props) => {
-  const { lang, t } = useLang()
+  const { t } = useLang()
   const [ahora, setAhora] = useState(() => new Date())
   const pistaRef = useRef<HTMLDivElement | null>(null)
   const [sombra, setSombra] = useState({ izq: false, der: false })
@@ -93,6 +93,7 @@ const DiaEnLaVida = ({ crons }: Props) => {
         carril = carriles.length
         carriles.push(-99)
       }
+
       if (carril > 2) carril = 2
       p.carril = carril
       carriles[carril] = p.hora

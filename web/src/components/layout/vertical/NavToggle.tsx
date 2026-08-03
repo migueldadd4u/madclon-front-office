@@ -2,7 +2,7 @@
 
 // Hook Imports
 import useVerticalNav from '@menu/hooks/useVerticalNav'
-import { useLang } from '@/lib/i18n'
+import { usePublicLang } from '@/lib/public-i18n'
 
 // Botón de menú real: antes era un icono <i> con onClick, inalcanzable por
 // teclado y mudo para lectores de pantalla. Ahora es un <button> con
@@ -10,7 +10,7 @@ import { useLang } from '@/lib/i18n'
 const NavToggle = () => {
   // Hooks
   const { toggleVerticalNav, isBreakpointReached, isToggled } = useVerticalNav()
-  const { t } = useLang()
+  const { t } = usePublicLang()
 
   if (!isBreakpointReached) return null
 

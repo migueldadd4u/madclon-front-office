@@ -5,7 +5,7 @@ import classnames from 'classnames'
 
 // Hook Imports
 import useVerticalNav from '@menu/hooks/useVerticalNav'
-import { useLang } from '@/lib/i18n'
+import { usePublicLang } from '@/lib/public-i18n'
 
 // Component Imports
 import CopiarEnlace from '@/components/dashboard/CopiarEnlace'
@@ -17,7 +17,7 @@ import { buildStamp, buildHuman } from '@/lib/build-stamp'
 const FooterContent = () => {
   // Hooks
   const { isBreakpointReached } = useVerticalNav()
-  const { t } = useLang()
+  const { t } = usePublicLang()
 
   // Sello de versión: qué build se está viendo, sin preguntar (esquema add4u-web)
   const version = t('footer_version').replace('{v}', buildStamp).replace('{fecha}', buildHuman)

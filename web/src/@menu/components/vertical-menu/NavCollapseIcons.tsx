@@ -5,7 +5,7 @@ import type { HTMLAttributes, ReactElement } from 'react'
 
 // Hook Imports
 import useVerticalNav from '../../hooks/useVerticalNav'
-import { useLang } from '@/lib/i18n'
+import { usePublicLang } from '@/lib/public-i18n'
 
 // Icon Imports
 import CloseIcon from '../../svg/Close'
@@ -26,7 +26,7 @@ const NavCollapseIcons = (props: NavCollapseIconsProps) => {
 
   // Hooks
   const { isCollapsed, collapseVerticalNav, isBreakpointReached, toggleVerticalNav } = useVerticalNav()
-  const { t } = useLang()
+  const { t } = usePublicLang()
 
   // Handle Lock / Unlock Icon Buttons click
   const handleClick = (action: 'lock' | 'unlock') => {
