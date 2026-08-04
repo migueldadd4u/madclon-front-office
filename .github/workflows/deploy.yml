@@ -1,6 +1,13 @@
 name: Deploy Front Office a GitHub Pages
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "web/public/data/**"
+      # El primer merge que reactiva este trigger también debe desplegar el
+      # lote de datos que ya esté en main.
+      - ".github/workflows/deploy.yml"
   workflow_dispatch:
 
 permissions:
