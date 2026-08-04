@@ -46,13 +46,13 @@ Todo es **responsive**: el panel se administra igual desde un portátil que desd
 MAD-brain/  (vault privado, SOLO LECTURA)
    │  exporter/export_panel.py  ← refresco nocturno automático
    ▼
-web/public/data/*.json   ← cinco documentos saneados; el gate los audita en cada build
+web/public/data/*.json   ← seis documentos saneados; el gate los audita en cada build
    │  Next.js (React) + Materialize MUI + recharts
    ▼
-web/out/  →  GitHub Pages  (workflow exclusivamente manual)
+web/out/  →  GitHub Pages  (push de datos o ejecución manual)
 ```
 
-- **`exporter/export_panel.py`** — genera los cinco JSON cada noche desde los paneles
+- **`exporter/export_panel.py`** — genera los seis JSON cada noche desde los paneles
   privados. El gate semántico decide si el lote es publicable.
 - **`web/`** — starter-kit TypeScript del tema Materialize (Next.js), adaptado:
   export estático, menú y marca MAD Clon. La capa de datos es **fail-soft**: cada
@@ -79,7 +79,7 @@ npm run check:public-safety  # debe quedar verde antes de construir
 npm run gate                 # build nuevo + matriz completa local
 ```
 
-`make data` refresca los cinco JSON desde el vault; el gate decide si el lote sale
+`make data` refresca los seis JSON desde el vault; el gate decide si el lote sale
 o se queda en local.
 
 ## Despliegue en GitHub Pages
@@ -92,14 +92,17 @@ git remote add origin git@github.com:<usuario>/madclon-front-office.git
 git push -u origin main
 ```
 
-El workflow solo admite `workflow_dispatch`. No debe ejecutarse mientras `TESTING.md`
-mantenga la fila de datos reales en **FALLA BLOQUEANTE**. Cuando el contrato sea verde,
-compilará con `BASEPATH=/<nombre-del-repo>` y publicará `web/out`.
+El workflow se ejecuta cuando `main` recibe cambios en `web/public/data/**` y también
+admite `workflow_dispatch`. Antes de subir el artefacto ejecuta las regresiones de
+privacidad, el gate sobre las fuentes, el build estático y el gate sobre `web/out`.
+Si falla cualquiera de esas puertas, GitHub Pages conserva el último despliegue válido.
+No hay un segundo horario en Actions: el productor nocturno de datos es quien dispara
+el flujo mediante su push.
 
 > ⚠️ **Licencia**: el tema Materialize es de pago (Envato/Pixinvent). Publicar su código
 > fuente en un repo **público** incumple la licencia — usa un repo **privado**
 > (GitHub Pages funciona en repos privados con plan Pro/Team) o confirma la licencia
 > antes de hacerlo público.
 
-No hay refresco autorizado hasta adaptar el exportador y sustituir los cinco JSON con
-aprobación expresa de MAD; el job nocturno queda fuera de este cambio.
+El job nocturno solo regenera y sube los JSON. La publicación pertenece a este workflow,
+que serializa los despliegues y nunca publica un lote que no supere todos los gates.
