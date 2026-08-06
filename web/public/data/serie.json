@@ -262,28 +262,54 @@
     },
     {
       "fecha": "2026-08-05",
-      "ts": 1785893896.20754,
+      "ts": 1785965736.9840052,
       "dias": 7,
       "contexto": {
-        "llamadas": 656,
-        "tokens": 30264950,
-        "tareas_hechas": 53,
-        "llamadas_router": 169
+        "llamadas": 839,
+        "tokens": 48161665,
+        "tareas_hechas": 40,
+        "llamadas_router": 140
       },
       "kpis": {
-        "entrada_por_llamada": 45471.708,
-        "pct_cache": 77.876,
-        "ratio_salida_entrada": 1.46,
-        "pct_local": 0.955,
+        "entrada_por_llamada": 56852.899,
+        "pct_cache": 83.173,
+        "ratio_salida_entrada": 0.969,
+        "pct_local": 0.448,
         "pct_metered": 0.0,
-        "pct_tokens_en_fallo": 46.681,
-        "latencia_p50": 23.13,
-        "tokens_motor_por_tarea": 71573.489,
-        "pct_llamadas_ok": 62.13,
-        "tareas_dia": 7.571,
-        "reintentos_por_tarea": 1.113,
+        "pct_tokens_en_fallo": 41.828,
+        "latencia_p50": 34.94,
+        "tokens_motor_por_tarea": 94502.31,
+        "pct_llamadas_ok": 60.714,
+        "tareas_dia": 5.714,
+        "reintentos_por_tarea": 1.154,
         "pct_propuestas_atendidas": 100.0,
-        "cobertura_medida": 89.024
+        "cobertura_medida": 92.253
+      }
+    },
+    {
+      "fecha": "2026-08-06",
+      "ts": 1785980138.724635,
+      "dias": 7,
+      "contexto": {
+        "llamadas": 843,
+        "tokens": 48308130,
+        "tareas_hechas": 33,
+        "llamadas_router": 142
+      },
+      "kpis": {
+        "entrada_por_llamada": 56828.485,
+        "pct_cache": 82.814,
+        "ratio_salida_entrada": 0.839,
+        "pct_local": 0.397,
+        "pct_metered": 0.0,
+        "pct_tokens_en_fallo": 40.289,
+        "latencia_p50": 8.63,
+        "tokens_motor_por_tarea": 117724.3,
+        "pct_llamadas_ok": 61.972,
+        "tareas_dia": 4.714,
+        "reintentos_por_tarea": 1.188,
+        "pct_propuestas_atendidas": 100.0,
+        "cobertura_medida": 92.289
       }
     }
   ],

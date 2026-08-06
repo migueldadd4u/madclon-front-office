@@ -95,53 +95,53 @@
     {
       "nombre": "Correo Add4u M365",
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-04T23:49:42.684940Z",
+      "ultimo_ok": "2026-08-05T23:19:41.647591Z",
       "ultimo_fallo": "2026-07-31T21:03:04.987050Z",
       "detalle": "lectura / autenticación OK"
     },
     {
       "nombre": "Correo Alastria Gmail",
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-04T23:49:42.684940Z",
+      "ultimo_ok": "2026-08-05T23:19:41.647591Z",
       "ultimo_fallo": null,
       "detalle": "lectura / autenticación OK"
     },
     {
       "nombre": "Correo Patrimonio Gmail",
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-04T23:49:42.684940Z",
+      "ultimo_ok": "2026-08-05T23:19:41.647591Z",
       "ultimo_fallo": null,
       "detalle": "lectura / autenticación OK"
     },
     {
       "nombre": "Correo Padre iCloud",
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-04T23:49:42.684940Z",
+      "ultimo_ok": "2026-08-05T23:19:41.647591Z",
       "ultimo_fallo": null,
       "detalle": "lectura / autenticación OK"
     },
     {
       "nombre": "Agenda Add4u M365",
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-04T23:49:42.684940Z",
+      "ultimo_ok": "2026-08-05T23:19:41.647591Z",
       "ultimo_fallo": "2026-07-31T17:30:52.148807Z",
       "detalle": "listado / acceso OK"
     },
     {
       "nombre": "Agenda Alastria Google",
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-04T23:49:42.684940Z",
+      "ultimo_ok": "2026-08-05T23:19:41.647591Z",
       "ultimo_fallo": null,
       "detalle": "listado / acceso OK"
     },
     {
       "nombre": "Agenda Familia iCloud",
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-04T23:49:42.684940Z",
+      "ultimo_ok": "2026-08-05T23:19:41.647591Z",
       "ultimo_fallo": null,
       "detalle": "listado / acceso OK"
     }
   ],
   "salud_global": "🟢 Todo OK",
-  "watchdog_ts": "2026-08-04T23:49:42.686212Z"
+  "watchdog_ts": "2026-08-05T23:19:41.648882Z"
 }
