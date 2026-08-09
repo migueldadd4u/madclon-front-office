@@ -1,7 +1,7 @@
 {
   "gtd": {
     "propuestas": null,
-    "bandeja": 39,
+    "bandeja": 28,
     "esperas_vencidas": 11,
     "decisiones": null,
     "acciones_hoy": 17,
@@ -12,20 +12,20 @@
     "staged": 0
   },
   "automejora": {
-    "hechas": 174,
+    "hechas": 178,
     "bloqueadas": 37,
     "aparcadas": 44,
-    "pendientes": 1,
-    "llamadas": 292,
+    "pendientes": 2,
+    "llamadas": 290,
     "metered": 0,
-    "top": "codex_cli 85, grok 71, minimax 40, agy_cli 33"
+    "top": "codex_cli 79, grok 73, minimax 41, agy_cli 32"
   },
   "crons": [
     {
       "nombre": "Briefing COO 08:05",
       "ambito": "global",
       "estado": "error",
-      "ultima": "07/08 09:16"
+      "ultima": "08/08 09:15"
     },
     {
       "nombre": "Higiene Semanal del Sistema",
@@ -37,31 +37,31 @@
       "nombre": "Triage correos del día",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "07/08 08:53"
+      "ultima": "08/08 08:55"
     },
     {
       "nombre": "Auto-mejora nocturna clon",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "07/08 03:40"
+      "ultima": "08/08 03:40"
     },
     {
       "nombre": "Resumen diario de Spam",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "07/08 21:30"
+      "ultima": "08/08 21:30"
     },
     {
       "nombre": "Morning briefing",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "07/08 08:00"
+      "ultima": "08/08 08:00"
     },
     {
       "nombre": "Important-mail monitor",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "08/08 03:00"
+      "ultima": "09/08 03:00"
     },
     {
       "nombre": "Weekly review",
@@ -79,7 +79,7 @@
       "nombre": "Repaso ¿Qué necesito?",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "07/08 08:30"
+      "ultima": "08/08 08:30"
     },
     {
       "nombre": "Clon ↔ Jarvis weekly mutual-improvemen",
@@ -101,10 +101,10 @@
   ],
   "crons_en_error": 2,
   "tokens_resumen": {
-    "tokens_30d": 393748862,
+    "tokens_30d": 383611273,
     "cobertura_pct": 91,
-    "indice_eficiencia": 290395
+    "indice_eficiencia": 280414
   },
-  "salud_global": "🟢 Todo OK",
-  "watchdog_ts": "2026-08-07T23:09:12.306751Z"
+  "salud_global": "🔴 Hay incidencias activas",
+  "watchdog_ts": "2026-08-08T23:31:14.805977Z"
 }
