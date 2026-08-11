@@ -44,9 +44,10 @@ const TITULOS_PORTADA = {
   en: 'The MAD Clone control room'
 }
 
+// El titular del informativo del 404 (views/NotFound.tsx): es el h1 de la página.
 const TITULOS_404 = {
-  es: 'Esta página no existe… pero el Clon de MAD sigue trabajando',
-  en: "This page doesn't exist… but MAD's clone keeps working"
+  es: 'La página que buscabas no existe, y el enlace lo sabía',
+  en: "The page you were looking for doesn't exist, and the link knew it"
 }
 
 // ── DEUDAS ABIERTAS DEL GATE ────────────────────────────────────────────────────

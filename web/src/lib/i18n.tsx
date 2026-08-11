@@ -102,19 +102,50 @@ const STR = {
   home_pulso_tooltip_tokens: { es: 'trabajo de IA', en: 'AI work' },
   home_pulso_tooltip_tareas: { es: 'tareas hechas', en: 'tasks done' },
 
-  // 404 con personalidad
+  // 404 con personalidad: el error se emite como si fuera el informativo de la noche.
+  // El titular es el rótulo de portada; la cinta de abajo son los demás titulares.
+  nf_canal: { es: 'Canal 404', en: 'Channel 404' },
+  nf_directo: { es: 'En directo', en: 'Live' },
+  nf_marca: { es: 'Última hora', en: 'Breaking news' },
   nf_titulo: {
-    es: 'Esta página no existe… pero el Clon de MAD sigue trabajando',
-    en: "This page doesn't exist… but MAD's clone keeps working"
+    es: 'La página que buscabas no existe, y el enlace lo sabía',
+    en: "The page you were looking for doesn't exist, and the link knew it"
   },
   nf_sub: {
-    es: 'Puede que el enlace esté mal escrito o que la página se moviera. Mientras tanto, el sistema ha seguido con sus rutinas: leyendo, clasificando y preparando el día.',
-    en: 'The link may be misspelled or the page may have moved. Meanwhile, the system kept to its routines: reading, sorting and preparing the day.'
+    es: 'Ampliamos la información: o la dirección venía mal escrita, o la página se mudó sin avisar a nadie. Mientras el enlace da explicaciones, el Clon de MAD sigue trabajando: leyendo, clasificando y preparando el día.',
+    en: 'More on this story: either the address was misspelled, or the page moved without telling anyone. While the link explains itself, MAD’s clone keeps working: reading, sorting and preparing the day.'
   },
   nf_boton: { es: 'Volver al panel', en: 'Back to the dashboard' },
   nf_pie: {
-    es: 'MAD Clon · front office — solo cifras agregadas, sin datos personales',
-    en: 'MAD Clon · front office — aggregated figures only, no personal data'
+    es: 'Informativo del Clon de MAD · aquí solo se emiten cifras agregadas, sin datos personales',
+    en: 'Newscast by MAD’s clone · only aggregated figures are broadcast here, no personal data'
+  },
+  nf_cinta_aria: { es: 'Titulares del informativo', en: 'Newscast headlines' },
+  nf_cinta_pausa: { es: 'Parar los titulares', en: 'Stop the headlines' },
+  nf_cinta_sigue: { es: 'Seguir con los titulares', en: 'Resume the headlines' },
+  nf_cinta_1: {
+    es: 'El enlace se acoge a su derecho a no declarar',
+    en: 'The link declines to comment'
+  },
+  nf_cinta_2: {
+    es: 'Fuentes cercanas al servidor apuntan a una errata en la dirección',
+    en: 'Sources close to the server point to a typo in the address'
+  },
+  nf_cinta_3: {
+    es: 'Continúa el operativo: se busca la página en el histórico del navegador',
+    en: 'The search continues: the page was last seen in your browsing history'
+  },
+  nf_cinta_4: {
+    es: 'El responsable asume toda la responsabilidad y, por supuesto, no dimite',
+    en: 'Those responsible take full responsibility and, of course, refuse to resign'
+  },
+  nf_cinta_5: {
+    es: 'La página no aparece; el Clon de MAD sí, y sigue con sus rutinas de siempre',
+    en: 'The page is nowhere to be found; MAD’s clone is, and keeps to its usual routines'
+  },
+  nf_cinta_6: {
+    es: 'El botón de esta pantalla, única salida conocida hacia el panel',
+    en: 'The button on this screen: the only known way back to the dashboard'
   },
 
   // el clon te cuenta su noche
