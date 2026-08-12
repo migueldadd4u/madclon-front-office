@@ -1,11 +1,11 @@
 {
   "clone": "clonmadv3",
-  "asOf": "2026-08-12T08:26:45Z",
+  "asOf": "2026-08-12T08:40:36Z",
   "indicators": [
     {
       "id": "tokens-consumidos-total",
       "label": "Tokens consumidos (total acumulado)",
-      "value": 640502405,
+      "value": 641265487,
       "unit": "tokens",
       "asOf": "2026-08-12",
       "source": "front-office",
