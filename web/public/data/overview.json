@@ -106,5 +106,185 @@
     "indice_eficiencia": 314007
   },
   "salud_global": "🔴 Hay incidencias activas",
-  "watchdog_ts": "2026-08-10T06:57:58.348618Z"
+  "watchdog_ts": "2026-08-10T06:57:58.348618Z",
+  "historia": {
+    "hitos": [
+      {
+        "fecha": "2026-04-14",
+        "icono": "ri-seedling-line",
+        "color": "success",
+        "es_titulo": "Nace el proyecto",
+        "es_texto": "Primeras notas de lo que será el segundo cerebro de MAD. Todo empieza como un experimento de memoria.",
+        "en_titulo": "The project is born",
+        "en_texto": "The first notes of what will become MAD's second brain. It all starts as a memory experiment."
+      },
+      {
+        "fecha": "2026-04-16",
+        "icono": "ri-team-line",
+        "color": "primary",
+        "es_titulo": "De un agente a varios",
+        "es_texto": "El clon da el salto a multi-agente con memoria propia: ya no es un chatbot, es un equipo.",
+        "en_titulo": "From one agent to many",
+        "en_texto": "The clone leaps to multi-agent with its own memory: no longer a chatbot, but a team."
+      },
+      {
+        "fecha": "2026-04-19",
+        "icono": "ri-heart-pulse-line",
+        "color": "info",
+        "es_titulo": "El motor Hermes arranca",
+        "es_texto": "El corazón del sistema queda operativo: rutinas automáticas que laten solas, de día y de noche.",
+        "en_titulo": "The Hermes engine starts",
+        "en_texto": "The system's heart becomes operational: automatic routines beating on their own, day and night."
+      },
+      {
+        "fecha": "2026-04-22",
+        "icono": "ri-safe-2-line",
+        "color": "warning",
+        "es_titulo": "Nace el clon Patrimonio",
+        "es_texto": "El primer especialista con oficio: vigilar el patrimonio de la familia. La flota empieza a crecer.",
+        "en_titulo": "The Assets clone is born",
+        "en_texto": "The first specialist with a craft: watching over the family's assets. The fleet begins to grow."
+      },
+      {
+        "fecha": "2026-05-12",
+        "icono": "ri-robot-2-line",
+        "color": "primary",
+        "es_titulo": "Ecosistema completo",
+        "es_texto": "Siete bots orquestados trabajando en equipo y WhatsApp conectado como puerta de entrada.",
+        "en_titulo": "Full ecosystem",
+        "en_texto": "Seven orchestrated bots working as a team, with WhatsApp connected as an entry door."
+      },
+      {
+        "fecha": "2026-05-15",
+        "icono": "ri-refresh-line",
+        "color": "info",
+        "es_titulo": "Cambio de motor en marcha",
+        "es_texto": "Toda la flota migra de OpenClaw a Hermes sin perder un solo día de servicio.",
+        "en_titulo": "Engine swap in motion",
+        "en_texto": "The whole fleet migrates from OpenClaw to Hermes without losing a single day of service."
+      },
+      {
+        "fecha": "2026-05-24",
+        "icono": "ri-mail-line",
+        "color": "success",
+        "es_titulo": "El correo entra en escena",
+        "es_texto": "El clon empieza a leer y clasificar el correo, con reglas de privacidad desde el primer día.",
+        "en_titulo": "Mail enters the scene",
+        "en_texto": "The clone starts reading and sorting mail, with privacy rules from day one."
+      },
+      {
+        "fecha": "2026-06-02",
+        "icono": "ri-mind-map",
+        "color": "primary",
+        "es_titulo": "El cerebro se interconecta",
+        "es_texto": "Las notas de la memoria privada (el «vault») dejan de ser islas: todo queda enlazado y localizable en segundos.",
+        "en_titulo": "The brain interconnects",
+        "en_texto": "The private memory («vault») notes stop being islands: everything gets linked and findable in seconds."
+      },
+      {
+        "fecha": "2026-06-20",
+        "icono": "ri-arrow-up-double-line",
+        "color": "warning",
+        "es_titulo": "Nace la automejora",
+        "es_texto": "El clon empieza a proponer y aplicar mejoras sobre sí mismo. Cada noche, un poco mejor.",
+        "en_titulo": "Self-improvement is born",
+        "en_texto": "The clone starts proposing and applying improvements on itself. Every night, a little better."
+      },
+      {
+        "fecha": "2026-07-07",
+        "icono": "ri-dashboard-3-line",
+        "color": "info",
+        "es_titulo": "La flota se organiza",
+        "es_texto": "Panel de dirección para los subclones: cada uno con oficio, canales y responsabilidades claras.",
+        "en_titulo": "The fleet gets organized",
+        "en_texto": "A management panel for the subclones: each with a craft, channels and clear responsibilities."
+      },
+      {
+        "fecha": "2026-07-26",
+        "icono": "ri-ruler-line",
+        "color": "success",
+        "es_titulo": "El clon se mide a sí mismo",
+        "es_texto": "Se congela la línea base de eficiencia y nace este Front Office: los números del clon, abiertos.",
+        "en_titulo": "The clone measures itself",
+        "en_texto": "The efficiency baseline is frozen and this Front Office is born: the clone's numbers, in the open."
+      },
+      {
+        "fecha": "2026-07-28",
+        "icono": "ri-shape-line",
+        "color": "primary",
+        "es_titulo": "Marca propia",
+        "es_texto": "El Front Office estrena logotipo MAD Clon: la M constelación, cinco nodos trabajando como uno.",
+        "en_titulo": "A brand of its own",
+        "en_texto": "The Front Office unveils the MAD Clon logo: the constellation M, five nodes working as one."
+      },
+      {
+        "fecha": "2026-07-31",
+        "icono": "ri-phone-line",
+        "color": "info",
+        "es_titulo": "El teléfono también entra",
+        "es_texto": "Las llamadas recibidas y las perdidas pasan a ser una entrada más: lo que suena y nadie coge deja de perderse.",
+        "en_titulo": "The phone comes in too",
+        "en_texto": "Received and missed calls become just another inbox: what rings and goes unanswered stops getting lost."
+      },
+      {
+        "fecha": "2026-08-01",
+        "icono": "ri-window-2-line",
+        "color": "secondary",
+        "es_titulo": "Sala de máquinas propia",
+        "es_texto": "El clon estrena su panel privado de dirección: el sitio donde MAD ve en un vistazo lo que su equipo de IA está haciendo.",
+        "en_titulo": "An engine room of its own",
+        "en_texto": "The clone gets its private control panel: the place where MAD sees at a glance what his AI team is up to."
+      },
+      {
+        "fecha": "2026-08-02",
+        "icono": "ri-contacts-book-3-line",
+        "color": "success",
+        "es_titulo": "La memoria de personas, al día",
+        "es_texto": "Las cuatro colas de fichas pendientes llegan a cero: el clon recuerda a quién conoce sin acumular atrasos.",
+        "en_titulo": "People memory, caught up",
+        "en_texto": "The four queues of pending records reach zero: the clone remembers who it knows without piling up a backlog."
+      },
+      {
+        "fecha": "2026-08-03",
+        "icono": "ri-global-line",
+        "color": "primary",
+        "es_titulo": "El clon sale a la calle",
+        "es_texto": "Se publica una web abierta que se refresca sola varias veces al día, en veintiún idiomas. Lo que era un experimento privado ya tiene escaparate.",
+        "en_titulo": "The clone goes public",
+        "en_texto": "An open website goes live, refreshing itself several times a day, in twenty-one languages. What was a private experiment now has a shop window."
+      },
+      {
+        "fecha": "2026-08-05",
+        "icono": "ri-auction-line",
+        "color": "warning",
+        "es_titulo": "Nace el clon licitador",
+        "es_texto": "Un especialista nuevo se pone a vigilar los concursos públicos y a puntuarlos cada mañana antes del desayuno.",
+        "en_titulo": "The bidding clone is born",
+        "en_texto": "A new specialist starts watching public tenders and scoring them every morning before breakfast."
+      },
+      {
+        "fecha": "2026-08-10",
+        "icono": "ri-alarm-warning-line",
+        "color": "error",
+        "es_titulo": "El día que la web se quedó quieta",
+        "es_texto": "El refresco nocturno dejó de llegar y esta web estuvo un día entera enseñando cifras viejas sin avisar. Se reparó el mismo día, y la lección quedó escrita: nada puede morir en silencio.",
+        "en_titulo": "The day the site stood still",
+        "en_texto": "The nightly refresh stopped arriving and this site spent a full day showing old figures without saying so. It was fixed the same day, and the lesson was written down: nothing may die in silence."
+      },
+      {
+        "fecha": "2026-08-12",
+        "icono": "ri-book-open-line",
+        "color": "success",
+        "es_titulo": "La historia se cuenta sola",
+        "es_texto": "Esta línea de tiempo deja de estar escrita a mano dentro de la web: los capítulos y las cifras salen del refresco nocturno, y si un capítulo se retrasa la propia página lo dice.",
+        "en_titulo": "The story tells itself",
+        "en_texto": "This timeline stops being hand-written inside the site: chapters and figures now come from the nightly refresh, and if a chapter runs late the page says so itself."
+      }
+    ],
+    "bitacoras": 177,
+    "nacimiento": "2026-04-14",
+    "ultima_bitacora": "2026-08-05",
+    "ultimo_hito": "2026-08-12",
+    "dias_sin_capitulo": 0
+  }
 }
