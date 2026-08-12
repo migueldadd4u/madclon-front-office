@@ -9,6 +9,7 @@ import { useLang } from '@/lib/i18n'
 
 // Component Imports
 import CopiarEnlace from '@/components/dashboard/CopiarEnlace'
+import EnlacePanelPrivado from '@components/layout/shared/EnlacePanelPrivado'
 
 // Util Imports
 import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
@@ -41,6 +42,8 @@ const FooterContent = () => {
         <span className='text-textDisabled text-sm font-mono' title={version} aria-label={version}>
           {buildStamp}
         </span>
+        {/* Solo aparece en los navegadores que llevan guardada la dirección del panel. */}
+        <EnlacePanelPrivado />
         <CopiarEnlace />
       </div>
     </div>
