@@ -94,54 +94,54 @@
   "integraciones": [
     {
       "nombre": "Correo Add4u M365",
-      "estado": "🔴 FALLA",
-      "ultimo_ok": "2026-08-08T06:15:58.353206Z",
+      "estado": "🟢 OK",
+      "ultimo_ok": "2026-08-12T08:19:20.850653Z",
       "ultimo_fallo": "2026-08-10T06:57:58.348011Z",
-      "detalle": "fallo al refrescar el token OAuth: sin resultado"
+      "detalle": "lectura / autenticación OK"
     },
     {
       "nombre": "Correo Alastria Gmail",
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-10T06:57:58.348011Z",
+      "ultimo_ok": "2026-08-12T08:19:20.850653Z",
       "ultimo_fallo": null,
       "detalle": "lectura / autenticación OK"
     },
     {
       "nombre": "Correo Patrimonio Gmail",
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-10T06:57:58.348011Z",
+      "ultimo_ok": "2026-08-12T08:19:20.850653Z",
       "ultimo_fallo": null,
       "detalle": "lectura / autenticación OK"
     },
     {
       "nombre": "Correo Padre iCloud",
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-10T06:57:58.348011Z",
+      "ultimo_ok": "2026-08-12T08:19:20.850653Z",
       "ultimo_fallo": null,
       "detalle": "lectura / autenticación OK"
     },
     {
       "nombre": "Agenda Add4u M365",
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-10T06:57:58.348011Z",
+      "ultimo_ok": "2026-08-12T08:19:20.850653Z",
       "ultimo_fallo": "2026-07-31T17:30:52.148807Z",
       "detalle": "listado / acceso OK"
     },
     {
       "nombre": "Agenda Alastria Google",
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-10T06:57:58.348011Z",
+      "ultimo_ok": "2026-08-12T08:19:20.850653Z",
       "ultimo_fallo": null,
       "detalle": "listado / acceso OK"
     },
     {
       "nombre": "Agenda Familia iCloud",
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-10T06:57:58.348011Z",
+      "ultimo_ok": "2026-08-12T08:19:20.850653Z",
       "ultimo_fallo": null,
       "detalle": "listado / acceso OK"
     }
   ],
-  "salud_global": "🔴 Hay incidencias activas",
-  "watchdog_ts": "2026-08-10T06:57:58.348618Z"
+  "salud_global": "🟢 Todo OK",
+  "watchdog_ts": "2026-08-12T08:19:20.851052Z"
 }

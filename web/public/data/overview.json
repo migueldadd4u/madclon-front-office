@@ -1,31 +1,31 @@
 {
   "gtd": {
     "propuestas": null,
-    "bandeja": 31,
+    "bandeja": null,
     "esperas_vencidas": 11,
     "decisiones": null,
     "acciones_hoy": 17,
     "esperas_listadas": 8
   },
   "personas": {
-    "fichas_curadas": 853,
+    "fichas_curadas": 855,
     "staged": 0
   },
   "automejora": {
-    "hechas": 184,
-    "bloqueadas": 38,
-    "aparcadas": 46,
-    "pendientes": 8,
-    "llamadas": 255,
+    "hechas": 188,
+    "bloqueadas": 42,
+    "aparcadas": 47,
+    "pendientes": 5,
+    "llamadas": 285,
     "metered": 0,
-    "top": "codex_cli 73, grok 70, minimax 41, agy_cli 29"
+    "top": "codex_cli 86, grok 76, minimax 42, agy_cli 30"
   },
   "crons": [
     {
       "nombre": "Briefing COO 08:05",
       "ambito": "global",
-      "estado": "error",
-      "ultima": "10/08 09:15"
+      "estado": "ok",
+      "ultima": "12/08 10:39"
     },
     {
       "nombre": "Higiene Semanal del Sistema",
@@ -37,31 +37,31 @@
       "nombre": "Triage correos del día",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "10/08 08:52"
+      "ultima": "12/08 08:52"
     },
     {
       "nombre": "Auto-mejora nocturna clon",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "10/08 03:40"
+      "ultima": "12/08 03:40"
     },
     {
       "nombre": "Resumen diario de Spam",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "10/08 21:30"
+      "ultima": "11/08 21:30"
     },
     {
       "nombre": "Morning briefing",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "10/08 08:00"
+      "ultima": "12/08 08:00"
     },
     {
       "nombre": "Important-mail monitor",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "11/08 02:30"
+      "ultima": "12/08 10:30"
     },
     {
       "nombre": "Weekly review",
@@ -73,13 +73,13 @@
       "nombre": "Topic news digest",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "10/08 18:05"
+      "ultima": "11/08 18:05"
     },
     {
       "nombre": "Repaso ¿Qué necesito?",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "10/08 08:30"
+      "ultima": "12/08 08:31"
     },
     {
       "nombre": "Clon ↔ Jarvis weekly mutual-improvemen",
@@ -99,14 +99,14 @@
     "gateway-tecnico",
     "whatsapp-bridge-clon"
   ],
-  "crons_en_error": 1,
+  "crons_en_error": 0,
   "tokens_resumen": {
-    "tokens_30d": 360134095,
+    "tokens_30d": 364554765,
     "cobertura_pct": 91,
-    "indice_eficiencia": 314007
+    "indice_eficiencia": 359783
   },
-  "salud_global": "🔴 Hay incidencias activas",
-  "watchdog_ts": "2026-08-10T06:57:58.348618Z",
+  "salud_global": "🟢 Todo OK",
+  "watchdog_ts": "2026-08-12T08:19:20.851052Z",
   "historia": {
     "hitos": [
       {
