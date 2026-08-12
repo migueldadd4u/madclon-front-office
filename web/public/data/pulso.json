@@ -1,31 +1,31 @@
 {
   "clone": "clonmadv3",
-  "asOf": "2026-08-11T01:43:14Z",
+  "asOf": "2026-08-12T01:43:14Z",
   "indicators": [
     {
       "id": "tokens-consumidos-total",
       "label": "Tokens consumidos (total acumulado)",
-      "value": 622401904,
+      "value": 639318133,
       "unit": "tokens",
-      "asOf": "2026-08-11",
+      "asOf": "2026-08-12",
       "source": "front-office",
       "monotonic": true
     },
     {
       "id": "dias-construyendo",
       "label": "Días construyendo en público",
-      "value": 9,
+      "value": 10,
       "unit": "días",
-      "asOf": "2026-08-11",
+      "asOf": "2026-08-12",
       "source": "front-office",
       "monotonic": true
     },
     {
       "id": "tareas-despachadas-7d",
       "label": "Tareas despachadas (últimos 7 días)",
-      "value": 222,
+      "value": 207,
       "unit": "tareas",
-      "asOf": "2026-08-11",
+      "asOf": "2026-08-12",
       "source": "front-office"
     },
     {
@@ -33,7 +33,7 @@
       "label": "Canales de entrada vigilados",
       "value": 3,
       "unit": "canales",
-      "asOf": "2026-08-11",
+      "asOf": "2026-08-12",
       "source": "front-office"
     }
   ]
