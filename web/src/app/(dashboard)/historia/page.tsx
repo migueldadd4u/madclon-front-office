@@ -25,13 +25,19 @@ import type { Lang, StrKey } from '@/lib/i18n'
 
 // Data Imports
 import { fmt, fmtCorto } from '@/lib/data'
-import type { Hito, PanelData } from '@/lib/data'
+import type { PanelData } from '@/lib/data'
+import { HITOS_BUILD } from '@/lib/historia-hitos'
 
-// La línea de tiempo NO vive aquí. Los capítulos nacen en exporter/historia.md,
-// el exportador los cuenta y los publica en overview.json, y esta página solo
-// los pinta. Escribirlos en el código fue la causa de que /historia sirviera un
-// capítulo de julio a mediados de agosto con el contador de bitácoras congelado:
-// lo que se escribe a mano envejece en silencio (scripts/check-hardcode.mjs).
+// La línea de tiempo NO se escribe aquí: nace en exporter/historia.md, fuente
+// única, y scripts/build-historia.mjs la hornea en el build. Escribirla a mano
+// en React fue lo que hizo que /historia sirviera un capítulo de julio a
+// mediados de agosto con el contador de bitácoras congelado.
+//
+// Y viaja CON EL BUILD, no por los datos: cuando dependió de overview.json, un
+// visitante con ese documento en la caché del service worker (hasta 24 h por
+// diseño) recibía JS nuevo + datos viejos y la línea de tiempo desaparecía
+// entera. El histórico no cambia; lo que cambia son las cifras, y esas sí
+// vienen de los JSON.
 
 type Color = 'primary' | 'success' | 'info' | 'warning' | 'error' | 'secondary'
 
@@ -121,16 +127,29 @@ const HistoriaPage = () => {
       {data => {
         const { tokens, clones, overview } = data
         const historia = overview.historia
-        const hitos: Hito[] = historia?.hitos ?? []
 
-        // Nace del dato, no de una constante: la edad y la línea cuentan lo mismo.
-        const nacimiento = historia?.nacimiento ? new Date(`${historia.nacimiento}T00:00:00`) : null
+        // Los capítulos vienen del build (fuente: exporter/historia.md), nunca de
+        // un JSON cacheable: así la línea de tiempo no puede quedarse en blanco.
+        const hitos = HITOS_BUILD
+
+        // La edad sale del dato cuando está, y si no del primer capítulo — que es
+        // el nacimiento. Nunca de una constante escrita a mano.
+        const nacimientoISO = historia?.nacimiento ?? hitos[0]?.fecha ?? null
+        const nacimiento = nacimientoISO ? new Date(`${nacimientoISO}T00:00:00`) : null
 
         const diasVida = nacimiento
           ? Math.max(1, Math.floor((Date.now() - nacimiento.getTime()) / 86_400_000))
           : null
 
-        const rancia = (historia?.dias_sin_capitulo ?? 0) > 21
+        // La antigüedad narrativa se mide sobre lo que se está pintando, no sobre
+        // el JSON: con datos rancios el aviso tiene que seguir siendo cierto.
+        const ultimoHito = hitos.at(-1)?.fecha ?? null
+
+        const diasSinCapitulo = ultimoHito
+          ? Math.max(0, Math.floor((Date.now() - new Date(`${ultimoHito}T00:00:00`).getTime()) / 86_400_000))
+          : null
+
+        const rancia = (diasSinCapitulo ?? 0) > 21
 
         return (
           <Grid container spacing={6}>
@@ -150,9 +169,7 @@ const HistoriaPage = () => {
                 icon='ri-calendar-line'
                 valor={diasVida === null ? '—' : String(diasVida)}
                 label={t('his_dias')}
-                detalle={
-                  historia?.nacimiento ? reemplaza(t('his_dias_det'), { fecha: fechaLarga(historia.nacimiento, lang) }) : '—'
-                }
+                detalle={nacimientoISO ? reemplaza(t('his_dias_det'), { fecha: fechaLarga(nacimientoISO, lang) }) : '—'}
                 color='primary'
               />
             </Grid>
@@ -223,10 +240,10 @@ const HistoriaPage = () => {
                   )}
 
                   {/* Nada muere en silencio: si la narración se retrasa, se dice. */}
-                  {historia?.ultimo_hito && (
+                  {ultimoHito && (
                     <div className='flex flex-wrap items-center gap-2'>
                       <Typography variant='caption' color='text.disabled'>
-                        {reemplaza(t('his_ultimo'), { fecha: fechaLarga(historia.ultimo_hito, lang) })}
+                        {reemplaza(t('his_ultimo'), { fecha: fechaLarga(ultimoHito, lang) })}
                       </Typography>
                       {rancia && (
                         <Chip
@@ -234,7 +251,7 @@ const HistoriaPage = () => {
                           color='warning'
                           variant='tonal'
                           icon={<i className='ri-time-line' />}
-                          label={reemplaza(t('his_pendiente'), { n: fmt(historia.dias_sin_capitulo ?? 0) })}
+                          label={reemplaza(t('his_pendiente'), { n: fmt(diasSinCapitulo ?? 0) })}
                         />
                       )}
                     </div>

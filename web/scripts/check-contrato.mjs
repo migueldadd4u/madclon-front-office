@@ -16,6 +16,8 @@
 import { readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 
+import { generar } from './build-historia.mjs'
+
 const COLORES_VALIDOS = ['primary', 'success', 'info', 'warning', 'error', 'secondary']
 const RE_ICONO = /^ri-[a-z0-9-]+$/
 const RE_FECHA = /^\d{4}-\d{2}-\d{2}$/
@@ -58,12 +60,44 @@ export function comprobarContrato(base = process.cwd()) {
   const notas = []
   const falla = (regla, evidencia) => fallos.push({ regla, evidencia })
 
-  // ── 1 · la historia llega por datos, no por código ──────────────────────────
+  // ── 1 · la historia llega de su fuente única, no escrita en la página ───────
   const pagina = join(base, 'src/app/(dashboard)/historia/page.tsx')
   const fuentePagina = existsSync(pagina) ? readFileSync(pagina, 'utf8') : ''
 
   if (/const HITOS\s*[:=]/.test(fuentePagina)) {
     falla('historia-en-codigo', 'historia/page.tsx vuelve a declarar HITOS: los capítulos van en exporter/historia.md')
+  }
+
+  // El 12/08 los capítulos se colgaron de overview.json y un documento cacheado
+  // por el service worker dejó la línea de tiempo EN BLANCO durante un día.
+  // El histórico tiene que viajar con el build, no con un dato cacheable.
+  if (fuentePagina && !/HITOS_BUILD/.test(fuentePagina)) {
+    falla('historia-colgada-del-dato',
+      'historia/page.tsx ya no pinta HITOS_BUILD: si los capítulos dependen de overview.json, ' +
+      'un lote cacheado deja la línea de tiempo en blanco')
+  }
+
+  // ── 1b · los capítulos horneados coinciden con exporter/historia.md ─────────
+  // Se hornean en el build para que un overview.json cacheado no pueda dejar la
+  // línea de tiempo en blanco (incidente del 12/08). Si alguien edita a mano el
+  // fichero generado, o lo deja sin regenerar, la web y su fuente divergen.
+  let horneados = []
+
+  try {
+    const { cuerpo, hitos, avisos: avisosMd } = generar()
+
+    horneados = hitos
+    avisosMd.forEach(a => avisos.push(`exporter/historia.md · ${a}`))
+
+    const generado = join(base, 'src/lib/historia-hitos.ts')
+    const enDisco = existsSync(generado) ? readFileSync(generado, 'utf8') : ''
+
+    if (enDisco !== cuerpo) {
+      falla('historia-horneada-desfasada',
+        'src/lib/historia-hitos.ts no coincide con exporter/historia.md — regenera con `node scripts/build-historia.mjs`')
+    }
+  } catch (e) {
+    falla('historia-md-ilegible', `no se pudo leer exporter/historia.md: ${e.message}`)
   }
 
   // ── 2 · el lote publicado trae una historia bien formada ────────────────────
@@ -102,6 +136,14 @@ export function comprobarContrato(base = process.cwd()) {
 
       if (typeof dias === 'number' && dias > DIAS_HISTORIA_RANCIA) {
         avisos.push(`la historia lleva ${dias} días sin capítulo (último ${historia.ultimo_hito}) — añade un bloque a exporter/historia.md`)
+      }
+
+      // El lote y el build tienen que contar la MISMA historia: si divergen, uno
+      // de los dos se publicó sin el otro.
+      if (horneados.length && hitos.length && horneados.length !== hitos.length) {
+        falla('historia-descuadrada',
+          `el build hornea ${horneados.length} capítulos y overview.json publica ${hitos.length}: ` +
+          'regenera los datos (`make data`) y vuelve a construir')
       }
 
       notas.push(`${hitos.length} capítulos · ${historia.bitacoras} bitácoras · último ${historia.ultimo_hito}`)
