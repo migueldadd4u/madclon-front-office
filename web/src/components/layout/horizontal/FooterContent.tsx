@@ -7,7 +7,7 @@ import classnames from 'classnames'
 import useHorizontalNav from '@menu/hooks/useHorizontalNav'
 
 // Component Imports
-import EnlacePanelPrivado from '@components/layout/shared/EnlacePanelPrivado'
+import SelloVersion from '@components/layout/shared/SelloVersion'
 
 // Util Imports
 import { horizontalLayoutClasses } from '@layouts/utils/layoutClasses'
@@ -25,8 +25,8 @@ const FooterContent = () => {
         {!isBreakpointReached && (
           <p className='text-textSecondary'>Panel público de solo lectura</p>
         )}
-        {/* Solo aparece en los navegadores que llevan guardada la dirección del panel. */}
-        <EnlacePanelPrivado />
+        {/* El sello de versión es también la puerta al panel privado. */}
+        <SelloVersion />
       </div>
     </div>
   )

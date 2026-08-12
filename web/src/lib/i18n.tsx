@@ -41,10 +41,9 @@ const STR = {
   },
   share_copiar: { es: 'Copiar enlace', en: 'Copy link' },
   share_copiado: { es: '¡Enlace copiado!', en: 'Link copied!' },
-  panel_privado: { es: 'Panel privado', en: 'Private panel' },
-  panel_privado_ayuda: {
-    es: 'Abre el panel privado del Clon de MAD. Solo funciona desde sus propios dispositivos.',
-    en: 'Opens the private panel of the Clon de MAD. It only works from his own devices.'
+  sello_puerta: {
+    es: 'Entrar al panel privado del Clon de MAD — te pedirá identificarte',
+    en: 'Enter the private panel of the Clon de MAD — it will ask you to identify yourself'
   },
   menu_abrir: { es: 'Abrir o cerrar el menú', en: 'Open or close the menu' },
   kiosk_entrar: { es: 'Modo presentación: oculta menús y muestra solo el panel', en: 'Presentation mode: hides menus and shows only the dashboard' },

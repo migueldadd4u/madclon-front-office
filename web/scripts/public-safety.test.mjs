@@ -12,6 +12,7 @@ import {
   PUBLIC_DATA_FILES,
   PUBLIC_PINNED_ASSET_FILES,
   PUBLIC_SCHEMA,
+  SALIDA_NAVEGABLE_DECLARADA,
   auditOutputTree,
   auditPublicAssetTree,
   auditPublicDataDirectory,
@@ -334,6 +335,30 @@ test('la superficie runtime bloquea APIs, mutaciones y orígenes externos', () =
 
   for (const [source, file, code] of cases) {
     assert.ok(auditRuntimeSource(source, file).some(item => item.code === code), `${file} debía emitir ${code}`)
+  }
+})
+
+test('la salida navegable declarada pasa SOLO en su fichero, con su destino y como href', () => {
+  const { fichero, destino } = SALIDA_NAVEGABLE_DECLARADA
+  const enlace = `<a href='${destino}' rel='noreferrer'>{buildStamp}</a>`
+
+  // La declarada, en su sitio: pasa.
+  assert.deepEqual(auditRuntimeSource(enlace, fichero), [])
+
+  // Lo que NO puede colarse detrás de la declaración.
+  const rechazos = [
+    [enlace, 'src/app/otro.tsx', 'el mismo enlace en otro fichero'],
+    [`<a href='https://otro.invalid/'>x</a>`, fichero, 'otro destino en el fichero declarado'],
+    [`<img src='${destino}' />`, fichero, 'el destino declarado usado como src'],
+    [`window.location='${destino}'`, fichero, 'el destino declarado por location'],
+    [`<a href='${destino}/../otra'>x</a>`, fichero, 'el destino declarado con cola']
+  ]
+
+  for (const [source, file, motivo] of rechazos) {
+    assert.ok(
+      auditRuntimeSource(source, file).some(item => item.code === 'RUNTIME_EXTERNAL_SUBRESOURCE_FORBIDDEN'),
+      `debía bloquear: ${motivo}`
+    )
   }
 })
 
