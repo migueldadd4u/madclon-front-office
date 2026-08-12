@@ -484,6 +484,36 @@ def audit_privacidad(obj, ruta="$"):
 
 # --------------------------------------------------------------------- main
 
+# Un lote solo es fresco si sus FUENTES lo son. El 12/08/2026 el frontal enseñó durante dos
+# días un «Correo Add4u M365 en rojo» y un «Briefing COO en error» que ya no existían: las dos
+# tarjetas venían de ficheros del vault que llevaban horas —o días— sin regenerarse, mientras el
+# lote nocturno seguía publicándolos puntualmente como si fueran de esa madrugada. El exportador
+# no puede refrescarlos (es de SOLO LECTURA: quien los genera es `make data`), pero sí puede
+# negarse a publicarlos en silencio. Umbral generoso: lo que se persigue es la foto de ANTEAYER,
+# no un desfase de minutos.
+HORAS_FUENTE_RANCIA = 24
+FUENTES_VIGILADAS = {
+    "Vistas-Principales/PANEL-CLON.md": "los crons y los agregados de GTD",
+    "cuadros-de-mando/SISTEMA-COMPLETO.md": "el estado de accesos de correo y agenda",
+}
+
+
+def avisar_fuentes_rancias(s00: Path, avisos: list, ahora: datetime | None = None) -> None:
+    """Delata la fuente que lleva demasiado sin regenerarse, antes de publicarla."""
+    ahora = ahora or datetime.now(timezone.utc)
+    for rel, que_cuenta in FUENTES_VIGILADAS.items():
+        f = s00 / rel
+        if not f.exists():
+            continue
+        horas = (ahora - datetime.fromtimestamp(f.stat().st_mtime, timezone.utc)).total_seconds() / 3600
+        if horas > HORAS_FUENTE_RANCIA:
+            avisos.append(
+                f"⚠️ {Path(rel).name} lleva {int(horas)} h sin regenerarse: lo que este lote "
+                f"publica sobre {que_cuenta} es una foto vieja, no el estado de ahora "
+                f"(regenerar con `make data`, que llama al generador antes de exportar)"
+            )
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Exporta paneles del vault a JSON público-safe")
     raiz = Path(__file__).resolve().parent.parent
@@ -502,6 +532,7 @@ def main() -> int:
                 "cuadros-de-mando/SISTEMA-COMPLETO.md", "Monitorizacion/tokens/serie-kpi.jsonl"]:
         if not (s00 / rel).exists():
             avisos.append(f"⚠️ fuente no encontrada: {rel}")
+    avisar_fuentes_rancias(s00, avisos)
 
     overview = parse_panel_clon(read(s00 / "Vistas-Principales/PANEL-CLON.md"))
     tokens = parse_panel_tokens(read(s00 / "Vistas-Principales/PANEL-TOKENS.md"))
