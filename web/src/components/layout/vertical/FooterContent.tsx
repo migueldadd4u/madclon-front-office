@@ -9,19 +9,15 @@ import { useLang } from '@/lib/i18n'
 
 // Component Imports
 import CopiarEnlace from '@/components/dashboard/CopiarEnlace'
-import EnlacePanelPrivado from '@components/layout/shared/EnlacePanelPrivado'
+import SelloVersion from '@components/layout/shared/SelloVersion'
 
 // Util Imports
 import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
-import { buildStamp, buildHuman } from '@/lib/build-stamp'
 
 const FooterContent = () => {
   // Hooks
   const { isBreakpointReached } = useVerticalNav()
   const { t } = useLang()
-
-  // Sello de versión: qué build se está viendo, sin preguntar (esquema add4u-web)
-  const version = t('footer_version').replace('{v}', buildStamp).replace('{fecha}', buildHuman)
 
   return (
     <div
@@ -39,11 +35,8 @@ const FooterContent = () => {
             {t('chrome_footer_2')}
           </span>
         )}
-        <span className='text-textDisabled text-sm font-mono' title={version} aria-label={version}>
-          {buildStamp}
-        </span>
-        {/* Solo aparece en los navegadores que llevan guardada la dirección del panel. */}
-        <EnlacePanelPrivado />
+        {/* El sello de versión es también la puerta al panel privado. */}
+        <SelloVersion />
         <CopiarEnlace />
       </div>
     </div>

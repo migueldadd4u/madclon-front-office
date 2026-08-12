@@ -507,6 +507,28 @@ function isAllowlistedFetchTarget(argument, relativeFile, source) {
   return false
 }
 
+// ── SALIDA NAVEGABLE DECLARADA ──────────────────────────────────────────────────
+// El escaparate no tenía NINGUNA salida externa, y era a propósito. MAD abre una
+// (12/08/2026): el sello de versión del pie es la puerta al panel privado, que
+// pide identificación nada más llegar. La dirección es de su tailnet (rango
+// 100.x): no se enruta desde internet, así que publicarla revela que existe y
+// cómo se llama, no da acceso.
+//
+// Se declara por FICHERO + DESTINO EXACTO + atributo `href`. No es una lista que
+// crezca sola: añadir otra obliga a escribirla aquí, que es justo el punto.
+export const SALIDA_NAVEGABLE_DECLARADA = {
+  fichero: 'src/components/layout/shared/SelloVersion.tsx',
+  destino: 'http://macstudio-de-clon.tail89283c.ts.net/entrar'
+}
+
+function descontarSalidaDeclarada(source, file) {
+  if (file !== SALIDA_NAVEGABLE_DECLARADA.fichero) return source
+
+  const destino = SALIDA_NAVEGABLE_DECLARADA.destino.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+  return source.replace(new RegExp(`\\bhref\\s*=\\s*(['"\`])${destino}\\1`, 'g'), 'href=§declarada§')
+}
+
 export function auditRuntimeSource(source, relativeFile) {
   const file = relativeFile.split(sep).join('/')
   const findings = []
@@ -539,13 +561,18 @@ export function auditRuntimeSource(source, relativeFile) {
     findings.push(finding('RUNTIME_EGRESS_CLIENT_FORBIDDEN', file, 'network'))
   }
 
-  const externalElement = /(?:\bsrc\b|\bposter\b)\s*=\s*(?:\{\s*)?['"`]https?:\/\//i.test(source)
-  const externalCss = extname(file) === '.css' && /url\(\s*['"]?https?:\/\//i.test(source)
+  // La salida declarada se descuenta ANTES de mirar, y solo donde está declarada:
+  // en cualquier otro fichero, o usada como `src`, o con otro destino, esa misma
+  // línea vuelve a bloquear el build.
+  const sinDeclarada = descontarSalidaDeclarada(source, file)
+
+  const externalElement = /(?:\bsrc\b|\bposter\b)\s*=\s*(?:\{\s*)?['"`]https?:\/\//i.test(sinDeclarada)
+  const externalCss = extname(file) === '.css' && /url\(\s*['"]?https?:\/\//i.test(sinDeclarada)
 
   const externalNavigation =
-    /\bhref\s*=\s*(?:\{\s*)?['"`]https?:\/\//i.test(source) ||
-    /\b(?:window\.)?location\s*(?:=|\.(?:assign|replace)\s*\()\s*['"`]https?:\/\//i.test(source) ||
-    /\bwindow\.open\s*\(\s*['"`]https?:\/\//i.test(source)
+    /\bhref\s*=\s*(?:\{\s*)?['"`]https?:\/\//i.test(sinDeclarada) ||
+    /\b(?:window\.)?location\s*(?:=|\.(?:assign|replace)\s*\()\s*['"`]https?:\/\//i.test(sinDeclarada) ||
+    /\bwindow\.open\s*\(\s*['"`]https?:\/\//i.test(sinDeclarada)
 
   if (externalElement || externalCss || externalNavigation) {
     findings.push(finding('RUNTIME_EXTERNAL_SUBRESOURCE_FORBIDDEN', file, 'origin'))
