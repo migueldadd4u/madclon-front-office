@@ -45,6 +45,14 @@ jobs:
         working-directory: web
         run: yarn check:public-safety
 
+      # Contrato datos↔web: la historia debe llegar por JSON y la flota no puede
+      # crecer sin marca. Informativo a propósito: una rotura de contrato se ve
+      # en el run, pero NUNCA congela la publicación del lote de datos fresco.
+      - name: Contrato datos ↔ web (informativo)
+        working-directory: web
+        continue-on-error: true
+        run: yarn check:contrato
+
       - name: Build (export estático)
         working-directory: web
         run: yarn build

@@ -35,6 +35,9 @@ export type Overview = {
   tokens_resumen?: { tokens_30d: number | null; cobertura_pct: number | null; indice_eficiencia?: number | null }
   salud_global?: string
   watchdog_ts?: string
+
+  /** Historia del clon: capítulos curados + cifras contadas en cada refresco. */
+  historia?: Historia
 }
 
 export type ClonePerfil = {
@@ -59,6 +62,34 @@ export type ClonesData = {
   integraciones: Integracion[]
   salud_global?: string
   watchdog_ts?: string
+}
+
+/**
+ * Un capítulo de la línea de tiempo. Nace en exporter/historia.md y llega aquí
+ * por el refresco nocturno: la web NO lleva hitos escritos en el código, que es
+ * lo que hacía que /historia envejeciera en silencio.
+ */
+export type Hito = {
+  fecha: string
+  icono: string
+  color: string
+  es_titulo: string
+  es_texto: string
+  en_titulo: string
+  en_texto: string
+}
+
+export type Historia = {
+  hitos: Hito[]
+
+  /** Bitácoras del vault, contadas en cada pasada (nunca a mano). */
+  bitacoras: number | null
+  nacimiento: string | null
+  ultima_bitacora: string | null
+  ultimo_hito: string | null
+
+  /** Días que la narración lleva por detrás del trabajo. La web lo confiesa. */
+  dias_sin_capitulo: number | null
 }
 
 export type Kpi = {

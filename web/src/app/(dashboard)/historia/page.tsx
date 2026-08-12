@@ -4,6 +4,7 @@
 import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
+import Chip from '@mui/material/Chip'
 import Typography from '@mui/material/Typography'
 import Timeline from '@mui/lab/Timeline'
 import TimelineItem from '@mui/lab/TimelineItem'
@@ -20,99 +21,36 @@ import StatCard from '@/components/dashboard/StatCard'
 
 // Hook Imports
 import { useLang } from '@/lib/i18n'
+import type { Lang, StrKey } from '@/lib/i18n'
 
 // Data Imports
-import { fmtCorto } from '@/lib/data'
+import { fmt, fmtCorto } from '@/lib/data'
+import type { Hito, PanelData } from '@/lib/data'
 
-// Hitos verificados: cada fecha corresponde a una bitácora real del vault (00_SISTEMA/handoffs/)
-const HITOS = [
-  {
-    fecha: { es: '14 abril 2026', en: '14 April 2026' },
-    es: { titulo: 'Nace el proyecto', texto: 'Primeras notas de lo que será el segundo cerebro de MAD. Todo empieza como un experimento de memoria.' },
-    en: { titulo: 'The project is born', texto: "The first notes of what will become MAD's second brain. It all starts as a memory experiment." },
-    icon: 'ri-seedling-line',
-    color: 'success' as const
-  },
-  {
-    fecha: { es: '16 abril 2026', en: '16 April 2026' },
-    es: { titulo: 'De un agente a varios', texto: 'El clon da el salto a multi-agente con memoria propia: ya no es un chatbot, es un equipo.' },
-    en: { titulo: 'From one agent to many', texto: 'The clone leaps to multi-agent with its own memory: no longer a chatbot, but a team.' },
-    icon: 'ri-team-line',
-    color: 'primary' as const
-  },
-  {
-    fecha: { es: '19 abril 2026', en: '19 April 2026' },
-    es: { titulo: 'El motor Hermes arranca', texto: 'El corazón del sistema queda operativo: rutinas automáticas que laten solas, de día y de noche.' },
-    en: { titulo: 'The Hermes engine starts', texto: "The system's heart becomes operational: automatic routines beating on their own, day and night." },
-    icon: 'ri-heart-pulse-line',
-    color: 'info' as const
-  },
-  {
-    fecha: { es: '22 abril 2026', en: '22 April 2026' },
-    es: { titulo: 'Nace el clon Patrimonio', texto: 'El primer especialista con oficio: vigilar el patrimonio de la familia. La flota empieza a crecer.' },
-    en: { titulo: 'The Assets clone is born', texto: "The first specialist with a craft: watching over the family's assets. The fleet begins to grow." },
-    icon: 'ri-safe-2-line',
-    color: 'warning' as const
-  },
-  {
-    fecha: { es: '12 mayo 2026', en: '12 May 2026' },
-    es: { titulo: 'Ecosistema completo', texto: 'Siete bots orquestados trabajando en equipo y WhatsApp conectado como puerta de entrada.' },
-    en: { titulo: 'Full ecosystem', texto: 'Seven orchestrated bots working as a team, with WhatsApp connected as an entry door.' },
-    icon: 'ri-robot-2-line',
-    color: 'primary' as const
-  },
-  {
-    fecha: { es: '15 mayo 2026', en: '15 May 2026' },
-    es: { titulo: 'Cambio de motor en marcha', texto: 'Toda la flota migra de OpenClaw a Hermes sin perder un solo día de servicio.' },
-    en: { titulo: 'Engine swap in motion', texto: 'The whole fleet migrates from OpenClaw to Hermes without losing a single day of service.' },
-    icon: 'ri-refresh-line',
-    color: 'info' as const
-  },
-  {
-    fecha: { es: '24 mayo 2026', en: '24 May 2026' },
-    es: { titulo: 'El correo entra en escena', texto: 'El clon empieza a leer y clasificar el correo, con reglas de privacidad desde el primer día.' },
-    en: { titulo: 'Mail enters the scene', texto: 'The clone starts reading and sorting mail, with privacy rules from day one.' },
-    icon: 'ri-mail-line',
-    color: 'success' as const
-  },
-  {
-    fecha: { es: '2 junio 2026', en: '2 June 2026' },
-    es: { titulo: 'El cerebro se interconecta', texto: 'Las notas de la memoria privada (el «vault») dejan de ser islas: todo queda enlazado y localizable en segundos.' },
-    en: { titulo: 'The brain interconnects', texto: 'The private memory («vault») notes stop being islands: everything gets linked and findable in seconds.' },
-    icon: 'ri-mind-map',
-    color: 'primary' as const
-  },
-  {
-    fecha: { es: '20 junio 2026', en: '20 June 2026' },
-    es: { titulo: 'Nace la automejora', texto: 'El clon empieza a proponer y aplicar mejoras sobre sí mismo. Cada noche, un poco mejor.' },
-    en: { titulo: 'Self-improvement is born', texto: 'The clone starts proposing and applying improvements on itself. Every night, a little better.' },
-    icon: 'ri-arrow-up-double-line',
-    color: 'warning' as const
-  },
-  {
-    fecha: { es: '7 julio 2026', en: '7 July 2026' },
-    es: { titulo: 'La flota se organiza', texto: 'Panel de dirección para los subclones: cada uno con oficio, canales y responsabilidades claras.' },
-    en: { titulo: 'The fleet gets organized', texto: 'A management panel for the subclones: each with a craft, channels and clear responsibilities.' },
-    icon: 'ri-dashboard-3-line',
-    color: 'info' as const
-  },
-  {
-    fecha: { es: '26 julio 2026', en: '26 July 2026' },
-    es: { titulo: 'El clon se mide a sí mismo', texto: 'Se congela la línea base de eficiencia y nace este Front Office: los números del clon, abiertos.' },
-    en: { titulo: 'The clone measures itself', texto: "The efficiency baseline is frozen and this Front Office is born: the clone's numbers, in the open." },
-    icon: 'ri-ruler-line',
-    color: 'success' as const
-  },
-  {
-    fecha: { es: '28 julio 2026', en: '28 July 2026' },
-    es: { titulo: 'Marca propia', texto: 'El Front Office estrena logotipo MAD Clon: la M constelación, cinco nodos trabajando como uno.' },
-    en: { titulo: 'A brand of its own', texto: 'The Front Office unveils the MAD Clon logo: the constellation M, five nodes working as one.' },
-    icon: 'ri-shape-line',
-    color: 'primary' as const
-  }
-]
+// La línea de tiempo NO vive aquí. Los capítulos nacen en exporter/historia.md,
+// el exportador los cuenta y los publica en overview.json, y esta página solo
+// los pinta. Escribirlos en el código fue la causa de que /historia sirviera un
+// capítulo de julio a mediados de agosto con el contador de bitácoras congelado:
+// lo que se escribe a mano envejece en silencio (scripts/check-hardcode.mjs).
 
-const NACIMIENTO = new Date('2026-04-14T00:00:00')
+type Color = 'primary' | 'success' | 'info' | 'warning' | 'error' | 'secondary'
+
+const COLORES: Color[] = ['primary', 'success', 'info', 'warning', 'error', 'secondary']
+
+// El icono y el color llegan como texto en un JSON: se validan antes de pisar el
+// DOM, y si no encajan el capítulo se pinta igual con el aspecto por defecto.
+const color = (v: string): Color => (COLORES.includes(v as Color) ? (v as Color) : 'primary')
+const icono = (v: string): string => (/^ri-[a-z0-9-]+$/.test(v) ? v : 'ri-circle-line')
+
+const reemplaza = (plantilla: string, valores: Record<string, string>) =>
+  Object.entries(valores).reduce((acc, [k, v]) => acc.replaceAll(`{${k}}`, v), plantilla)
+
+const fechaLarga = (iso: string, lang: Lang) =>
+  new Date(`${iso}T00:00:00`).toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  })
 
 // Máximo de la serie por métrica, conservando la fecha en la que se marcó
 const maxPor = (puntos: { fecha: string; contexto?: Record<string, number> }[], clave: string) =>
@@ -122,14 +60,77 @@ const maxPor = (puntos: { fecha: string; contexto?: Record<string, number> }[], 
     return v != null && v > 0 && (!acc || v > acc.v) ? { v, f: p.fecha } : acc
   }, null)
 
+/** Un capítulo de la línea: los curados y el vivo comparten forma y aspecto. */
+const Capitulo = ({
+  fecha,
+  titulo,
+  texto,
+  icon,
+  dot,
+  ultimo,
+  destacado
+}: {
+  fecha: string
+  titulo: string
+  texto: string
+  icon: string
+  dot: Color
+  ultimo: boolean
+  destacado?: boolean
+}) => (
+  <TimelineItem>
+    <TimelineOppositeContent
+      sx={{ flex: { xs: 0.25, sm: 0.2 }, m: 'auto 0' }}
+      color='text.secondary'
+      variant='body2'
+      className='font-medium'
+    >
+      {fecha}
+    </TimelineOppositeContent>
+    <TimelineSeparator>
+      <TimelineDot color={dot} variant={destacado ? 'filled' : 'tonal'}>
+        <i className={`${icon} text-base`} />
+      </TimelineDot>
+      {!ultimo && <TimelineConnector />}
+    </TimelineSeparator>
+    <TimelineContent className='pbs-1'>
+      <Typography variant='h6' component='span'>
+        {titulo}
+      </Typography>
+      <Typography variant='body2' color='text.secondary'>
+        {texto}
+      </Typography>
+    </TimelineContent>
+  </TimelineItem>
+)
+
+/** Texto del capítulo vivo: solo cifras de los JSON, cero literales. */
+const textoDeHoy = (data: PanelData, t: (k: StrKey) => string) =>
+  reemplaza(t('his_hoy_texto'), {
+    clones: fmt(data.clones.clones.length),
+    rutinasok: fmt(data.overview.crons.length - data.overview.crons_en_error),
+    rutinas: fmt(data.overview.crons.length),
+    tokens: fmtCorto(data.tokens.contador.ventana_30d)
+  })
+
 const HistoriaPage = () => {
   const { lang, t } = useLang()
 
   return (
-    <DataGate necesita={['tokens', 'clones', 'serie']}>
+    <DataGate necesita={['overview', 'tokens', 'clones', 'serie']}>
       {data => {
-        const { tokens, clones } = data
-        const diasVida = Math.max(1, Math.floor((Date.now() - NACIMIENTO.getTime()) / 86_400_000))
+        const { tokens, clones, overview } = data
+        const historia = overview.historia
+        const hitos: Hito[] = historia?.hitos ?? []
+
+        // Nace del dato, no de una constante: la edad y la línea cuentan lo mismo.
+        const nacimiento = historia?.nacimiento ? new Date(`${historia.nacimiento}T00:00:00`) : null
+
+        const diasVida = nacimiento
+          ? Math.max(1, Math.floor((Date.now() - nacimiento.getTime()) / 86_400_000))
+          : null
+
+        const rancia = (historia?.dias_sin_capitulo ?? 0) > 21
 
         return (
           <Grid container spacing={6}>
@@ -147,16 +148,18 @@ const HistoriaPage = () => {
             <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
               <StatCard
                 icon='ri-calendar-line'
-                valor={String(diasVida)}
+                valor={diasVida === null ? '—' : String(diasVida)}
                 label={t('his_dias')}
-                detalle={t('his_dias_det')}
+                detalle={
+                  historia?.nacimiento ? reemplaza(t('his_dias_det'), { fecha: fechaLarga(historia.nacimiento, lang) }) : '—'
+                }
                 color='primary'
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
               <StatCard
                 icon='ri-book-open-line'
-                valor='175'
+                valor={historia?.bitacoras == null ? '—' : fmt(historia.bitacoras)}
                 label={t('his_bitacoras')}
                 detalle={t('his_bitacoras_det')}
                 color='info'
@@ -183,35 +186,59 @@ const HistoriaPage = () => {
 
             <Grid size={12}>
               <Card>
-                <CardContent>
-                  <Timeline
-                    sx={{
-                      [`& .MuiTimelineItem-root:before`]: { flex: 0, padding: 0 }
-                    }}
-                  >
-                    {HITOS.map((h, i) => (
-                      <TimelineItem key={h.icon + i}>
-                        <TimelineOppositeContent
-                          sx={{ flex: { xs: 0.25, sm: 0.2 }, m: 'auto 0' }}
-                          color='text.secondary'
-                          variant='body2'
-                          className='font-medium'
-                        >
-                          {h.fecha[lang]}
-                        </TimelineOppositeContent>
-                        <TimelineSeparator>
-                          <TimelineDot color={h.color} variant='tonal'>
-                            <i className={`${h.icon} text-base`} />
-                          </TimelineDot>
-                          {i < HITOS.length - 1 && <TimelineConnector />}
-                        </TimelineSeparator>
-                        <TimelineContent className='pbs-1'>
-                          <Typography variant='h6' component='span'>{h[lang].titulo}</Typography>
-                          <Typography variant='body2' color='text.secondary'>{h[lang].texto}</Typography>
-                        </TimelineContent>
-                      </TimelineItem>
-                    ))}
-                  </Timeline>
+                <CardContent className='flex flex-col gap-3'>
+                  {hitos.length === 0 ? (
+                    <Typography color='text.secondary' role='status'>
+                      {t('his_sin_hitos')}
+                    </Typography>
+                  ) : (
+                    <Timeline
+                      sx={{
+                        [`& .MuiTimelineItem-root:before`]: { flex: 0, padding: 0 }
+                      }}
+                    >
+                      {hitos.map(h => (
+                        <Capitulo
+                          key={h.fecha + h.icono}
+                          fecha={fechaLarga(h.fecha, lang)}
+                          titulo={lang === 'es' ? h.es_titulo : h.en_titulo}
+                          texto={lang === 'es' ? h.es_texto : h.en_texto}
+                          icon={icono(h.icono)}
+                          dot={color(h.color)}
+                          ultimo={false}
+                        />
+                      ))}
+
+                      {/* El capítulo vivo: la línea nunca termina en el pasado. */}
+                      <Capitulo
+                        fecha={t('his_hoy_fecha')}
+                        titulo={t('his_hoy_titulo')}
+                        texto={textoDeHoy(data, t)}
+                        icon='ri-pulse-line'
+                        dot='primary'
+                        ultimo
+                        destacado
+                      />
+                    </Timeline>
+                  )}
+
+                  {/* Nada muere en silencio: si la narración se retrasa, se dice. */}
+                  {historia?.ultimo_hito && (
+                    <div className='flex flex-wrap items-center gap-2'>
+                      <Typography variant='caption' color='text.disabled'>
+                        {reemplaza(t('his_ultimo'), { fecha: fechaLarga(historia.ultimo_hito, lang) })}
+                      </Typography>
+                      {rancia && (
+                        <Chip
+                          size='small'
+                          color='warning'
+                          variant='tonal'
+                          icon={<i className='ri-time-line' />}
+                          label={reemplaza(t('his_pendiente'), { n: fmt(historia.dias_sin_capitulo ?? 0) })}
+                        />
+                      )}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </Grid>
@@ -225,13 +252,6 @@ const HistoriaPage = () => {
               ].filter(r => r.rec !== null)
 
               if (records.length === 0) return null
-
-              const fechaLocal = (iso: string) =>
-                new Date(`${iso}T00:00:00`).toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-GB', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric'
-                })
 
               return (
                 <>
@@ -251,7 +271,7 @@ const HistoriaPage = () => {
                         icon={r.icon}
                         valor=''
                         label={r.label}
-                        detalle={fechaLocal(r.rec!.f)}
+                        detalle={fechaLarga(r.rec!.f, lang)}
                         color={r.color}
                         countTo={r.rec!.v}
                         countFormat={r.formato}
@@ -264,7 +284,7 @@ const HistoriaPage = () => {
 
             {/* Insignias del sistema */}
             <Grid size={12}>
-              <Insignias data={data} diasVida={diasVida} />
+              <Insignias data={data} diasVida={diasVida ?? 0} />
             </Grid>
           </Grid>
         )

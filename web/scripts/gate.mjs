@@ -19,6 +19,7 @@ import { createRequire } from 'node:module'
 import { readFileSync, existsSync, statSync } from 'node:fs'
 import { join, extname, resolve } from 'node:path'
 
+import { comprobarContrato } from './check-contrato.mjs'
 import { comprobarCopy } from './check-copy.mjs'
 import { comprobarHardcode } from './check-hardcode.mjs'
 import { resolverPlaywrightHome } from './playwright-home.mjs'
@@ -197,6 +198,15 @@ function estaticas() {
   const c = comprobarCopy(RAIZ)
 
   marca(4, 'check-copy (eje 5)', c.fallos.length === 0, `${c.fallos.length} fallos · ${c.deudas.length} deudas`)
+
+  // 4b · contrato datos↔web: la historia llega por JSON y la flota no crece sin
+  // marca. Los avisos de frescura narrativa se ven pero NO tumban el gate: un
+  // capítulo con retraso jamás puede bloquear la publicación de datos frescos.
+  const k = comprobarContrato(RAIZ)
+
+  marca('4b', 'check-contrato (historia + flota)', k.fallos.length === 0,
+    [k.notas.join(' · '), ...k.fallos.map(f => `${f.regla}: ${f.evidencia}`), ...k.avisos.map(a => `AVISO ${a}`)]
+      .filter(Boolean).join(' · '))
 }
 
 // ── servidor estático mínimo para web/out bajo la subruta real ──────────────────

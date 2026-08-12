@@ -602,11 +602,31 @@ const STR = {
     en: 'How a memory experiment became a team of AI working every day. Every date on this line matches a real logbook entry written by the system itself.'
   },
   his_dias: { es: 'días de vida', en: 'days of life' },
-  his_dias_det: { es: 'desde el 14 de abril de 2026', en: 'since April 14, 2026' },
+  his_dias_det: { es: 'desde el {fecha}', en: 'since {fecha}' },
   his_bitacoras: { es: 'bitácoras escritas', en: 'logbook entries written' },
   his_bitacoras_det: { es: 'el clon documenta su propio trabajo', en: 'the clone documents its own work' },
   his_clones: { es: 'clones con oficio', en: 'clones with a craft' },
   his_tokens_det: { es: 'y contando, cada noche', en: 'and counting, every night' },
+
+  // capítulo vivo: la línea de tiempo termina SIEMPRE en hoy, con cifras del día
+  his_hoy_fecha: { es: 'hoy', en: 'today' },
+  his_hoy_titulo: { es: 'El capítulo de hoy', en: "Today's chapter" },
+  his_hoy_texto: {
+    es: 'Lo que el clon es ahora mismo: {clones} clones con oficio, {rutinasok} de {rutinas} rutinas en verde y {tokens} tokens pensados en los últimos 30 días. Esta línea se vuelve a escribir sola con el refresco de cada noche.',
+    en: 'What the clone is right now: {clones} clones with a craft, {rutinasok} of {rutinas} routines green and {tokens} tokens thought over the last 30 days. This line rewrites itself with every nightly refresh.'
+  },
+  his_ultimo: {
+    es: 'último capítulo escrito el {fecha} · los capítulos se publican con el refresco nocturno',
+    en: 'last chapter written on {fecha} · chapters publish with the nightly refresh'
+  },
+  his_pendiente: {
+    es: 'la historia lleva {n} días sin capítulo nuevo',
+    en: 'the story has gone {n} days without a new chapter'
+  },
+  his_sin_hitos: {
+    es: 'Los capítulos llegan con el refresco nocturno y este lote no los trae. Las cifras de arriba siguen siendo las de hoy.',
+    en: 'Chapters arrive with the nightly refresh and this batch does not carry them. The figures above are still today’s.'
+  },
 
   // récords del sistema (máximos reales de la serie)
   rec_titulo: { es: 'Récords del sistema', en: 'System records' },

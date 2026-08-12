@@ -37,7 +37,12 @@ const BLANCA = [
   { re: /\b30 (días|days|d)\b/i, motivo: 'ventana fija de medición del exportador, no una cifra medida' },
   { re: /(^|[\s:])0\s?€|€0\b/, motivo: 'el cero es un hecho verificable, no una estimación que envejezca' },
   // Saldadas o justificadas en la entrega 4 (2026-08-01):
-  { fichero: 'src/app/(dashboard)/historia/page.tsx', motivo: 'línea de tiempo: cada hito cuenta lo que pasó ESE día; actualizarlo con los datos de hoy sería reescribir la historia' },
+  // ⛔ RETIRADA en la ronda R7 (2026-08-12). La exención cubría el fichero ENTERO
+  // para proteger las fechas de los hitos, y con ellas coló un contador de
+  // bitácoras escrito a mano que se quedó congelado en 175 mientras el vault ya
+  // tenía 177: exactamente el fallo que este script existe para impedir. Los
+  // hitos viven ahora en exporter/historia.md y llegan por overview.json, así que
+  // /historia ya no necesita ninguna exención: cualquier cifra a mano FALLA.
   { re: /\b(dos|two) (voces|voices)\b/i, motivo: 'constante estructural del gráfico: siempre son dos series (piensa / termina)' },
   { re: /\b(un aviso o dos|a warning or two)\b/i, motivo: 'modismo, no un recuento' },
   { re: /\b(capa|layer) [12]\b/i, motivo: 'nombre de la capa de navegación, no una cifra medida' },

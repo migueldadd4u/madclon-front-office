@@ -9,6 +9,10 @@ Lee (SOLO LECTURA) los paneles vivos del vault:
   - 00_SISTEMA/cuadros-de-mando/SISTEMA-COMPLETO.md  (clones + integraciones)
   - 00_SISTEMA/Vistas-Principales/subclones/*.md     (misión de cada clon)
   - 00_SISTEMA/Monitorizacion/tokens/*.json(l)       (serie KPI + línea base)
+  - 00_SISTEMA/handoffs/handoff-*.md                 (solo se CUENTAN: nº y fechas)
+
+Y del propio repo (copy público curado, nunca del vault):
+  - exporter/historia.md                             (capítulos de /historia)
 
 Escribe en web/public/data/:
   manifest.json · overview.json · clones.json · tokens.json · serie.json
@@ -276,6 +280,128 @@ def parse_serie(tokens_dir: Path) -> dict:
 
 # ----------------------------------------------------- pulso.json (loquedigalaia)
 
+# ------------------------------------------------------------- historia
+# La línea de tiempo de /historia vivía escrita a mano dentro del React y
+# envejecía en silencio (último capítulo 28/07 servido el 12/08, contador de
+# bitácoras congelado en 175 cuando ya había 177). Desde la ronda R7 los
+# capítulos salen de exporter/historia.md — copy público, curado, fuera del
+# código — y las cifras se cuentan aquí en cada refresco. Añadir un capítulo
+# ya no exige tocar React: lo publica el refresco de esa misma noche.
+
+RE_HITO_CABECERA = re.compile(r"^###\s+(\d{4}-\d{2}-\d{2})\s*$")
+RE_HITO_CAMPO = re.compile(r"^(icono|color|es_titulo|es_texto|en_titulo|en_texto|fuente):\s*(.+?)\s*$")
+
+# Se publica solo esto: `fuente` es trazabilidad interna y se queda en el .md.
+CAMPOS_PUBLICOS = ("icono", "color", "es_titulo", "es_texto", "en_titulo", "en_texto")
+COLORES_VALIDOS = {"primary", "success", "info", "warning", "error", "secondary"}
+RE_ICONO = re.compile(r"^ri-[a-z0-9-]+$")
+
+# Cuántos días puede quedarse la narración por detrás del trabajo antes de que
+# el sistema lo diga en voz alta (principio de MAD: nada muere en silencio).
+DIAS_HISTORIA_RANCIA = 21
+
+
+def parse_hitos(md: str, avisos: list) -> list:
+    """exporter/historia.md → lista de hitos publicables, en orden cronológico.
+
+    Un bloque mal formado se descarta CON aviso: mejor un capítulo menos y un
+    aviso visible que un hito a medias en producción."""
+    hitos, actual, fecha = [], None, None
+
+    def cerrar():
+        if actual is None:
+            return
+        faltan = [c for c in CAMPOS_PUBLICOS if not actual.get(c)]
+        if faltan:
+            avisos.append(f"⚠️ historia.md: el hito {fecha} ignora campos {', '.join(faltan)}")
+            return
+        if actual["color"] not in COLORES_VALIDOS:
+            avisos.append(f"⚠️ historia.md: color inválido en {fecha}: {actual['color']}")
+            return
+        if not RE_ICONO.match(actual["icono"]):
+            avisos.append(f"⚠️ historia.md: icono inválido en {fecha}: {actual['icono']}")
+            return
+        hitos.append({"fecha": fecha, **{c: actual[c] for c in CAMPOS_PUBLICOS}})
+
+    for linea in md.splitlines():
+        cab = RE_HITO_CABECERA.match(linea)
+        if cab:
+            cerrar()
+            fecha, actual = cab.group(1), {}
+            continue
+        if actual is None:
+            continue
+        campo = RE_HITO_CAMPO.match(linea)
+        if campo:
+            actual[campo.group(1)] = campo.group(2)
+    cerrar()
+
+    return sorted(hitos, key=lambda h: h["fecha"])
+
+
+def parse_historia(fichero_hitos: Path, dir_handoffs: Path, hoy: date, avisos: list) -> dict:
+    """Bloque `historia` de overview.json: capítulos curados + cifras contadas.
+
+    Las bitácoras se cuentan del vault en cada pasada (nunca a mano) y la
+    diferencia entre el último capítulo y la última bitácora es la medida de
+    cuánto se ha quedado atrás la narración."""
+    hitos = parse_hitos(read(fichero_hitos), avisos) if fichero_hitos.exists() else []
+    if not fichero_hitos.exists():
+        avisos.append(f"⚠️ fuente no encontrada: {fichero_hitos.name} (la historia se queda sin capítulos nuevos)")
+
+    fechas = sorted(re.findall(r"20\d{6}", " ".join(p.name for p in dir_handoffs.glob("handoff-*.md"))))
+    bitacoras = len(list(dir_handoffs.glob("handoff-*.md")))
+    iso = lambda s: f"{s[0:4]}-{s[4:6]}-{s[6:8]}"
+
+    historia = {
+        "hitos": hitos,
+        "bitacoras": bitacoras or None,
+        "nacimiento": iso(fechas[0]) if fechas else None,
+        "ultima_bitacora": iso(fechas[-1]) if fechas else None,
+        "ultimo_hito": hitos[-1]["fecha"] if hitos else None,
+        "dias_sin_capitulo": None,
+    }
+
+    if hitos:
+        ultimo = date.fromisoformat(hitos[-1]["fecha"])
+        historia["dias_sin_capitulo"] = max((hoy - ultimo).days, 0)
+        if historia["dias_sin_capitulo"] > DIAS_HISTORIA_RANCIA:
+            avisos.append(
+                f"⚠️ la historia lleva {historia['dias_sin_capitulo']} días sin capítulo "
+                f"(último {historia['ultimo_hito']}): añade un bloque a exporter/historia.md"
+            )
+
+    return historia
+
+
+def preserva_historia(nueva: dict, overview_previo: Path, avisos: list) -> dict:
+    """Nunca publicar una historia con MENOS capítulos de los que ya estaban.
+
+    Misma regla que rige el vault: una ficha no sale de una escritura con menos
+    contenido del que tenía. Si el .md desaparece o se rompe, producción
+    conserva los capítulos del lote anterior y el aviso queda visible."""
+    if not overview_previo.exists():
+        return nueva
+    try:
+        previa = json.loads(overview_previo.read_text(encoding="utf-8")).get("historia") or {}
+    except (json.JSONDecodeError, OSError):
+        return nueva
+
+    antes = previa.get("hitos") or []
+    if len(antes) > len(nueva.get("hitos") or []):
+        avisos.append(
+            f"⚠️ historia: el lote nuevo trae {len(nueva.get('hitos') or [])} capítulos y el "
+            f"anterior tenía {len(antes)} — se conservan los del lote anterior"
+        )
+        conservada = dict(nueva)
+        conservada["hitos"] = antes
+        conservada["ultimo_hito"] = antes[-1]["fecha"] if antes else None
+
+        return conservada
+
+    return nueva
+
+
 LANZAMIENTO_LQDIA = date(2026, 8, 2)  # lanzamiento público de Lo que diga la IA
 
 
@@ -387,6 +513,10 @@ def main() -> int:
         clon["mision"] = misiones.get(clon["perfil"])
     overview["salud_global"] = sistema.get("salud_global")
     overview["watchdog_ts"] = sistema.get("watchdog_ts")
+    overview["historia"] = preserva_historia(
+        parse_historia(raiz / "exporter" / "historia.md", s00 / "handoffs",
+                       datetime.now(timezone.utc).date(), avisos),
+        outdir / "overview.json", avisos)
 
     # las intervenciones del md vienen truncadas: recuperar el texto completo del jsonl
     for itv in tokens["intervenciones"]:

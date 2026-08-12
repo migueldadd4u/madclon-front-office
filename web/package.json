@@ -18,6 +18,7 @@
     "clean": "rm -rf .next",
     "clear": "rm -rf node_modules .next",
     "gate": "node scripts/gate.mjs",
+    "check:contrato": "node scripts/check-contrato.mjs",
     "check:public-safety": "node scripts/public-safety.mjs --source",
     "check:public-safety:out": "node scripts/public-safety.mjs --out",
     "test:public-safety": "node --test scripts/public-safety.test.mjs"
