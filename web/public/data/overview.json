@@ -1,7 +1,7 @@
 {
   "gtd": {
     "propuestas": null,
-    "bandeja": null,
+    "bandeja": 54,
     "esperas_vencidas": 11,
     "decisiones": null,
     "acciones_hoy": 17,
@@ -12,13 +12,13 @@
     "staged": 0
   },
   "automejora": {
-    "hechas": 188,
+    "hechas": 190,
     "bloqueadas": 42,
     "aparcadas": 47,
-    "pendientes": 5,
-    "llamadas": 285,
+    "pendientes": 4,
+    "llamadas": 256,
     "metered": 0,
-    "top": "codex_cli 86, grok 76, minimax 42, agy_cli 30"
+    "top": "codex_cli 98, minimax 41, grok 35, agy_cli 28"
   },
   "crons": [
     {
@@ -49,7 +49,7 @@
       "nombre": "Resumen diario de Spam",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "11/08 21:30"
+      "ultima": "12/08 21:30"
     },
     {
       "nombre": "Morning briefing",
@@ -61,7 +61,7 @@
       "nombre": "Important-mail monitor",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "12/08 10:30"
+      "ultima": "13/08 03:00"
     },
     {
       "nombre": "Weekly review",
@@ -73,7 +73,7 @@
       "nombre": "Topic news digest",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "11/08 18:05"
+      "ultima": "12/08 18:05"
     },
     {
       "nombre": "Repaso ¿Qué necesito?",
@@ -101,12 +101,12 @@
   ],
   "crons_en_error": 0,
   "tokens_resumen": {
-    "tokens_30d": 364554765,
+    "tokens_30d": 361578514,
     "cobertura_pct": 91,
-    "indice_eficiencia": 359783
+    "indice_eficiencia": 351095
   },
   "salud_global": "🟢 Todo OK",
-  "watchdog_ts": "2026-08-12T08:19:20.851052Z",
+  "watchdog_ts": "2026-08-12T23:34:08.160710Z",
   "historia": {
     "hitos": [
       {
@@ -281,10 +281,10 @@
         "en_texto": "This timeline stops being hand-written inside the site: chapters and figures now come from the nightly refresh, and if a chapter runs late the page says so itself."
       }
     ],
-    "bitacoras": 177,
+    "bitacoras": 184,
     "nacimiento": "2026-04-14",
-    "ultima_bitacora": "2026-08-05",
+    "ultima_bitacora": "2026-08-12",
     "ultimo_hito": "2026-08-12",
-    "dias_sin_capitulo": 0
+    "dias_sin_capitulo": 1
   }
 }
