@@ -17,6 +17,7 @@ import { readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { generar } from './build-historia.mjs'
+import { generar as generarCopia } from './build-copia-publica.mjs'
 
 const COLORES_VALIDOS = ['primary', 'success', 'info', 'warning', 'error', 'secondary']
 const RE_ICONO = /^ri-[a-z0-9-]+$/
@@ -29,47 +30,7 @@ const DIAS_HISTORIA_RANCIA = 21
 // El director no orbita: es el centro del mini-mapa de la anatomía.
 const PERFIL_DIRECTOR = 'clon'
 
-// Lo único que /flota puede decir de cada clon con palabras, y en los dos
-// idiomas. Mismo juego de campos que publica el exportador.
-const CAMPOS_OFICIO = ['es_rol', 'en_rol', 'es_mision', 'en_mision']
-const RE_OFICIO_CABECERA = /^###\s+([a-z]+)\s*$/
-const RE_OFICIO_CAMPO = /^(es_rol|en_rol|es_mision|en_mision|fuente):\s*(.+?)\s*$/
-
 const leerJSON = ruta => JSON.parse(readFileSync(ruta, 'utf8'))
-
-/** exporter/misiones.md → {perfil: {es_rol, en_rol, es_mision, en_mision}} o null. */
-function leerOficios(ruta) {
-  if (!existsSync(ruta)) return null
-
-  const oficios = {}
-  let perfil = null
-  let actual = null
-
-  const cerrar = () => {
-    if (!actual) return
-    if (CAMPOS_OFICIO.every(c => actual[c])) oficios[perfil] = actual
-  }
-
-  for (const linea of readFileSync(ruta, 'utf8').split('\n')) {
-    const cab = RE_OFICIO_CABECERA.exec(linea)
-
-    if (cab) {
-      cerrar()
-      perfil = cab[1]
-      actual = {}
-      continue
-    }
-
-    if (!actual) continue
-    const campo = RE_OFICIO_CAMPO.exec(linea)
-
-    if (campo) actual[campo[1]] = campo[2]
-  }
-
-  cerrar()
-
-  return oficios
-}
 
 /** Claves de un objeto literal `const NOMBRE… = { a: …, b: … }` de un .tsx. */
 function clavesDeMapa(fuente, nombre) {
@@ -236,57 +197,121 @@ export function comprobarContrato(base = process.cwd()) {
     notas.push(`flota ${perfiles.length} perfiles · órbita ${orbita ? orbita.length : '?'}`)
   }
 
-  // ── 4 · el texto de la flota es copia PÚBLICA, no la línea del vault ────────
+  // ── 4 · las palabras de la flota: horneadas, y del sitio correcto ──────────
   // El 13/08/2026 /flota llevaba meses publicando el `**Misión:**` de las vistas
   // privadas de subclones y el `rol` de la tabla del vault, palabra por palabra:
   // el nombre de una operación patrimonial viva, los nombres de las empresas y
   // varios tecnicismos sin traducir. Ni public-safety ni check-copy lo vieron,
   // porque los dos auditan el CÓDIGO y esto viajaba en un JSON de DATOS.
   //
-  // La regla que lo cierra no enumera palabras prohibidas — eso solo detecta el
-  // pasado. Exige lo contrario: que el texto visible de cada tarjeta SEA,
-  // carácter a carácter, el de exporter/misiones.md. Cualquier cosa que llegue
-  // por otro camino (el vault, una edición a mano del JSON) falla aquí.
-  if (existsSync(rutaClones)) {
-    const clones = leerJSON(rutaClones).clones || []
-    const oficios = leerOficios(join(base, '../exporter/misiones.md'))
+  // Se arregló en dos movimientos, y esta regla vigila los dos:
+  //   a) el copy vive en exporter/misiones.md + exporter/conexiones.md, curado;
+  //   b) viaja HORNEADO en el build, no en el lote — que es cacheable 24 h y
+  //      dejaría la flota muda (misma lección que la regla 1b, de /historia).
+  //
+  // No enumera palabras prohibidas: eso solo detecta el pasado. Exige que el
+  // fichero horneado SEA, carácter a carácter, el de sus fuentes, y que el lote
+  // no traiga texto ninguno — solo las claves con las que se cruza.
+  let horneada = null
 
-    if (!oficios) {
-      falla('misiones-ilegible', 'no se pudo leer exporter/misiones.md: /flota se quedaría sin rol ni misión')
-    } else {
-      clones.forEach(c => {
-        const donde = `clon «${c.perfil}»`
+  try {
+    const { cuerpo, oficios, conexiones, avisos: avisosMd } = generarCopia()
 
-        for (const crudo of ['rol', 'mision']) {
-          if (crudo in c) {
-            falla('flota-texto-del-vault',
-              `${donde}: clones.json trae «${crudo}», que es el texto privado del vault — ` +
-              'el exportador debe publicar solo la copia de exporter/misiones.md')
-          }
-        }
+    horneada = { oficios, conexiones }
+    avisosMd.forEach(a => avisos.push(`copia pública · ${a}`))
 
-        const publico = oficios[c.perfil]
+    const generado = join(base, 'src/lib/copia-publica.ts')
+    const enDisco = existsSync(generado) ? readFileSync(generado, 'utf8') : ''
 
-        if (!publico) {
-          falla('flota-sin-copia-publica',
-            `${donde}: no tiene bloque en exporter/misiones.md — su tarjeta saldría muda`)
-
-          return
-        }
-
-        for (const campo of CAMPOS_OFICIO) {
-          if (!c[campo]) {
-            falla('flota-idioma', `${donde}: falta ${campo} (la web es bilingüe)`)
-          } else if (c[campo] !== publico[campo]) {
-            falla('flota-texto-divergente',
-              `${donde}: ${campo} del lote no coincide con exporter/misiones.md — ` +
-              'regenera los datos (`make data`)')
-          }
-        }
-      })
-
-      notas.push(`copia pública ${Object.keys(oficios).length} oficios`)
+    if (enDisco !== cuerpo) {
+      falla('copia-publica-desfasada',
+        'src/lib/copia-publica.ts no coincide con exporter/misiones.md + conexiones.md — ' +
+        'regenera con `node scripts/build-copia-publica.mjs`')
     }
+  } catch (e) {
+    falla('copia-publica-ilegible', `no se pudieron leer las fuentes de copy público: ${e.message}`)
+  }
+
+  // Las páginas tienen que pintar lo horneado. Si alguien vuelve a colgar el
+  // copy del dato, esto falla aunque el lote de ese día lo traiga y se vea bien.
+  for (const [ruta, simbolo] of [
+    ['src/app/(dashboard)/flota/page.tsx', 'OFICIOS_BUILD'],
+    ['src/components/dashboard/AnatomiaClon.tsx', 'OFICIOS_BUILD'],
+    ['src/components/dashboard/AnatomiaClon.tsx', 'CONEXIONES_BUILD'],
+    ['src/app/(dashboard)/salud/page.tsx', 'CONEXIONES_BUILD']
+  ]) {
+    const fuente = existsSync(join(base, ruta)) ? readFileSync(join(base, ruta), 'utf8') : ''
+
+    if (fuente && !fuente.includes(simbolo)) {
+      falla('copia-colgada-del-dato',
+        `${ruta} ya no pinta ${simbolo}: si el copy vuelve a depender del lote, ` +
+        'un dato cacheado deja la página muda')
+    }
+  }
+
+  if (existsSync(rutaClones) && horneada) {
+    const datos = leerJSON(rutaClones)
+    const clones = datos.clones || []
+    const integraciones = datos.integraciones || []
+
+    // a) ni el texto del vault ni su sustituto público viajan en el lote
+    const PROHIBIDAS_CLON = ['rol', 'mision', 'es_rol', 'en_rol', 'es_mision', 'en_mision']
+    const PROHIBIDAS_INTEGRA = ['nombre', 'es_nombre', 'en_nombre']
+
+    clones.forEach(c => {
+      for (const campo of PROHIBIDAS_CLON) {
+        if (campo in c) {
+          falla('flota-texto-en-el-lote',
+            `clon «${c.perfil}»: clones.json trae «${campo}» — las palabras van horneadas, ` +
+            'y si son del vault además son privadas')
+        }
+      }
+
+      if (!horneada.oficios[c.perfil]) {
+        falla('flota-sin-copia-publica',
+          `clon «${c.perfil}»: no tiene bloque en exporter/misiones.md — su tarjeta saldría muda`)
+      }
+    })
+
+    // b) las conexiones se cruzan por clave, y cada clave tiene nombre público
+    const claves = new Set()
+
+    integraciones.forEach(i => {
+      for (const campo of PROHIBIDAS_INTEGRA) {
+        if (campo in i) {
+          falla('conexion-texto-en-el-lote',
+            `integración «${i.clave ?? '?'}»: el lote trae «${campo}» — la etiqueta del vault ` +
+            'lleva dentro el nombre de las organizaciones, y el nombre público va horneado')
+        }
+      }
+
+      if (!i.clave) {
+        falla('conexion-sin-clave', 'una integración llega sin `clave`: nada puede cruzarla con su clon')
+
+        return
+      }
+
+      claves.add(i.clave)
+
+      if (!horneada.conexiones[i.clave]) {
+        falla('conexion-sin-nombre-publico',
+          `integración «${i.clave}»: sin bloque en exporter/conexiones.md — saldría anónima en /salud ` +
+          '(saca la clave con `python3 exporter/export_panel.py --claves-conexiones`)')
+      }
+    })
+
+    // c) el cruce cierra: toda conexión citada por un clon existe arriba
+    clones.forEach(c => {
+      for (const clave of [c.correo, ...(c.calendarios || [])].filter(Boolean)) {
+        if (!claves.has(clave)) {
+          falla('conexion-huerfana',
+            `clon «${c.perfil}» cita la conexión «${clave}», que no está en integraciones: ` +
+            'su capa 2 la pintaría como «sin señal»')
+        }
+      }
+    })
+
+    notas.push(`copia horneada ${Object.keys(horneada.oficios).length} oficios · ${integraciones.length} conexiones`)
   }
 
   return { fallos, avisos, notas }

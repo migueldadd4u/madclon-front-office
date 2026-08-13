@@ -7,12 +7,17 @@ Lee (SOLO LECTURA) los paneles vivos del vault:
   - 00_SISTEMA/Vistas-Principales/PANEL-CLON.md      (agregados GTD/flota/crons)
   - 00_SISTEMA/Vistas-Principales/PANEL-TOKENS.md    (contador, KPIs, modelos)
   - 00_SISTEMA/cuadros-de-mando/SISTEMA-COMPLETO.md  (clones + integraciones)
-  - 00_SISTEMA/Vistas-Principales/subclones/*.md     (misión de cada clon)
   - 00_SISTEMA/Monitorizacion/tokens/*.json(l)       (serie KPI + línea base)
   - 00_SISTEMA/handoffs/handoff-*.md                 (solo se CUENTAN: nº y fechas)
 
 Y del propio repo (copy público curado, nunca del vault):
   - exporter/historia.md                             (capítulos de /historia)
+
+Las PALABRAS de la flota ya no salen de aquí. El rol y la misión de cada clon
+(exporter/misiones.md) y el nombre de cada buzón y agenda (exporter/conexiones.md)
+los hornea el build en src/lib/copia-publica.ts: el service worker guarda estos
+JSON hasta 24 h, y el contenido que no cambia no puede depender de un documento
+cacheable. De este exportador solo salen claves de cruce, cifras y estados.
 
 Escribe en web/public/data/:
   manifest.json · overview.json · clones.json · tokens.json · serie.json
@@ -25,6 +30,7 @@ exportador FALLA y no escribe nada.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
@@ -242,43 +248,23 @@ def parse_sistema_completo(md: str) -> dict:
     return out
 
 
-def parse_oficios(fichero: Path, avisos: list) -> dict:
-    """exporter/misiones.md → {perfil: {es_rol, en_rol, es_mision, en_mision}}.
+def aplica_conexiones(sistema: dict, avisos: list) -> None:
+    """Sustituye TODA etiqueta de buzón/agenda por su clave derivada.
 
-    Un bloque incompleto se descarta CON aviso: la tarjeta se queda sin texto y
-    el hueco se ve, que es infinitamente mejor que publicar media frase — o que
-    caer de vuelta al texto privado del vault, que es justo lo que esto impide."""
-    if not fichero.exists():
-        avisos.append(f"⚠️ fuente no encontrada: {fichero.name} (la flota se queda sin rol ni misión)")
+    La etiqueta era además la clave con la que la capa 2 cruza cada clon con su
+    integración, así que ese cruce se conserva — pero por la clave, no por el
+    texto privado, que a partir de aquí no sale del vault. El nombre visible lo
+    pone el build desde exporter/conexiones.md."""
+    for integra in sistema.get("integraciones", []):
+        etiqueta = integra.pop("nombre", "")
+        if not etiqueta:
+            avisos.append("⚠️ SISTEMA-COMPLETO.md: una integración llega sin nombre")
+        integra["clave"] = clave_conexion(etiqueta)
 
-        return {}
-
-    oficios, actual, perfil = {}, None, None
-
-    def cerrar():
-        if actual is None:
-            return
-        faltan = [c for c in CAMPOS_OFICIO if not actual.get(c)]
-        if faltan:
-            avisos.append(f"⚠️ misiones.md: el perfil «{perfil}» ignora campos {', '.join(faltan)}")
-
-            return
-        oficios[perfil] = {c: actual[c] for c in CAMPOS_OFICIO}
-
-    for linea in read(fichero).splitlines():
-        cab = RE_OFICIO_CABECERA.match(linea)
-        if cab:
-            cerrar()
-            perfil, actual = cab.group(1), {}
-            continue
-        if actual is None:
-            continue
-        campo = RE_OFICIO_CAMPO.match(linea)
-        if campo:
-            actual[campo.group(1)] = campo.group(2)
-    cerrar()
-
-    return oficios
+    for clon in sistema.get("clones", []):
+        if clon.get("correo"):
+            clon["correo"] = clave_conexion(clon["correo"])
+        clon["calendarios"] = [clave_conexion(c) for c in clon.get("calendarios", [])]
 
 # ---------------------------------------------------------- serie KPI jsonl
 
@@ -339,6 +325,27 @@ DIAS_HISTORIA_RANCIA = 21
 RE_OFICIO_CABECERA = re.compile(r"^###\s+([a-z]+)\s*$")
 RE_OFICIO_CAMPO = re.compile(r"^(es_rol|en_rol|es_mision|en_mision|fuente):\s*(.+?)\s*$")
 CAMPOS_OFICIO = ("es_rol", "en_rol", "es_mision", "en_mision")
+
+# ------------------------------------------------------ conexiones públicas
+# El mismo defecto, en otra columna: las etiquetas de buzón y agenda del vault
+# («Correo <organización> <proveedor>») se publicaban tal cual en /salud y en la
+# capa 2. Van contra la regla 1 de REGLAS-COPY («ni cargo, ni empresa»).
+#
+# La fuente curada (exporter/conexiones.md) NO puede indexarse por la etiqueta
+# del vault: este repositorio es público, así que eso solo movería la etiqueta de
+# la web al repo. Se indexa por un derivado corto y estable de la etiqueta, que
+# el exportador recalcula en cada pasada. Si alguien renombra en el vault, la
+# clave cambia, no encuentra bloque, y la fila sale SIN nombre y con aviso —
+# nunca cayendo de vuelta a la etiqueta privada.
+RE_CONEXION_CABECERA = re.compile(r"^###\s+([0-9a-f]{8})\s*$")
+RE_CONEXION_CAMPO = re.compile(r"^(es_nombre|en_nombre):\s*(.+?)\s*$")
+CAMPOS_CONEXION = ("es_nombre", "en_nombre")
+
+
+def clave_conexion(etiqueta: str) -> str:
+    """Derivado corto y estable de una etiqueta del vault. No es un secreto:
+    su trabajo es que la etiqueta no quede PUBLICADA en un repo abierto."""
+    return hashlib.sha256(etiqueta.encode("utf-8")).hexdigest()[:8]
 
 
 def parse_hitos(md: str, avisos: list) -> list:
@@ -531,6 +538,9 @@ def main() -> int:
                     help="raíz del vault MAD-brain")
     ap.add_argument("--out", default=str(raiz / "web" / "public" / "data"),
                     help="directorio de salida (web/public/data)")
+    ap.add_argument("--claves-conexiones", action="store_true",
+                    help="imprime `clave ← etiqueta` de buzones y agendas y sale, sin escribir nada. "
+                         "Sirve para mantener exporter/conexiones.md; su salida NO se pega en el repo")
     args = ap.parse_args()
 
     vault = Path(args.vault).expanduser().resolve()
@@ -546,20 +556,24 @@ def main() -> int:
     overview = parse_panel_clon(read(s00 / "Vistas-Principales/PANEL-CLON.md"))
     tokens = parse_panel_tokens(read(s00 / "Vistas-Principales/PANEL-TOKENS.md"))
     sistema = parse_sistema_completo(read(s00 / "cuadros-de-mando/SISTEMA-COMPLETO.md"))
-    oficios = parse_oficios(raiz / "exporter" / "misiones.md", avisos)
     serie = parse_serie(s00 / "Monitorizacion/tokens")
 
-    # El rol crudo del vault NO se publica: se descarta aquí y en su lugar va la
-    # copia pública de misiones.md. Un perfil sin bloque sale sin texto (la
-    # tarjeta aguanta) y con aviso — nunca cayendo de vuelta al texto privado.
+    if args.claves_conexiones:
+        etiquetas = {i["nombre"] for i in sistema["integraciones"]}
+        for clon in sistema["clones"]:
+            etiquetas.update(filter(None, [clon.get("correo"), *clon.get("calendarios", [])]))
+        for etiqueta in sorted(etiquetas):
+            print(f"{clave_conexion(etiqueta)} ← {etiqueta}")
+
+        return 0
+
+    aplica_conexiones(sistema, avisos)
+
+    # El rol crudo del vault NO se publica. Su sustituto público tampoco viaja
+    # por aquí: lo hornea el build desde exporter/misiones.md y se cruza por
+    # `perfil`. Del dato solo salen claves y estados — lo que de verdad cambia.
     for clon in sistema["clones"]:
         clon.pop("rol", None)
-        publico = oficios.get(clon["perfil"])
-        if publico:
-            clon.update(publico)
-        else:
-            avisos.append(f"⚠️ misiones.md: falta el bloque «{clon['perfil']}» "
-                          f"(su tarjeta sale sin rol ni misión)")
     overview["salud_global"] = sistema.get("salud_global")
     overview["watchdog_ts"] = sistema.get("watchdog_ts")
     overview["historia"] = preserva_historia(

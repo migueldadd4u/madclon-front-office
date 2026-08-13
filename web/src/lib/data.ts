@@ -41,25 +41,44 @@ export type Overview = {
 }
 
 /**
- * Un clon de la flota. Las palabras (`*_rol`, `*_mision`) son copia PÚBLICA
- * curada en `exporter/misiones.md`, no el texto de las vistas privadas del
- * vault: hasta el 13/08/2026 se publicaba aquel tal cual y se coló en la web
- * abierta el nombre de una operación patrimonial viva. Son opcionales porque el
- * exportador prefiere una tarjeta sin texto a una tarjeta con texto privado.
+ * Un clon de la flota. Aquí NO viajan sus palabras: el rol y la misión los pone
+ * `OFICIOS_BUILD` (horneado de `exporter/misiones.md`), cruzado por `perfil`.
+ *
+ * Hasta el 13/08/2026 este objeto traía el texto de las vistas privadas del
+ * vault palabra por palabra, y así se publicó en abierto el nombre de una
+ * operación patrimonial viva.
  */
 export type ClonePerfil = {
   perfil: string
   canales: string[]
+
+  /** Claves de conexión (ver `Integracion.clave`), no etiquetas legibles. */
   correo: string | null
   calendarios: string[]
-  es_rol?: string | null
-  en_rol?: string | null
-  es_mision?: string | null
-  en_mision?: string | null
 }
 
+/** Rol y misión públicos de un clon. Fuente: `exporter/misiones.md`. */
+export type OficioPublico = {
+  es_rol: string
+  en_rol: string
+  es_mision: string
+  en_mision: string
+}
+
+/** Nombre público de un buzón o agenda. Fuente: `exporter/conexiones.md`. */
+export type ConexionPublica = {
+  es_nombre: string
+  en_nombre: string
+}
+
+/**
+ * Un buzón o una agenda vigilados. `clave` es un derivado estable de la
+ * etiqueta del vault: hace de cruce con `ClonePerfil.correo/calendarios` y con
+ * `CONEXIONES_BUILD`, que es de donde sale el nombre visible. La etiqueta del
+ * vault no viaja, porque lleva dentro el nombre de las organizaciones de MAD.
+ */
 export type Integracion = {
-  nombre: string
+  clave: string
   estado: string
   ultimo_ok: string | null
   ultimo_fallo: string | null

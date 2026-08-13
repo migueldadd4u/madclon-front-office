@@ -380,6 +380,10 @@ const STR = {
   },
   anat_senal: { es: 'última señal {x}', en: 'last signal {x}' },
   anat_sin_senal: { es: 'sin señal registrada', en: 'no signal recorded' },
+
+  // Una conexión sin bloque en exporter/conexiones.md. Se dice, no se rellena
+  // con la etiqueta privada del vault ni con un guion suelto.
+  anat_conexion_sin_nombre: { es: 'conexión sin nombre público', en: 'connection with no public name' },
   anat_sin_conexiones: {
     es: 'No tiene correo ni agendas propias: vive en {canales}, ligero a propósito.',
     en: 'No mailbox or calendars of its own: it lives on {canales}, light on purpose.'

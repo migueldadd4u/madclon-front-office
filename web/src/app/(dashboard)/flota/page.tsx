@@ -24,6 +24,7 @@ import { useLang } from '@/lib/i18n'
 
 // Data Imports
 import { fmtCorto } from '@/lib/data'
+import { OFICIOS_BUILD } from '@/lib/copia-publica'
 
 const FlotaPage = () => {
   const { t, lang } = useLang()
@@ -109,11 +110,13 @@ const FlotaPage = () => {
             const pct = Math.max((usado / maxConsumo) * 100, usado > 0 ? 2 : 0)
             const nombreVisible = c.perfil.charAt(0).toUpperCase() + c.perfil.slice(1)
 
-            // Rol y misión vienen en los dos idiomas desde exporter/misiones.md.
-            // Antes era un solo campo en español que la versión inglesa servía
-            // igual: media tarjeta se quedaba sin traducir.
-            const rol = lang === 'en' ? c.en_rol : c.es_rol
-            const mision = lang === 'en' ? c.en_mision : c.es_mision
+            // Rol y misión salen del build (exporter/misiones.md), no del lote:
+            // el dato es cacheable hasta 24 h y estas palabras no cambian. Antes
+            // era un solo campo en español, copiado del vault, que la versión
+            // inglesa servía igual.
+            const oficio = OFICIOS_BUILD[c.perfil]
+            const rol = lang === 'en' ? oficio?.en_rol : oficio?.es_rol
+            const mision = lang === 'en' ? oficio?.en_mision : oficio?.es_mision
 
             return (
               <Grid key={c.perfil} size={{ xs: 12, sm: 6, lg: 4 }}>

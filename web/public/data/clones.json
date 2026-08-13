@@ -7,16 +7,12 @@
         "WhatsApp",
         "Email"
       ],
-      "correo": "Correo Add4u M365",
+      "correo": "2a5e3926",
       "calendarios": [
-        "Agenda Add4u M365",
-        "Agenda Alastria Google",
-        "Agenda Familia iCloud"
-      ],
-      "es_rol": "Coordinador del equipo",
-      "en_rol": "Team coordinator",
-      "es_mision": "Dirige al resto: comprueba que todo esté en pie, reparte cada asunto al clon que le toca y decide qué es lo primero de todo lo que entra en la bandeja única.",
-      "en_mision": "Runs the rest of the team: checks that everything is up, routes each matter to the clone it belongs to, and decides what comes first among everything arriving in the single inbox."
+        "6b996a58",
+        "4f1bcdaf",
+        "c75c1d4b"
+      ]
     },
     {
       "perfil": "ceo",
@@ -24,15 +20,11 @@
         "Telegram",
         "Email"
       ],
-      "correo": "Correo Alastria Gmail",
+      "correo": "2c435866",
       "calendarios": [
-        "Agenda Alastria Google",
-        "Agenda Add4u M365"
-      ],
-      "es_rol": "La mirada larga",
-      "en_rol": "The long view",
-      "es_mision": "Sostiene lo que no urge hoy pero decide el rumbo: las decisiones grandes y las relaciones que hay que cuidar antes de necesitarlas.",
-      "en_mision": "Holds what is not urgent today but sets the course: the big decisions, and the relationships worth tending before you need them."
+        "4f1bcdaf",
+        "6b996a58"
+      ]
     },
     {
       "perfil": "patrimonio",
@@ -40,14 +32,10 @@
         "Telegram",
         "Email"
       ],
-      "correo": "Correo Patrimonio Gmail",
+      "correo": "132b93b4",
       "calendarios": [
-        "Agenda Add4u M365"
-      ],
-      "es_rol": "Patrimonio de la familia",
-      "en_rol": "Family assets",
-      "es_mision": "Cuida lo que la familia tiene: ahorro, inmuebles, impuestos y el trato con los bancos. Avisa antes de que venza un plazo, no después.",
-      "en_mision": "Looks after what the family owns: savings, property, taxes and dealings with the banks. It warns before a deadline expires, not after."
+        "6b996a58"
+      ]
     },
     {
       "perfil": "padre",
@@ -55,14 +43,10 @@
         "Telegram",
         "Email"
       ],
-      "correo": "Correo Padre iCloud",
+      "correo": "aefcdbb3",
       "calendarios": [
-        "Agenda Familia iCloud"
-      ],
-      "es_rol": "La vida de casa",
-      "en_rol": "Life at home",
-      "es_mision": "Protege la esfera personal: la familia, la salud, el colegio, las vacaciones y el tiempo libre. Es el único clon al que no se le pide productividad.",
-      "en_mision": "Protects the personal sphere: family, health, school, holidays and free time. It is the one clone never asked to be productive."
+        "c75c1d4b"
+      ]
     },
     {
       "perfil": "licitador",
@@ -71,12 +55,8 @@
       ],
       "correo": null,
       "calendarios": [
-        "Agenda Add4u M365"
-      ],
-      "es_rol": "Concursos públicos",
-      "en_rol": "Public tenders",
-      "es_mision": "Repasa cada mañana los concursos que publican las administraciones, los puntúa uno a uno y deja preparadas las propuestas técnicas que merecen la pena.",
-      "en_mision": "Goes through the tenders published by public bodies every morning, scores them one by one, and drafts the technical proposals worth writing."
+        "6b996a58"
+      ]
     },
     {
       "perfil": "tecnico",
@@ -85,12 +65,8 @@
       ],
       "correo": null,
       "calendarios": [
-        "Agenda Add4u M365"
-      ],
-      "es_rol": "La sala de máquinas",
-      "en_rol": "The engine room",
-      "es_mision": "Mantiene y audita la maquinaria del propio clon: el motor que late cada noche, las conexiones con el correo y las agendas, y las instrucciones con las que piensa.",
-      "en_mision": "Maintains and audits the clone's own machinery: the engine that beats every night, the links to mail and calendars, and the instructions it thinks with."
+        "6b996a58"
+      ]
     },
     {
       "perfil": "ideas",
@@ -98,62 +74,58 @@
         "Telegram"
       ],
       "correo": null,
-      "calendarios": [],
-      "es_rol": "Lo que aún no existe",
-      "en_rol": "What does not exist yet",
-      "es_mision": "Incubadora sin reglas: el sitio donde se prueba una idea antes de que tenga nombre, y de donde salen los proyectos que después se toman en serio.",
-      "en_mision": "An incubator with no rules: where an idea gets tried before it has a name, and where the projects later taken seriously come from."
+      "calendarios": []
     }
   ],
   "integraciones": [
     {
-      "nombre": "Correo Add4u M365",
       "estado": "🟢 OK",
       "ultimo_ok": "2026-08-13T03:37:37.770629Z",
       "ultimo_fallo": "2026-08-10T06:57:58.348011Z",
-      "detalle": "lectura / autenticación OK"
+      "detalle": "lectura / autenticación OK",
+      "clave": "2a5e3926"
     },
     {
-      "nombre": "Correo Alastria Gmail",
       "estado": "🟢 OK",
       "ultimo_ok": "2026-08-13T03:37:37.770629Z",
       "ultimo_fallo": null,
-      "detalle": "lectura / autenticación OK"
+      "detalle": "lectura / autenticación OK",
+      "clave": "2c435866"
     },
     {
-      "nombre": "Correo Patrimonio Gmail",
       "estado": "🟢 OK",
       "ultimo_ok": "2026-08-13T03:37:37.770629Z",
       "ultimo_fallo": null,
-      "detalle": "lectura / autenticación OK"
+      "detalle": "lectura / autenticación OK",
+      "clave": "132b93b4"
     },
     {
-      "nombre": "Correo Padre iCloud",
       "estado": "🟢 OK",
       "ultimo_ok": "2026-08-13T03:37:37.770629Z",
       "ultimo_fallo": null,
-      "detalle": "lectura / autenticación OK"
+      "detalle": "lectura / autenticación OK",
+      "clave": "aefcdbb3"
     },
     {
-      "nombre": "Agenda Add4u M365",
       "estado": "🟢 OK",
       "ultimo_ok": "2026-08-13T03:37:37.770629Z",
       "ultimo_fallo": "2026-07-31T17:30:52.148807Z",
-      "detalle": "listado / acceso OK"
+      "detalle": "listado / acceso OK",
+      "clave": "6b996a58"
     },
     {
-      "nombre": "Agenda Alastria Google",
       "estado": "🟢 OK",
       "ultimo_ok": "2026-08-13T03:37:37.770629Z",
       "ultimo_fallo": null,
-      "detalle": "listado / acceso OK"
+      "detalle": "listado / acceso OK",
+      "clave": "4f1bcdaf"
     },
     {
-      "nombre": "Agenda Familia iCloud",
       "estado": "🟢 OK",
       "ultimo_ok": "2026-08-13T03:37:37.770629Z",
       "ultimo_fallo": null,
-      "detalle": "listado / acceso OK"
+      "detalle": "listado / acceso OK",
+      "clave": "c75c1d4b"
     }
   ],
   "salud_global": "🟢 Todo OK",
