@@ -24,6 +24,7 @@ import { useLang } from '@/lib/i18n'
 
 // Data Imports
 import { fmtFecha } from '@/lib/data'
+import { CONEXIONES_BUILD } from '@/lib/copia-publica'
 
 const esOk = (e: string) => e.toLowerCase().includes('ok') || e.includes('🟢')
 
@@ -35,7 +36,7 @@ const iconoEstado = (e: string) =>
       : 'ri-information-fill text-textSecondary'
 
 const SaludPage = () => {
-  const { t } = useLang()
+  const { t, lang } = useLang()
 
   return (
   <DataGate necesita={['overview', 'clones', 'manifest']}>
@@ -76,11 +77,15 @@ const SaludPage = () => {
                 </TableHead>
                 <TableBody>
                   {clones.integraciones.map(i => (
-                    <TableRow key={i.nombre} hover>
+                    <TableRow key={i.clave} hover>
                       <TableCell>
                         <div className='flex items-center gap-2'>
                           {esOk(i.estado) ? <PuntoVivo /> : <i className={iconoEstado(i.estado)} />}
-                          <Typography variant='body2'>{i.nombre}</Typography>
+                          <Typography variant='body2'>
+                            {(lang === 'en'
+                              ? CONEXIONES_BUILD[i.clave]?.en_nombre
+                              : CONEXIONES_BUILD[i.clave]?.es_nombre) ?? t('anat_conexion_sin_nombre')}
+                          </Typography>
                         </div>
                       </TableCell>
                       <TableCell>

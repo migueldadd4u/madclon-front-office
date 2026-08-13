@@ -335,6 +335,7 @@ const STR = {
     en: ', works on improving the others. The bar shows how much each one has worked in the last 30 days.'
   },
   flota_correo: { es: 'correo', en: 'mail' },
+  flota_agenda: { es: 'agenda', en: 'calendar' },
   flota_agendas: { es: 'agendas', en: 'calendars' },
   flota_trabajo: { es: 'trabajo 30 d', en: 'work 30 d' },
   flota_tokens: { es: 'tokens', en: 'tokens' },
@@ -379,6 +380,10 @@ const STR = {
   },
   anat_senal: { es: 'última señal {x}', en: 'last signal {x}' },
   anat_sin_senal: { es: 'sin señal registrada', en: 'no signal recorded' },
+
+  // Una conexión sin bloque en exporter/conexiones.md. Se dice, no se rellena
+  // con la etiqueta privada del vault ni con un guion suelto.
+  anat_conexion_sin_nombre: { es: 'conexión sin nombre público', en: 'connection with no public name' },
   anat_sin_conexiones: {
     es: 'No tiene correo ni agendas propias: vive en {canales}, ligero a propósito.',
     en: 'No mailbox or calendars of its own: it lives on {canales}, light on purpose.'

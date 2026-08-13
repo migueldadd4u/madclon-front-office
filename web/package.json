@@ -4,8 +4,8 @@
   "license": "Commercial",
   "private": true,
   "scripts": {
-    "predev": "node scripts/build-historia.mjs && node scripts/build-stamp.mjs",
-    "prebuild": "node scripts/public-safety.mjs --source && node scripts/build-historia.mjs && node scripts/build-stamp.mjs",
+    "predev": "node scripts/build-historia.mjs && node scripts/build-copia-publica.mjs && node scripts/build-stamp.mjs",
+    "prebuild": "node scripts/public-safety.mjs --source && node scripts/build-historia.mjs && node scripts/build-copia-publica.mjs && node scripts/build-stamp.mjs",
     "dev": "next dev --turbopack",
     "build": "next build --webpack",
     "postbuild": "node scripts/public-safety.mjs --out",

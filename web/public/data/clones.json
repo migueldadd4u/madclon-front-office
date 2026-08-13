@@ -2,146 +2,132 @@
   "clones": [
     {
       "perfil": "clon",
-      "rol": "Clon / Router principal",
       "canales": [
         "Telegram",
         "WhatsApp",
         "Email"
       ],
-      "correo": "Correo Add4u M365",
+      "correo": "2a5e3926",
       "calendarios": [
-        "Agenda Add4u M365",
-        "Agenda Alastria Google",
-        "Agenda Familia iCloud"
-      ],
-      "mision": "Actuar como el director de orquesta del sistema MADClon. Supervisa la salud del sistema, coordina la comunicación entre agentes y realiza el triaje inicial del Inbox (¿Qué Necesito?)."
+        "6b996a58",
+        "4f1bcdaf",
+        "c75c1d4b"
+      ]
     },
     {
       "perfil": "ceo",
-      "rol": "CEO / Add4u + Alastria",
       "canales": [
         "Telegram",
         "Email"
       ],
-      "correo": "Correo Alastria Gmail",
+      "correo": "2c435866",
       "calendarios": [
-        "Agenda Alastria Google",
-        "Agenda Add4u M365"
-      ],
-      "mision": "Mantener la visión estratégica a largo plazo, cultivar y monitorizar relaciones de alto nivel (VIPs) y tomar decisiones críticas que afecten al rumbo global."
+        "4f1bcdaf",
+        "6b996a58"
+      ]
     },
     {
       "perfil": "patrimonio",
-      "rol": "Patrimonio",
       "canales": [
         "Telegram",
         "Email"
       ],
-      "correo": "Correo Patrimonio Gmail",
+      "correo": "132b93b4",
       "calendarios": [
-        "Agenda Add4u M365"
-      ],
-      "mision": "Administrar activos financieros, operaciones inmobiliarias, fiscalidad, relación con bancos y el plan 99 Secons."
+        "6b996a58"
+      ]
     },
     {
       "perfil": "padre",
-      "rol": "Padre / Familiar",
       "canales": [
         "Telegram",
         "Email"
       ],
-      "correo": "Correo Padre iCloud",
+      "correo": "aefcdbb3",
       "calendarios": [
-        "Agenda Familia iCloud"
-      ],
-      "mision": "Gestionar y proteger la esfera personal y familiar: vacaciones, salud, colegios, rutinas y tiempo libre."
+        "c75c1d4b"
+      ]
     },
     {
       "perfil": "licitador",
-      "rol": "Licitador",
       "canales": [
         "Telegram"
       ],
       "correo": null,
       "calendarios": [
-        "Agenda Add4u M365"
-      ],
-      "mision": "Gestionar concursos públicos, elaborar propuestas técnicas (ej. Add4u, GestDoc), y monitorizar oportunidades de negocio B2B/B2G."
+        "6b996a58"
+      ]
     },
     {
       "perfil": "tecnico",
-      "rol": "Técnico",
       "canales": [
         "Telegram"
       ],
       "correo": null,
       "calendarios": [
-        "Agenda Add4u M365"
-      ],
-      "mision": "Mantener, expandir y auditar la arquitectura técnica del sistema MADClon (Hermes, agentes, integraciones M365/Google, promts, scripts)."
+        "6b996a58"
+      ]
     },
     {
       "perfil": "ideas",
-      "rol": "Ideas / Ventures",
       "canales": [
         "Telegram"
       ],
       "correo": null,
-      "calendarios": [],
-      "mision": "Funcionar como incubadora de nuevos proyectos, zona de brainstorming sin restricciones, y experimentación creativa."
+      "calendarios": []
     }
   ],
   "integraciones": [
     {
-      "nombre": "Correo Add4u M365",
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-12T23:34:08.159283Z",
+      "ultimo_ok": "2026-08-13T03:37:37.770629Z",
       "ultimo_fallo": "2026-08-10T06:57:58.348011Z",
-      "detalle": "lectura / autenticación OK"
+      "detalle": "lectura / autenticación OK",
+      "clave": "2a5e3926"
     },
     {
-      "nombre": "Correo Alastria Gmail",
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-12T23:34:08.159283Z",
+      "ultimo_ok": "2026-08-13T03:37:37.770629Z",
       "ultimo_fallo": null,
-      "detalle": "lectura / autenticación OK"
+      "detalle": "lectura / autenticación OK",
+      "clave": "2c435866"
     },
     {
-      "nombre": "Correo Patrimonio Gmail",
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-12T23:34:08.159283Z",
+      "ultimo_ok": "2026-08-13T03:37:37.770629Z",
       "ultimo_fallo": null,
-      "detalle": "lectura / autenticación OK"
+      "detalle": "lectura / autenticación OK",
+      "clave": "132b93b4"
     },
     {
-      "nombre": "Correo Padre iCloud",
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-12T23:34:08.159283Z",
+      "ultimo_ok": "2026-08-13T03:37:37.770629Z",
       "ultimo_fallo": null,
-      "detalle": "lectura / autenticación OK"
+      "detalle": "lectura / autenticación OK",
+      "clave": "aefcdbb3"
     },
     {
-      "nombre": "Agenda Add4u M365",
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-12T23:34:08.159283Z",
+      "ultimo_ok": "2026-08-13T03:37:37.770629Z",
       "ultimo_fallo": "2026-07-31T17:30:52.148807Z",
-      "detalle": "listado / acceso OK"
+      "detalle": "listado / acceso OK",
+      "clave": "6b996a58"
     },
     {
-      "nombre": "Agenda Alastria Google",
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-12T23:34:08.159283Z",
+      "ultimo_ok": "2026-08-13T03:37:37.770629Z",
       "ultimo_fallo": null,
-      "detalle": "listado / acceso OK"
+      "detalle": "listado / acceso OK",
+      "clave": "4f1bcdaf"
     },
     {
-      "nombre": "Agenda Familia iCloud",
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-12T23:34:08.159283Z",
+      "ultimo_ok": "2026-08-13T03:37:37.770629Z",
       "ultimo_fallo": null,
-      "detalle": "listado / acceso OK"
+      "detalle": "listado / acceso OK",
+      "clave": "c75c1d4b"
     }
   ],
   "salud_global": "🟢 Todo OK",
-  "watchdog_ts": "2026-08-12T23:34:08.160710Z"
+  "watchdog_ts": "2026-08-13T03:37:37.771873Z"
 }

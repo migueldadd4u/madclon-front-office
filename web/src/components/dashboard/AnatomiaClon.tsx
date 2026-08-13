@@ -26,6 +26,7 @@ import type { StrKey } from '@/lib/i18n'
 // Data Imports
 import { fmtCorto } from '@/lib/data'
 import type { ClonePerfil, PanelData } from '@/lib/data'
+import { OFICIOS_BUILD, CONEXIONES_BUILD } from '@/lib/copia-publica'
 
 // Anatomía de un clon — el modal que se abre al pulsar su tarjeta en la Flota.
 // Compone la ficha completa cruzando SOLO los JSON públicos ya exportados:
@@ -186,9 +187,14 @@ const AnatomiaClon = ({ clon, datos, icono, color, open, onClose, onAnterior, on
 
   const reemplaza = (texto: string, k: string, v: string) => texto.replace(`{${k}}`, v)
 
+  // --- palabras: del build, no del lote (ver scripts/build-copia-publica.mjs) ---
+  const oficio = OFICIOS_BUILD[clon.perfil]
+
   // --- conexiones en vivo: correo + agendas cruzados con integraciones ---
-  const integraPorNombre = new Map(datos.clones.integraciones.map(i => [i.nombre, i]))
-  const conexiones = [clon.correo, ...clon.calendarios].filter((n): n is string => Boolean(n))
+  // El cruce va por `clave` (derivado estable), no por el nombre: desde el
+  // 13/08/2026 el nombre es copia pública curada y el del vault no se publica.
+  const integraPorClave = new Map(datos.clones.integraciones.map(i => [i.clave, i]))
+  const conexiones = [clon.correo, ...clon.calendarios].filter((c): c is string => Boolean(c))
 
   // --- rutinas: las suyas por ámbito; si no tiene, las compartidas del sistema ---
   const propias = datos.overview.crons.filter(c => c.ambito === clon.perfil)
@@ -264,12 +270,16 @@ const AnatomiaClon = ({ clon, datos, icono, color, open, onClose, onAnterior, on
         <div className='flex items-start gap-3'>
           <div className='flex-auto'>
             <Typography variant='h5' id={tituloId} className='capitalize'>{nombreVisible}</Typography>
-            <Typography variant='body2' color='text.secondary'>{clon.rol}</Typography>
+            <Typography variant='body2' color='text.secondary'>
+              {lang === 'en' ? oficio?.en_rol : oficio?.es_rol}
+            </Typography>
           </div>
         </div>
 
-        {clon.mision && (
-          <Typography variant='body2' color='text.secondary'>{clon.mision}</Typography>
+        {(lang === 'en' ? oficio?.en_mision : oficio?.es_mision) && (
+          <Typography variant='body2' color='text.secondary'>
+            {lang === 'en' ? oficio?.en_mision : oficio?.es_mision}
+          </Typography>
         )}
 
         <Typography variant='body2' color='text.secondary'>
@@ -293,8 +303,8 @@ const AnatomiaClon = ({ clon, datos, icono, color, open, onClose, onAnterior, on
         <Seccion icono='ri-pulse-line' titulo={t('anat_conexiones')} sub={t('anat_conexiones_sub')}>
           {conexiones.length > 0 ? (
             <ul className='flex flex-col gap-2' style={{ margin: 0, padding: 0, listStyle: 'none' }}>
-              {conexiones.map(nombre => {
-                const integ = integraPorNombre.get(nombre)
+              {conexiones.map(clave => {
+                const integ = integraPorClave.get(clave)
                 const ok = integ?.estado?.includes('🟢') ?? false
 
                 const estadoTexto = integ
@@ -303,8 +313,13 @@ const AnatomiaClon = ({ clon, datos, icono, color, open, onClose, onAnterior, on
                     : (integ.estado || t('anat_sin_senal')).replace(/^[🔴🟢⚪]\s*/u, '')
                   : t('anat_sin_senal')
 
+                // Sin bloque en conexiones.md la fila sale sin nombre, nunca con
+                // el del vault: mejor una conexión anónima que una filtrada.
+                const publico = CONEXIONES_BUILD[clave]
+                const nombre = (lang === 'en' ? publico?.en_nombre : publico?.es_nombre) ?? t('anat_conexion_sin_nombre')
+
                 return (
-                  <li key={nombre} className='flex items-center gap-2'>
+                  <li key={clave} className='flex items-center gap-2'>
                     {ok ? <PuntoVivo /> : <PuntoRojo />}
                     <Typography variant='body2' className='flex-auto'>{nombre}</Typography>
                     <Typography variant='caption' color='text.secondary' className='font-mono'>{estadoTexto}</Typography>

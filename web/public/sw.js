@@ -2,7 +2,13 @@
 // Estáticos con hash: caché primero (offline total una vez vistos).
 // Páginas HTML: red primero (fresco); sin red, la última versión vista.
 // JSON de /data: caché de UN DÍA — fresco se sirve al instante; viejo o sin red, lo guardado.
-const VERSION = 'v2' // v2: los JSON se clonan antes de sellarlos en caché (arreglo del ERR_FAILED en frío)
+// v2: los JSON se clonan antes de sellarlos en caché (arreglo del ERR_FAILED en frío)
+// v3 (13/08/2026): cambia la FORMA de clones.json — los buzones y agendas pasan a
+//     identificarse por `clave` y las palabras de la flota se fueron al build. Un
+//     lote viejo servido de caché (hasta 24 h) pintaría /salud con filas anónimas,
+//     así que esta versión tira la caché de datos al activarse. Subir VERSION es
+//     obligatorio siempre que cambie la forma de un JSON, no solo su contenido.
+const VERSION = 'v3'
 const ESTATICA = `madclon-estatica-${VERSION}`
 const PAGINAS = `madclon-paginas-${VERSION}`
 const DATOS = `madclon-datos-${VERSION}`

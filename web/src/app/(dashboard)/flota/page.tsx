@@ -24,9 +24,10 @@ import { useLang } from '@/lib/i18n'
 
 // Data Imports
 import { fmtCorto } from '@/lib/data'
+import { OFICIOS_BUILD } from '@/lib/copia-publica'
 
 const FlotaPage = () => {
-  const { t } = useLang()
+  const { t, lang } = useLang()
   const [perfilAbierto, setPerfilAbierto] = useState<string | null>(null)
   const [anuncio, setAnuncio] = useState('')
 
@@ -109,6 +110,14 @@ const FlotaPage = () => {
             const pct = Math.max((usado / maxConsumo) * 100, usado > 0 ? 2 : 0)
             const nombreVisible = c.perfil.charAt(0).toUpperCase() + c.perfil.slice(1)
 
+            // Rol y misión salen del build (exporter/misiones.md), no del lote:
+            // el dato es cacheable hasta 24 h y estas palabras no cambian. Antes
+            // era un solo campo en español, copiado del vault, que la versión
+            // inglesa servía igual.
+            const oficio = OFICIOS_BUILD[c.perfil]
+            const rol = lang === 'en' ? oficio?.en_rol : oficio?.es_rol
+            const mision = lang === 'en' ? oficio?.en_mision : oficio?.es_mision
+
             return (
               <Grid key={c.perfil} size={{ xs: 12, sm: 6, lg: 4 }}>
                 <Card className='bs-full fo-card-hover'>
@@ -125,21 +134,28 @@ const FlotaPage = () => {
                         </CustomAvatar>
                         <div>
                           <Typography variant='h6' className='capitalize'>{c.perfil}</Typography>
-                          <Typography variant='caption' color='text.secondary'>{c.rol}</Typography>
+                          <Typography variant='caption' color='text.secondary'>{rol}</Typography>
                         </div>
                       </div>
 
-                      {c.mision && (
-                        <Typography variant='body2' color='text.secondary' className='flex-auto'>{c.mision}</Typography>
+                      {mision && (
+                        <Typography variant='body2' color='text.secondary' className='flex-auto'>{mision}</Typography>
                       )}
 
                       <div className='flex flex-wrap gap-1'>
                         {c.canales.map(canal => (
                           <Chip key={canal} size='small' variant='outlined' label={canal} />
                         ))}
-                        {c.correo && <Chip size='small' variant='outlined' icon={<i className='ri-mail-line' />} label='correo' />}
+                        {c.correo && (
+                          <Chip size='small' variant='outlined' icon={<i className='ri-mail-line' />} label={t('flota_correo')} />
+                        )}
                         {c.calendarios.length > 0 && (
-                          <Chip size='small' variant='outlined' icon={<i className='ri-calendar-line' />} label={`${c.calendarios.length} agendas`} />
+                          <Chip
+                            size='small'
+                            variant='outlined'
+                            icon={<i className='ri-calendar-line' />}
+                            label={`${c.calendarios.length} ${t(c.calendarios.length === 1 ? 'flota_agenda' : 'flota_agendas')}`}
+                          />
                         )}
                       </div>
 

@@ -22,6 +22,10 @@ import { buildStamp, buildHuman } from '@/lib/build-stamp'
 // El candado no es decoración: sin él nadie sabría que un número de versión se
 // puede pulsar. El texto visible es el sello, así que el nombre accesible se da
 // aparte — un lector de pantalla no debe leer «v2026081211161659» y callarse.
+//
+// El área de toque va a 44 px de alto (eje 3): el sello nació midiendo 163×20 y
+// el gate lo cazó a 375 px en las seis páginas del pie. El tamaño VISIBLE del
+// texto no cambia — crece el área pulsable alrededor.
 
 const SelloVersion = () => {
   const { t } = useLang()
@@ -35,7 +39,7 @@ const SelloVersion = () => {
       rel='noreferrer'
       title={`${puerta} · ${version}`}
       aria-label={`${puerta} · ${version}`}
-      className='inline-flex items-center gap-1 text-textSecondary text-sm font-mono no-underline hover:text-primary'
+      className='inline-flex items-center gap-1 min-bs-[44px] text-textSecondary text-sm font-mono no-underline hover:text-primary'
     >
       <i className='ri-lock-2-line text-base' aria-hidden />
       <span className='underline decoration-dotted underline-offset-4'>{buildStamp}</span>

@@ -7,12 +7,17 @@ Lee (SOLO LECTURA) los paneles vivos del vault:
   - 00_SISTEMA/Vistas-Principales/PANEL-CLON.md      (agregados GTD/flota/crons)
   - 00_SISTEMA/Vistas-Principales/PANEL-TOKENS.md    (contador, KPIs, modelos)
   - 00_SISTEMA/cuadros-de-mando/SISTEMA-COMPLETO.md  (clones + integraciones)
-  - 00_SISTEMA/Vistas-Principales/subclones/*.md     (misión de cada clon)
   - 00_SISTEMA/Monitorizacion/tokens/*.json(l)       (serie KPI + línea base)
   - 00_SISTEMA/handoffs/handoff-*.md                 (solo se CUENTAN: nº y fechas)
 
 Y del propio repo (copy público curado, nunca del vault):
   - exporter/historia.md                             (capítulos de /historia)
+
+Las PALABRAS de la flota ya no salen de aquí. El rol y la misión de cada clon
+(exporter/misiones.md) y el nombre de cada buzón y agenda (exporter/conexiones.md)
+los hornea el build en src/lib/copia-publica.ts: el service worker guarda estos
+JSON hasta 24 h, y el contenido que no cambia no puede depender de un documento
+cacheable. De este exportador solo salen claves de cruce, cifras y estados.
 
 Escribe en web/public/data/:
   manifest.json · overview.json · clones.json · tokens.json · serie.json
@@ -25,6 +30,7 @@ exportador FALLA y no escribe nada.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
@@ -242,16 +248,23 @@ def parse_sistema_completo(md: str) -> dict:
     return out
 
 
-def parse_misiones(dir_subclones: Path) -> dict:
-    mapa = {"CEO": "ceo", "Clon-COO": "clon", "Ideas": "ideas", "Licitador": "licitador",
-            "Padre": "padre", "Patrimonio": "patrimonio", "Tecnico": "tecnico"}
-    misiones = {}
-    for stem, perfil in mapa.items():
-        md = read(dir_subclones / f"{stem}.md")
-        m = re.search(r"\*\*Misión:\*\*\s*(.+)", md)
-        if m:
-            misiones[perfil] = m.group(1).strip()
-    return misiones
+def aplica_conexiones(sistema: dict, avisos: list) -> None:
+    """Sustituye TODA etiqueta de buzón/agenda por su clave derivada.
+
+    La etiqueta era además la clave con la que la capa 2 cruza cada clon con su
+    integración, así que ese cruce se conserva — pero por la clave, no por el
+    texto privado, que a partir de aquí no sale del vault. El nombre visible lo
+    pone el build desde exporter/conexiones.md."""
+    for integra in sistema.get("integraciones", []):
+        etiqueta = integra.pop("nombre", "")
+        if not etiqueta:
+            avisos.append("⚠️ SISTEMA-COMPLETO.md: una integración llega sin nombre")
+        integra["clave"] = clave_conexion(etiqueta)
+
+    for clon in sistema.get("clones", []):
+        if clon.get("correo"):
+            clon["correo"] = clave_conexion(clon["correo"])
+        clon["calendarios"] = [clave_conexion(c) for c in clon.get("calendarios", [])]
 
 # ---------------------------------------------------------- serie KPI jsonl
 
@@ -299,6 +312,40 @@ RE_ICONO = re.compile(r"^ri-[a-z0-9-]+$")
 # Cuántos días puede quedarse la narración por detrás del trabajo antes de que
 # el sistema lo diga en voz alta (principio de MAD: nada muere en silencio).
 DIAS_HISTORIA_RANCIA = 21
+
+# ------------------------------------------------------ oficios públicos de la flota
+# Misma doctrina que los capítulos, y por el mismo motivo. Hasta el 13/08/2026 el
+# rol y la misión de cada tarjeta de /flota se copiaban TAL CUAL del vault (la
+# tabla de SISTEMA-COMPLETO.md y el campo `**Misión:**` de cada vista de
+# subclón). Así llegó a producción el nombre de una operación patrimonial viva,
+# los nombres de las empresas y varios tecnicismos sin traducir: el escáner de
+# privacidad audita el CÓDIGO y check-copy audita el CÓDIGO — ninguno de los dos
+# mira un JSON de datos. Ahora la versión pública se escribe a mano en
+# exporter/misiones.md, en los dos idiomas, y el texto del vault no sale nunca.
+RE_OFICIO_CABECERA = re.compile(r"^###\s+([a-z]+)\s*$")
+RE_OFICIO_CAMPO = re.compile(r"^(es_rol|en_rol|es_mision|en_mision|fuente):\s*(.+?)\s*$")
+CAMPOS_OFICIO = ("es_rol", "en_rol", "es_mision", "en_mision")
+
+# ------------------------------------------------------ conexiones públicas
+# El mismo defecto, en otra columna: las etiquetas de buzón y agenda del vault
+# («Correo <organización> <proveedor>») se publicaban tal cual en /salud y en la
+# capa 2. Van contra la regla 1 de REGLAS-COPY («ni cargo, ni empresa»).
+#
+# La fuente curada (exporter/conexiones.md) NO puede indexarse por la etiqueta
+# del vault: este repositorio es público, así que eso solo movería la etiqueta de
+# la web al repo. Se indexa por un derivado corto y estable de la etiqueta, que
+# el exportador recalcula en cada pasada. Si alguien renombra en el vault, la
+# clave cambia, no encuentra bloque, y la fila sale SIN nombre y con aviso —
+# nunca cayendo de vuelta a la etiqueta privada.
+RE_CONEXION_CABECERA = re.compile(r"^###\s+([0-9a-f]{8})\s*$")
+RE_CONEXION_CAMPO = re.compile(r"^(es_nombre|en_nombre):\s*(.+?)\s*$")
+CAMPOS_CONEXION = ("es_nombre", "en_nombre")
+
+
+def clave_conexion(etiqueta: str) -> str:
+    """Derivado corto y estable de una etiqueta del vault. No es un secreto:
+    su trabajo es que la etiqueta no quede PUBLICADA en un repo abierto."""
+    return hashlib.sha256(etiqueta.encode("utf-8")).hexdigest()[:8]
 
 
 def parse_hitos(md: str, avisos: list) -> list:
@@ -491,6 +538,9 @@ def main() -> int:
                     help="raíz del vault MAD-brain")
     ap.add_argument("--out", default=str(raiz / "web" / "public" / "data"),
                     help="directorio de salida (web/public/data)")
+    ap.add_argument("--claves-conexiones", action="store_true",
+                    help="imprime `clave ← etiqueta` de buzones y agendas y sale, sin escribir nada. "
+                         "Sirve para mantener exporter/conexiones.md; su salida NO se pega en el repo")
     args = ap.parse_args()
 
     vault = Path(args.vault).expanduser().resolve()
@@ -506,11 +556,24 @@ def main() -> int:
     overview = parse_panel_clon(read(s00 / "Vistas-Principales/PANEL-CLON.md"))
     tokens = parse_panel_tokens(read(s00 / "Vistas-Principales/PANEL-TOKENS.md"))
     sistema = parse_sistema_completo(read(s00 / "cuadros-de-mando/SISTEMA-COMPLETO.md"))
-    misiones = parse_misiones(s00 / "Vistas-Principales/subclones")
     serie = parse_serie(s00 / "Monitorizacion/tokens")
 
+    if args.claves_conexiones:
+        etiquetas = {i["nombre"] for i in sistema["integraciones"]}
+        for clon in sistema["clones"]:
+            etiquetas.update(filter(None, [clon.get("correo"), *clon.get("calendarios", [])]))
+        for etiqueta in sorted(etiquetas):
+            print(f"{clave_conexion(etiqueta)} ← {etiqueta}")
+
+        return 0
+
+    aplica_conexiones(sistema, avisos)
+
+    # El rol crudo del vault NO se publica. Su sustituto público tampoco viaja
+    # por aquí: lo hornea el build desde exporter/misiones.md y se cruza por
+    # `perfil`. Del dato solo salen claves y estados — lo que de verdad cambia.
     for clon in sistema["clones"]:
-        clon["mision"] = misiones.get(clon["perfil"])
+        clon.pop("rol", None)
     overview["salud_global"] = sistema.get("salud_global")
     overview["watchdog_ts"] = sistema.get("watchdog_ts")
     overview["historia"] = preserva_historia(
