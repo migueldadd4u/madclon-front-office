@@ -29,7 +29,47 @@ const DIAS_HISTORIA_RANCIA = 21
 // El director no orbita: es el centro del mini-mapa de la anatomía.
 const PERFIL_DIRECTOR = 'clon'
 
+// Lo único que /flota puede decir de cada clon con palabras, y en los dos
+// idiomas. Mismo juego de campos que publica el exportador.
+const CAMPOS_OFICIO = ['es_rol', 'en_rol', 'es_mision', 'en_mision']
+const RE_OFICIO_CABECERA = /^###\s+([a-z]+)\s*$/
+const RE_OFICIO_CAMPO = /^(es_rol|en_rol|es_mision|en_mision|fuente):\s*(.+?)\s*$/
+
 const leerJSON = ruta => JSON.parse(readFileSync(ruta, 'utf8'))
+
+/** exporter/misiones.md → {perfil: {es_rol, en_rol, es_mision, en_mision}} o null. */
+function leerOficios(ruta) {
+  if (!existsSync(ruta)) return null
+
+  const oficios = {}
+  let perfil = null
+  let actual = null
+
+  const cerrar = () => {
+    if (!actual) return
+    if (CAMPOS_OFICIO.every(c => actual[c])) oficios[perfil] = actual
+  }
+
+  for (const linea of readFileSync(ruta, 'utf8').split('\n')) {
+    const cab = RE_OFICIO_CABECERA.exec(linea)
+
+    if (cab) {
+      cerrar()
+      perfil = cab[1]
+      actual = {}
+      continue
+    }
+
+    if (!actual) continue
+    const campo = RE_OFICIO_CAMPO.exec(linea)
+
+    if (campo) actual[campo[1]] = campo[2]
+  }
+
+  cerrar()
+
+  return oficios
+}
 
 /** Claves de un objeto literal `const NOMBRE… = { a: …, b: … }` de un .tsx. */
 function clavesDeMapa(fuente, nombre) {
@@ -194,6 +234,59 @@ export function comprobarContrato(base = process.cwd()) {
     }
 
     notas.push(`flota ${perfiles.length} perfiles · órbita ${orbita ? orbita.length : '?'}`)
+  }
+
+  // ── 4 · el texto de la flota es copia PÚBLICA, no la línea del vault ────────
+  // El 13/08/2026 /flota llevaba meses publicando el `**Misión:**` de las vistas
+  // privadas de subclones y el `rol` de la tabla del vault, palabra por palabra:
+  // el nombre de una operación patrimonial viva, los nombres de las empresas y
+  // varios tecnicismos sin traducir. Ni public-safety ni check-copy lo vieron,
+  // porque los dos auditan el CÓDIGO y esto viajaba en un JSON de DATOS.
+  //
+  // La regla que lo cierra no enumera palabras prohibidas — eso solo detecta el
+  // pasado. Exige lo contrario: que el texto visible de cada tarjeta SEA,
+  // carácter a carácter, el de exporter/misiones.md. Cualquier cosa que llegue
+  // por otro camino (el vault, una edición a mano del JSON) falla aquí.
+  if (existsSync(rutaClones)) {
+    const clones = leerJSON(rutaClones).clones || []
+    const oficios = leerOficios(join(base, '../exporter/misiones.md'))
+
+    if (!oficios) {
+      falla('misiones-ilegible', 'no se pudo leer exporter/misiones.md: /flota se quedaría sin rol ni misión')
+    } else {
+      clones.forEach(c => {
+        const donde = `clon «${c.perfil}»`
+
+        for (const crudo of ['rol', 'mision']) {
+          if (crudo in c) {
+            falla('flota-texto-del-vault',
+              `${donde}: clones.json trae «${crudo}», que es el texto privado del vault — ` +
+              'el exportador debe publicar solo la copia de exporter/misiones.md')
+          }
+        }
+
+        const publico = oficios[c.perfil]
+
+        if (!publico) {
+          falla('flota-sin-copia-publica',
+            `${donde}: no tiene bloque en exporter/misiones.md — su tarjeta saldría muda`)
+
+          return
+        }
+
+        for (const campo of CAMPOS_OFICIO) {
+          if (!c[campo]) {
+            falla('flota-idioma', `${donde}: falta ${campo} (la web es bilingüe)`)
+          } else if (c[campo] !== publico[campo]) {
+            falla('flota-texto-divergente',
+              `${donde}: ${campo} del lote no coincide con exporter/misiones.md — ` +
+              'regenera los datos (`make data`)')
+          }
+        }
+      })
+
+      notas.push(`copia pública ${Object.keys(oficios).length} oficios`)
+    }
   }
 
   return { fallos, avisos, notas }

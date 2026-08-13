@@ -264,12 +264,16 @@ const AnatomiaClon = ({ clon, datos, icono, color, open, onClose, onAnterior, on
         <div className='flex items-start gap-3'>
           <div className='flex-auto'>
             <Typography variant='h5' id={tituloId} className='capitalize'>{nombreVisible}</Typography>
-            <Typography variant='body2' color='text.secondary'>{clon.rol}</Typography>
+            <Typography variant='body2' color='text.secondary'>
+              {lang === 'en' ? clon.en_rol : clon.es_rol}
+            </Typography>
           </div>
         </div>
 
-        {clon.mision && (
-          <Typography variant='body2' color='text.secondary'>{clon.mision}</Typography>
+        {(lang === 'en' ? clon.en_mision : clon.es_mision) && (
+          <Typography variant='body2' color='text.secondary'>
+            {lang === 'en' ? clon.en_mision : clon.es_mision}
+          </Typography>
         )}
 
         <Typography variant='body2' color='text.secondary'>

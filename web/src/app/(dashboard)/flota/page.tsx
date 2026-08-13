@@ -26,7 +26,7 @@ import { useLang } from '@/lib/i18n'
 import { fmtCorto } from '@/lib/data'
 
 const FlotaPage = () => {
-  const { t } = useLang()
+  const { t, lang } = useLang()
   const [perfilAbierto, setPerfilAbierto] = useState<string | null>(null)
   const [anuncio, setAnuncio] = useState('')
 
@@ -109,6 +109,12 @@ const FlotaPage = () => {
             const pct = Math.max((usado / maxConsumo) * 100, usado > 0 ? 2 : 0)
             const nombreVisible = c.perfil.charAt(0).toUpperCase() + c.perfil.slice(1)
 
+            // Rol y misión vienen en los dos idiomas desde exporter/misiones.md.
+            // Antes era un solo campo en español que la versión inglesa servía
+            // igual: media tarjeta se quedaba sin traducir.
+            const rol = lang === 'en' ? c.en_rol : c.es_rol
+            const mision = lang === 'en' ? c.en_mision : c.es_mision
+
             return (
               <Grid key={c.perfil} size={{ xs: 12, sm: 6, lg: 4 }}>
                 <Card className='bs-full fo-card-hover'>
@@ -125,21 +131,28 @@ const FlotaPage = () => {
                         </CustomAvatar>
                         <div>
                           <Typography variant='h6' className='capitalize'>{c.perfil}</Typography>
-                          <Typography variant='caption' color='text.secondary'>{c.rol}</Typography>
+                          <Typography variant='caption' color='text.secondary'>{rol}</Typography>
                         </div>
                       </div>
 
-                      {c.mision && (
-                        <Typography variant='body2' color='text.secondary' className='flex-auto'>{c.mision}</Typography>
+                      {mision && (
+                        <Typography variant='body2' color='text.secondary' className='flex-auto'>{mision}</Typography>
                       )}
 
                       <div className='flex flex-wrap gap-1'>
                         {c.canales.map(canal => (
                           <Chip key={canal} size='small' variant='outlined' label={canal} />
                         ))}
-                        {c.correo && <Chip size='small' variant='outlined' icon={<i className='ri-mail-line' />} label='correo' />}
+                        {c.correo && (
+                          <Chip size='small' variant='outlined' icon={<i className='ri-mail-line' />} label={t('flota_correo')} />
+                        )}
                         {c.calendarios.length > 0 && (
-                          <Chip size='small' variant='outlined' icon={<i className='ri-calendar-line' />} label={`${c.calendarios.length} agendas`} />
+                          <Chip
+                            size='small'
+                            variant='outlined'
+                            icon={<i className='ri-calendar-line' />}
+                            label={`${c.calendarios.length} ${t(c.calendarios.length === 1 ? 'flota_agenda' : 'flota_agendas')}`}
+                          />
                         )}
                       </div>
 

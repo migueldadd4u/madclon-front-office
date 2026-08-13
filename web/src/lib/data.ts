@@ -40,13 +40,22 @@ export type Overview = {
   historia?: Historia
 }
 
+/**
+ * Un clon de la flota. Las palabras (`*_rol`, `*_mision`) son copia PÚBLICA
+ * curada en `exporter/misiones.md`, no el texto de las vistas privadas del
+ * vault: hasta el 13/08/2026 se publicaba aquel tal cual y se coló en la web
+ * abierta el nombre de una operación patrimonial viva. Son opcionales porque el
+ * exportador prefiere una tarjeta sin texto a una tarjeta con texto privado.
+ */
 export type ClonePerfil = {
   perfil: string
-  rol: string
   canales: string[]
   correo: string | null
   calendarios: string[]
-  mision?: string | null
+  es_rol?: string | null
+  en_rol?: string | null
+  es_mision?: string | null
+  en_mision?: string | null
 }
 
 export type Integracion = {

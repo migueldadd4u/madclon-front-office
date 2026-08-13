@@ -335,6 +335,7 @@ const STR = {
     en: ', works on improving the others. The bar shows how much each one has worked in the last 30 days.'
   },
   flota_correo: { es: 'correo', en: 'mail' },
+  flota_agenda: { es: 'agenda', en: 'calendar' },
   flota_agendas: { es: 'agendas', en: 'calendars' },
   flota_trabajo: { es: 'trabajo 30 d', en: 'work 30 d' },
   flota_tokens: { es: 'tokens', en: 'tokens' },

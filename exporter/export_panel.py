@@ -242,16 +242,43 @@ def parse_sistema_completo(md: str) -> dict:
     return out
 
 
-def parse_misiones(dir_subclones: Path) -> dict:
-    mapa = {"CEO": "ceo", "Clon-COO": "clon", "Ideas": "ideas", "Licitador": "licitador",
-            "Padre": "padre", "Patrimonio": "patrimonio", "Tecnico": "tecnico"}
-    misiones = {}
-    for stem, perfil in mapa.items():
-        md = read(dir_subclones / f"{stem}.md")
-        m = re.search(r"\*\*Misión:\*\*\s*(.+)", md)
-        if m:
-            misiones[perfil] = m.group(1).strip()
-    return misiones
+def parse_oficios(fichero: Path, avisos: list) -> dict:
+    """exporter/misiones.md → {perfil: {es_rol, en_rol, es_mision, en_mision}}.
+
+    Un bloque incompleto se descarta CON aviso: la tarjeta se queda sin texto y
+    el hueco se ve, que es infinitamente mejor que publicar media frase — o que
+    caer de vuelta al texto privado del vault, que es justo lo que esto impide."""
+    if not fichero.exists():
+        avisos.append(f"⚠️ fuente no encontrada: {fichero.name} (la flota se queda sin rol ni misión)")
+
+        return {}
+
+    oficios, actual, perfil = {}, None, None
+
+    def cerrar():
+        if actual is None:
+            return
+        faltan = [c for c in CAMPOS_OFICIO if not actual.get(c)]
+        if faltan:
+            avisos.append(f"⚠️ misiones.md: el perfil «{perfil}» ignora campos {', '.join(faltan)}")
+
+            return
+        oficios[perfil] = {c: actual[c] for c in CAMPOS_OFICIO}
+
+    for linea in read(fichero).splitlines():
+        cab = RE_OFICIO_CABECERA.match(linea)
+        if cab:
+            cerrar()
+            perfil, actual = cab.group(1), {}
+            continue
+        if actual is None:
+            continue
+        campo = RE_OFICIO_CAMPO.match(linea)
+        if campo:
+            actual[campo.group(1)] = campo.group(2)
+    cerrar()
+
+    return oficios
 
 # ---------------------------------------------------------- serie KPI jsonl
 
@@ -299,6 +326,19 @@ RE_ICONO = re.compile(r"^ri-[a-z0-9-]+$")
 # Cuántos días puede quedarse la narración por detrás del trabajo antes de que
 # el sistema lo diga en voz alta (principio de MAD: nada muere en silencio).
 DIAS_HISTORIA_RANCIA = 21
+
+# ------------------------------------------------------ oficios públicos de la flota
+# Misma doctrina que los capítulos, y por el mismo motivo. Hasta el 13/08/2026 el
+# rol y la misión de cada tarjeta de /flota se copiaban TAL CUAL del vault (la
+# tabla de SISTEMA-COMPLETO.md y el campo `**Misión:**` de cada vista de
+# subclón). Así llegó a producción el nombre de una operación patrimonial viva,
+# los nombres de las empresas y varios tecnicismos sin traducir: el escáner de
+# privacidad audita el CÓDIGO y check-copy audita el CÓDIGO — ninguno de los dos
+# mira un JSON de datos. Ahora la versión pública se escribe a mano en
+# exporter/misiones.md, en los dos idiomas, y el texto del vault no sale nunca.
+RE_OFICIO_CABECERA = re.compile(r"^###\s+([a-z]+)\s*$")
+RE_OFICIO_CAMPO = re.compile(r"^(es_rol|en_rol|es_mision|en_mision|fuente):\s*(.+?)\s*$")
+CAMPOS_OFICIO = ("es_rol", "en_rol", "es_mision", "en_mision")
 
 
 def parse_hitos(md: str, avisos: list) -> list:
@@ -506,11 +546,20 @@ def main() -> int:
     overview = parse_panel_clon(read(s00 / "Vistas-Principales/PANEL-CLON.md"))
     tokens = parse_panel_tokens(read(s00 / "Vistas-Principales/PANEL-TOKENS.md"))
     sistema = parse_sistema_completo(read(s00 / "cuadros-de-mando/SISTEMA-COMPLETO.md"))
-    misiones = parse_misiones(s00 / "Vistas-Principales/subclones")
+    oficios = parse_oficios(raiz / "exporter" / "misiones.md", avisos)
     serie = parse_serie(s00 / "Monitorizacion/tokens")
 
+    # El rol crudo del vault NO se publica: se descarta aquí y en su lugar va la
+    # copia pública de misiones.md. Un perfil sin bloque sale sin texto (la
+    # tarjeta aguanta) y con aviso — nunca cayendo de vuelta al texto privado.
     for clon in sistema["clones"]:
-        clon["mision"] = misiones.get(clon["perfil"])
+        clon.pop("rol", None)
+        publico = oficios.get(clon["perfil"])
+        if publico:
+            clon.update(publico)
+        else:
+            avisos.append(f"⚠️ misiones.md: falta el bloque «{clon['perfil']}» "
+                          f"(su tarjeta sale sin rol ni misión)")
     overview["salud_global"] = sistema.get("salud_global")
     overview["watchdog_ts"] = sistema.get("watchdog_ts")
     overview["historia"] = preserva_historia(
