@@ -80,54 +80,54 @@
   "integraciones": [
     {
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-18T10:14:13.275130Z",
+      "ultimo_ok": "2026-08-18T12:16:28.636436Z",
       "ultimo_fallo": "2026-08-10T06:57:58.348011Z",
       "detalle": "lectura / autenticación OK",
       "clave": "2a5e3926"
     },
     {
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-18T10:14:13.275130Z",
+      "ultimo_ok": "2026-08-18T12:16:28.636436Z",
       "ultimo_fallo": null,
       "detalle": "lectura / autenticación OK",
       "clave": "2c435866"
     },
     {
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-18T10:14:13.275130Z",
+      "ultimo_ok": "2026-08-18T12:16:28.636436Z",
       "ultimo_fallo": null,
       "detalle": "lectura / autenticación OK",
       "clave": "132b93b4"
     },
     {
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-18T10:14:13.275130Z",
+      "ultimo_ok": "2026-08-18T12:16:28.636436Z",
       "ultimo_fallo": null,
       "detalle": "lectura / autenticación OK",
       "clave": "aefcdbb3"
     },
     {
-      "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-18T10:14:13.275130Z",
-      "ultimo_fallo": "2026-08-17T11:56:22.494026Z",
-      "detalle": "listado / acceso OK",
+      "estado": "🔴 FALLA",
+      "ultimo_ok": "2026-08-18T11:15:21.572702Z",
+      "ultimo_fallo": "2026-08-18T12:16:28.636436Z",
+      "detalle": "sin token M365: falta ~/.hermes/m365_token.json o ya no refresca",
       "clave": "6b996a58"
     },
     {
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-18T10:14:13.275130Z",
+      "ultimo_ok": "2026-08-18T12:16:28.636436Z",
       "ultimo_fallo": null,
       "detalle": "listado / acceso OK",
       "clave": "4f1bcdaf"
     },
     {
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-08-18T10:14:13.275130Z",
+      "ultimo_ok": "2026-08-18T12:16:28.636436Z",
       "ultimo_fallo": null,
       "detalle": "listado / acceso OK",
       "clave": "c75c1d4b"
     }
   ],
-  "salud_global": "🟢 Todo OK",
-  "watchdog_ts": "2026-08-18T10:14:13.275764Z"
+  "salud_global": "🔴 Hay incidencias activas",
+  "watchdog_ts": "2026-08-18T12:16:28.637550Z"
 }
