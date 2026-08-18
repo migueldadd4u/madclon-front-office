@@ -58,8 +58,8 @@ Reglas derivadas, aplicables a toda pieza nueva:
 ### Eje 5 · El clon dice quién es — deuda a saldar
 Hoy la web habla del clon **en tercera persona y a medias**: «un equipo de IA que trabaja mientras **Miguel** vive su vida» (`app/layout.tsx:32,42`, `lib/i18n.tsx:55`), «propuestas esperando a **Miguel**» (`lib/i18n.tsx:208`), FAQ en `preguntas/page.tsx`, `ClonOpina.tsx`. Un recién llegado no sabe **de quién** es esto.
 
-- Identidad canónica y única: **«el Clon de Miguel Ángel Delgado (MAD)»**, abreviado **«el Clon de MAD»** tras la primera mención de cada página. En inglés: *«Miguel Ángel Delgado's clone (MAD)»* / *«MAD's clone»*.
-- En primera persona donde el clon habla (`ClonOpina`, `EstaNoche`, `ConsolaClon`): **«Soy el Clon de Miguel Ángel Delgado»**, no «ayudo a Miguel».
+- Identidad canónica y única: **«el Clon de Miguel Ángel Domínguez (MAD)»**, abreviado **«el Clon de MAD»** tras la primera mención de cada página. En inglés: *«Miguel Ángel Domínguez's clone (MAD)»* / *«MAD's clone»*.
+- En primera persona donde el clon habla (`ClonOpina`, `EstaNoche`, `ConsolaClon`): **«Soy el Clon de Miguel Ángel Domínguez»**, no «ayudo a Miguel».
 - Barre **todas** las cadenas: `lib/i18n.tsx`, las 8 páginas, `layout.tsx` (title, description, OpenGraph, Twitter), el 404, el manifest de la PWA, la og-image (`exporter/og_image.py`) y el `<title>`.
 - Artefacto: **regla de nomenclatura** en `front-office/REGLAS-COPY.md` + comprobador determinista que falle si aparece «Miguel» suelto sin «Ángel»/«MAD» en la misma frase (ver §3, `check-copy`).
 - Cuidado: **nada de datos personales nuevos**. Es el nombre público del titular, ya presente en la marca — no se añade cargo, empresa, correo ni vida privada.
@@ -154,7 +154,7 @@ Cada comprobación imprime `OK` / `FALLO` con la evidencia (fichero, selector o 
 
 ## 4. LOS TRES ARTEFACTOS PERMANENTES
 
-1. **`front-office/REGLAS-COPY.md`** — identidad («Clon de Miguel Ángel Delgado (MAD)»), glosario de tecnicismos con su traducción llana obligatoria, tono, reglas de navegación por capas y de procedencia de datos. Cada regla nace de una entrega real: nada de reglas teóricas.
+1. **`front-office/REGLAS-COPY.md`** — identidad («Clon de Miguel Ángel Domínguez (MAD)»), glosario de tecnicismos con su traducción llana obligatoria, tono, reglas de navegación por capas y de procedencia de datos. Cada regla nace de una entrega real: nada de reglas teóricas.
 2. **`front-office/CHECKLIST-RECIEN-LLEGADO.md`** — las 5 preguntas del eje 4 × las 8 páginas, con veredicto y fecha de la última pasada. Se revisa entero **una vez por tanda**.
 3. **`web/scripts/gate.mjs`** (+ `check-hardcode.mjs`, `check-copy.mjs`) — el gate de §3, cableado a `yarn gate` y al workflow del CI.
 
