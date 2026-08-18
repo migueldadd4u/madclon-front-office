@@ -1,10 +1,10 @@
 {
   "gtd": {
     "propuestas": null,
-    "bandeja": 19,
+    "bandeja": 1,
     "esperas_vencidas": 11,
     "decisiones": null,
-    "acciones_hoy": 17,
+    "acciones_hoy": 20,
     "esperas_listadas": 8
   },
   "personas": {
@@ -12,80 +12,86 @@
     "staged": 0
   },
   "automejora": {
-    "hechas": 199,
-    "bloqueadas": 43,
-    "aparcadas": 48,
-    "pendientes": 2,
-    "llamadas": 153,
+    "hechas": 210,
+    "bloqueadas": 44,
+    "aparcadas": 50,
+    "pendientes": 7,
+    "llamadas": 266,
     "metered": 0,
-    "top": "codex_cli 66, grok 33, minimax 21, local 13"
+    "top": "codex_cli 157, grok 45, minimax 20, local 19"
   },
   "crons": [
     {
       "nombre": "Briefing COO 08:05",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "14/08 09:11"
+      "ultima": "18/08 09:10"
     },
     {
       "nombre": "Higiene Semanal del Sistema",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "09/08 04:00"
+      "ultima": "16/08 04:00"
     },
     {
       "nombre": "Triage correos del día",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "14/08 08:53"
+      "ultima": "18/08 08:53"
     },
     {
       "nombre": "Auto-mejora nocturna clon",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "14/08 03:40"
+      "ultima": "18/08 03:40"
     },
     {
       "nombre": "Resumen diario de Spam",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "14/08 21:30"
+      "ultima": "17/08 21:30"
     },
     {
       "nombre": "Morning briefing",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "14/08 08:00"
+      "ultima": "18/08 08:00"
     },
     {
       "nombre": "Important-mail monitor",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "15/08 02:30"
+      "ultima": "18/08 13:30"
     },
     {
       "nombre": "Weekly review",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "09/08 18:00"
+      "ultima": "16/08 18:00"
     },
     {
       "nombre": "Topic news digest",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "14/08 18:11"
+      "ultima": "17/08 18:05"
     },
     {
       "nombre": "Repaso ¿Qué necesito?",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "14/08 08:30"
+      "ultima": "18/08 08:30"
     },
     {
       "nombre": "Clon ↔ Jarvis weekly mutual-improvemen",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "09/08 19:15"
+      "ultima": "16/08 19:15"
+    },
+    {
+      "nombre": "Guardia de tiradas programadas",
+      "ambito": "clon",
+      "estado": "ok",
+      "ultima": "18/08 13:38"
     }
   ],
   "gateways": [
@@ -101,12 +107,12 @@
   ],
   "crons_en_error": 0,
   "tokens_resumen": {
-    "tokens_30d": 357294864,
+    "tokens_30d": 269068591,
     "cobertura_pct": 91,
-    "indice_eficiencia": 203560
+    "indice_eficiencia": 397960
   },
   "salud_global": "🟢 Todo OK",
-  "watchdog_ts": "2026-08-14T23:21:24.592932Z",
+  "watchdog_ts": "2026-08-18T10:14:13.275764Z",
   "historia": {
     "hitos": [
       {
@@ -281,10 +287,10 @@
         "en_texto": "This timeline stops being hand-written inside the site: chapters and figures now come from the nightly refresh, and if a chapter runs late the page says so itself."
       }
     ],
-    "bitacoras": 184,
+    "bitacoras": 186,
     "nacimiento": "2026-04-14",
-    "ultima_bitacora": "2026-08-12",
+    "ultima_bitacora": "2026-08-15",
     "ultimo_hito": "2026-08-12",
-    "dias_sin_capitulo": 3
+    "dias_sin_capitulo": 6
   }
 }
