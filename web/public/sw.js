@@ -8,7 +8,16 @@
 //     lote viejo servido de caché (hasta 24 h) pintaría /salud con filas anónimas,
 //     así que esta versión tira la caché de datos al activarse. Subir VERSION es
 //     obligatorio siempre que cambie la forma de un JSON, no solo su contenido.
-const VERSION = 'v3'
+// v4 (18/08/2026): la forma no cambia, pero la caché tenía secuestrado un lote
+//     RANCIO. El refresco nocturno estuvo tres días parado (su reloj vivía dentro
+//     de una aplicación que dejó de correr) y, cuando se arregló y se publicó lote
+//     fresco, la web SEGUÍA enseñando el del 15/8: quien la hubiera visitado en
+//     las 24 h anteriores tenía el lote viejo sellado con la hora de SU descarga,
+//     y esta caché es «primero caché» — no revalida, ni siquiera pregunta.
+//     Así que una parada de publicación se paga DOS veces: los días que dura, y
+//     hasta 24 h más después de arreglarla. Subir VERSION es la única forma de
+//     desalojar eso en el navegador de todo el mundo a la vez.
+const VERSION = 'v4'
 const ESTATICA = `madclon-estatica-${VERSION}`
 const PAGINAS = `madclon-paginas-${VERSION}`
 const DATOS = `madclon-datos-${VERSION}`
