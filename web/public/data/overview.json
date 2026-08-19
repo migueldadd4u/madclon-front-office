@@ -111,8 +111,8 @@
     "cobertura_pct": 91,
     "indice_eficiencia": 397960
   },
-  "salud_global": "🔴 Hay incidencias activas",
-  "watchdog_ts": "2026-08-18T12:16:28.637550Z",
+  "salud_global": "🟢 Todo OK",
+  "watchdog_ts": "2026-08-18T23:25:30.387966Z",
   "historia": {
     "hitos": [
       {
@@ -291,6 +291,6 @@
     "nacimiento": "2026-04-14",
     "ultima_bitacora": "2026-08-15",
     "ultimo_hito": "2026-08-12",
-    "dias_sin_capitulo": 6
+    "dias_sin_capitulo": 7
   }
 }
