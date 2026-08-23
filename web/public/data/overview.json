@@ -12,20 +12,20 @@
     "staged": 0
   },
   "automejora": {
-    "hechas": 221,
+    "hechas": 226,
     "bloqueadas": 50,
-    "aparcadas": 53,
-    "pendientes": 4,
-    "llamadas": 278,
+    "aparcadas": 54,
+    "pendientes": 1,
+    "llamadas": 198,
     "metered": 0,
-    "top": "codex_cli 144, grok 50, minimax 30, local 22"
+    "top": "codex_cli 76, grok 49, minimax 30, local 16"
   },
   "crons": [
     {
       "nombre": "Briefing COO 08:05",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "21/08 09:11"
+      "ultima": "22/08 09:10"
     },
     {
       "nombre": "Higiene Semanal del Sistema",
@@ -37,31 +37,31 @@
       "nombre": "Triage correos del día",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "21/08 08:52"
+      "ultima": "22/08 08:53"
     },
     {
       "nombre": "Auto-mejora nocturna clon",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "21/08 03:40"
+      "ultima": "22/08 03:40"
     },
     {
       "nombre": "Resumen diario de Spam",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "21/08 21:30"
+      "ultima": "22/08 21:30"
     },
     {
       "nombre": "Morning briefing",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "21/08 08:00"
+      "ultima": "22/08 08:00"
     },
     {
       "nombre": "Important-mail monitor",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "22/08 02:31"
+      "ultima": "23/08 03:00"
     },
     {
       "nombre": "Weekly review",
@@ -79,7 +79,7 @@
       "nombre": "Repaso ¿Qué necesito?",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "21/08 08:30"
+      "ultima": "22/08 08:30"
     },
     {
       "nombre": "Clon ↔ Jarvis weekly mutual-improvemen",
@@ -91,7 +91,25 @@
       "nombre": "Guardia de tiradas programadas",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "22/08 02:38"
+      "ultima": "23/08 02:38"
+    },
+    {
+      "nombre": "Radar Buzz semanal",
+      "ambito": "clon",
+      "estado": "—",
+      "ultima": "nunca"
+    },
+    {
+      "nombre": "Scorecard Buzz mensual",
+      "ambito": "clon",
+      "estado": "—",
+      "ultima": "nunca"
+    },
+    {
+      "nombre": "Decision Buzz 22-11-2026",
+      "ambito": "clon",
+      "estado": "—",
+      "ultima": "nunca"
     }
   ],
   "gateways": [
@@ -107,12 +125,12 @@
   ],
   "crons_en_error": 0,
   "tokens_resumen": {
-    "tokens_30d": 136486623,
+    "tokens_30d": 132503296,
     "cobertura_pct": 90,
-    "indice_eficiencia": 336680
+    "indice_eficiencia": 240735
   },
   "salud_global": "🟢 Todo OK",
-  "watchdog_ts": "2026-08-21T23:37:13.624551Z",
+  "watchdog_ts": "2026-08-22T23:52:19.720987Z",
   "historia": {
     "hitos": [
       {
@@ -291,6 +309,6 @@
     "nacimiento": "2026-04-14",
     "ultima_bitacora": "2026-08-15",
     "ultimo_hito": "2026-08-12",
-    "dias_sin_capitulo": 10
+    "dias_sin_capitulo": 11
   }
 }
