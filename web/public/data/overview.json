@@ -1,7 +1,7 @@
 {
   "gtd": {
     "propuestas": null,
-    "bandeja": 36,
+    "bandeja": 66,
     "esperas_vencidas": 11,
     "decisiones": null,
     "acciones_hoy": 21,
@@ -12,20 +12,20 @@
     "staged": 0
   },
   "automejora": {
-    "hechas": 230,
+    "hechas": 234,
     "bloqueadas": 50,
-    "aparcadas": 54,
-    "pendientes": 2,
-    "llamadas": 177,
+    "aparcadas": 55,
+    "pendientes": 3,
+    "llamadas": 190,
     "metered": 0,
-    "top": "codex_cli 65, grok 42, minimax 30, local 16"
+    "top": "codex_cli 70, grok 52, minimax 30, local 16"
   },
   "crons": [
     {
       "nombre": "Briefing COO 08:05",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "23/08 09:10"
+      "ultima": "24/08 09:11"
     },
     {
       "nombre": "Higiene Semanal del Sistema",
@@ -37,31 +37,31 @@
       "nombre": "Triage correos del día",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "23/08 08:52"
+      "ultima": "24/08 08:55"
     },
     {
       "nombre": "Auto-mejora nocturna clon",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "23/08 03:40"
+      "ultima": "24/08 03:40"
     },
     {
       "nombre": "Resumen diario de Spam",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "23/08 21:30"
+      "ultima": "24/08 21:30"
     },
     {
       "nombre": "Morning briefing",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "23/08 08:00"
+      "ultima": "24/08 08:00"
     },
     {
       "nombre": "Important-mail monitor",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "24/08 03:00"
+      "ultima": "25/08 03:00"
     },
     {
       "nombre": "Weekly review",
@@ -73,13 +73,13 @@
       "nombre": "Topic news digest",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "21/08 18:05"
+      "ultima": "24/08 18:05"
     },
     {
       "nombre": "Repaso ¿Qué necesito?",
       "ambito": "clon",
-      "estado": "ok",
-      "ultima": "23/08 08:30"
+      "estado": "error",
+      "ultima": "24/08 09:30"
     },
     {
       "nombre": "Clon ↔ Jarvis weekly mutual-improvemen",
@@ -91,19 +91,19 @@
       "nombre": "Guardia de tiradas programadas",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "24/08 02:38"
+      "ultima": "25/08 02:38"
     },
     {
       "nombre": "Radar Buzz semanal",
       "ambito": "clon",
-      "estado": "—",
-      "ultima": "nunca"
+      "estado": "ok",
+      "ultima": "24/08 09:00"
     },
     {
       "nombre": "Scorecard Buzz mensual",
       "ambito": "clon",
-      "estado": "—",
-      "ultima": "nunca"
+      "estado": "ok",
+      "ultima": "24/08 09:15"
     },
     {
       "nombre": "Decision Buzz 22-11-2026",
@@ -113,7 +113,6 @@
     }
   ],
   "gateways": [
-    "gateway",
     "gateway-ceo",
     "gateway-clon",
     "gateway-ideas",
@@ -123,14 +122,14 @@
     "gateway-tecnico",
     "whatsapp-bridge-clon"
   ],
-  "crons_en_error": 0,
+  "crons_en_error": 1,
   "tokens_resumen": {
-    "tokens_30d": 122214234,
+    "tokens_30d": 114710426,
     "cobertura_pct": 90,
-    "indice_eficiencia": 201205
+    "indice_eficiencia": 216557
   },
   "salud_global": "🟢 Todo OK",
-  "watchdog_ts": "2026-08-24T00:09:22.066039Z",
+  "watchdog_ts": "2026-08-25T00:30:25.374140Z",
   "historia": {
     "hitos": [
       {
@@ -309,6 +308,6 @@
     "nacimiento": "2026-04-14",
     "ultima_bitacora": "2026-08-15",
     "ultimo_hito": "2026-08-12",
-    "dias_sin_capitulo": 12
+    "dias_sin_capitulo": 13
   }
 }
