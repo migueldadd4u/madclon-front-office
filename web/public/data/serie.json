@@ -782,28 +782,54 @@
     },
     {
       "fecha": "2026-08-25",
-      "ts": 1787621470.409329,
+      "ts": 1787693480.9825,
       "dias": 7,
       "contexto": {
-        "llamadas": 250,
-        "tokens": 8091726,
+        "llamadas": 241,
+        "tokens": 7861001,
         "tareas_hechas": 25,
-        "llamadas_router": 190
+        "llamadas_router": 201
       },
       "kpis": {
-        "entrada_por_llamada": 31087.236,
-        "pct_cache": 27.715,
-        "ratio_salida_entrada": 4.116,
-        "pct_local": 1.545,
+        "entrada_por_llamada": 31126.461,
+        "pct_cache": 24.47,
+        "ratio_salida_entrada": 4.793,
+        "pct_local": 1.591,
         "pct_metered": 0.0,
-        "pct_tokens_en_fallo": 28.562,
-        "latencia_p50": 34.55,
-        "tokens_motor_por_tarea": 199544.21,
-        "pct_llamadas_ok": 65.789,
+        "pct_tokens_en_fallo": 27.467,
+        "latencia_p50": 34.96,
+        "tokens_motor_por_tarea": 214186.33,
+        "pct_llamadas_ok": 66.169,
         "tareas_dia": 3.571,
         "reintentos_por_tarea": 1.097,
         "pct_propuestas_atendidas": 33.333,
-        "cobertura_medida": 70.4
+        "cobertura_medida": 68.05
+      }
+    },
+    {
+      "fecha": "2026-08-26",
+      "ts": 1787707297.148447,
+      "dias": 7,
+      "contexto": {
+        "llamadas": 247,
+        "tokens": 8183541,
+        "tareas_hechas": 25,
+        "llamadas_router": 207
+      },
+      "kpis": {
+        "entrada_por_llamada": 31613.883,
+        "pct_cache": 23.508,
+        "ratio_salida_entrada": 4.801,
+        "pct_local": 1.528,
+        "pct_metered": 0.0,
+        "pct_tokens_en_fallo": 25.907,
+        "latencia_p50": 36.05,
+        "tokens_motor_por_tarea": 227087.93,
+        "pct_llamadas_ok": 67.15,
+        "tareas_dia": 3.571,
+        "reintentos_por_tarea": 1.1,
+        "pct_propuestas_atendidas": 33.333,
+        "cobertura_medida": 68.826
       }
     }
   ],
