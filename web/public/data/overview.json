@@ -129,7 +129,7 @@
     "indice_eficiencia": 231572
   },
   "salud_global": "🟢 Todo OK",
-  "watchdog_ts": "2026-08-27T00:03:07.990434Z",
+  "watchdog_ts": "2026-08-28T00:16:56.107826Z",
   "historia": {
     "hitos": [
       {
@@ -308,6 +308,6 @@
     "nacimiento": "2026-04-14",
     "ultima_bitacora": "2026-08-15",
     "ultimo_hito": "2026-08-12",
-    "dias_sin_capitulo": 15
+    "dias_sin_capitulo": 16
   }
 }
