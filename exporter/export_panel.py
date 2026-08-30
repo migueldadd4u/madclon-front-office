@@ -208,7 +208,8 @@ def parse_panel_tokens(md: str) -> dict:
     for f in tabla_md(sec.splitlines()):
         if len(f) >= 4 and f[0] != "Clon":  # salta solo la cabecera
             nombre = f[0].strip("*")
-            out["por_clon"].append({"clon": nombre, "tokens": num_es(f[1]),
+            out["por_clon"].append({"clon": NOMBRE_PUBLICO_CLON.get(nombre, nombre),
+                                    "tokens": num_es(f[1]),
                                     "llamadas": num_es(f[2]), "modelos": f[3]})
 
     sec = seccion(md, r"## Por modelo[^\n]*\n", r"\n## ")
@@ -506,7 +507,14 @@ def build_pulso(tokens: dict, sistema: dict, serie: dict, hoy: date) -> dict:
 
 # ------------------------------------------------------------ privacidad
 
+# Perfiles cuyo slug coincide con una ficha del vault (grupo/persona): el slug no
+# sale del vault. Aquí se sustituye en origen; el patrón de abajo corta la
+# exportación si el slug reaparece por cualquier otro campo, y G6 (gate-grupos)
+# lo vigila además desde el lado del vault.
+NOMBRE_PUBLICO_CLON = {"amigos-lqdlia": "perfil-social"}
+
 PATRONES_PROHIBIDOS = [
+    (r"amigos-lqdlia", "slug de ficha del vault"),
     (r"@", "posible email"),
     (r"/Users/", "ruta local"),
     (r"(?<!\d)(?:\+?34[ .-]?)?[6-9]\d{2}[ .-]?\d{2}[ .-]?\d{2}[ .-]?\d{2}(?!\d)", "posible teléfono"),
