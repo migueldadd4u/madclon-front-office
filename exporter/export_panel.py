@@ -248,6 +248,77 @@ def parse_sistema_completo(md: str) -> dict:
     return out
 
 
+
+def slugs_de_grupo(vault: Path) -> set:
+    """Slugs (y alias) de las fichas de grupo conversacional de 10_SITIOS.
+
+    Se lee del vault en vez de mantener una lista a mano para que el exportador
+    redacte EXACTAMENTE lo que la guardia G6 prohíbe (`check-grupos.sh`): si
+    mañana nace un grupo nuevo, queda cubierto sin tocar este fichero. Una lista
+    hardcodeada aquí se habría quedado atrás en la primera ficha nueva."""
+    fuera = set()
+    sitios = vault / "10_SITIOS"
+    if not sitios.is_dir():
+        return fuera
+    for f in sitios.glob("*.md"):
+        try:
+            txt = f.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        if "subtipo: grupo-conversacional" not in txt:
+            continue
+        fuera.add(f.stem.lower())
+        m = re.search(r"^slug:\s*(.+?)\s*$", txt, re.M)
+        if m:
+            fuera.add(m.group(1).strip().strip('"').strip("'").lower())
+        m = re.search(r"^nombre:\s*(.+?)\s*$", txt, re.M)
+        if m:
+            fuera.add(m.group(1).strip().strip('"').strip("'").lower())
+    return fuera
+
+
+def aplica_privacidad_clones(tokens: dict, vault: Path, avisos: list) -> None:
+    """Ningún slug de ficha de grupo puede salir en el material publicado.
+
+    El 01/09/2026 `"clon": "amigos-lqdlia"` llevaba desde el 18/08 servido en
+    https://migueldadd4u.github.io/madclon-front-office/data/tokens.json, y el
+    refresco nocturno lo reescribía cada madrugada. `public-safety.mjs` no podía
+    cazarlo porque valida FORMA y esquema, no semántica: no sabe qué texto sale
+    de una ficha de grupo. La guardia que sí lo veía era G6 de
+    `check-grupos.sh`, y llevaba 14 días en rojo sin que nadie la leyera.
+
+    Se sustituye la etiqueta por «privado» y se FUNDEN las filas afectadas en
+    una sola, en vez de borrarlas: así los totales de la página siguen
+    cuadrando y no se publica tampoco el consumo por grupo. Mismo criterio que
+    `aplica_conexiones()` — el texto privado no sale del vault, el cruce se
+    conserva."""
+    grupos = slugs_de_grupo(vault)
+    if not grupos:
+        avisos.append("⚠️ 10_SITIOS: no encuentro fichas de grupo; no puedo redactar por_clon")
+        return
+
+    filas, privada, tocados = [], None, []
+    for fila in tokens.get("por_clon", []):
+        nombre = str(fila.get("clon") or "").strip()
+        if nombre.lower().strip("*") not in grupos:
+            filas.append(fila)
+            continue
+        tocados.append(nombre)
+        if privada is None:
+            privada = dict(fila)
+            privada["clon"] = "privado"
+            privada["modelos"] = "—"
+            filas.append(privada)
+        else:
+            for campo in ("tokens", "llamadas"):
+                a, b = privada.get(campo), fila.get(campo)
+                if isinstance(a, (int, float)) and isinstance(b, (int, float)):
+                    privada[campo] = a + b
+    if tocados:
+        tokens["por_clon"] = filas
+        avisos.append(f"🔒 por_clon: {len(tocados)} fila(s) de grupo redactadas a «privado»")
+
+
 def aplica_conexiones(sistema: dict, avisos: list) -> None:
     """Sustituye TODA etiqueta de buzón/agenda por su clave derivada.
 
@@ -568,6 +639,7 @@ def main() -> int:
         return 0
 
     aplica_conexiones(sistema, avisos)
+    aplica_privacidad_clones(tokens, vault, avisos)
 
     # El rol crudo del vault NO se publica. Su sustituto público tampoco viaja
     # por aquí: lo hornea el build desde exporter/misiones.md y se cruza por
