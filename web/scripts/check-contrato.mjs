@@ -18,6 +18,7 @@ import { join } from 'node:path'
 
 import { generar } from './build-historia.mjs'
 import { generar as generarCopia } from './build-copia-publica.mjs'
+import { generar as generarRetos } from './build-copia-retos.mjs'
 
 const COLORES_VALIDOS = ['primary', 'success', 'info', 'warning', 'error', 'secondary']
 const RE_ICONO = /^ri-[a-z0-9-]+$/
@@ -56,6 +57,15 @@ function perfilesDeOrbita(fuente) {
 }
 
 export function comprobarContrato(base = process.cwd()) {
+  /** Lee un fichero o devuelve null: un fichero que falta es un fallo con nombre, no una excepción. */
+  const leerSiExiste = url => {
+    try {
+      return readFileSync(url, 'utf8')
+    } catch {
+      return null
+    }
+  }
+
   const fallos = []
   const avisos = []
   const notas = []
@@ -312,6 +322,52 @@ export function comprobarContrato(base = process.cwd()) {
     })
 
     notas.push(`copia horneada ${Object.keys(horneada.oficios).length} oficios · ${integraciones.length} conexiones`)
+  }
+
+  // ── 5) La página de los retos (arco «El escaparate cuenta el reto», 05/09/2026) ──
+  // Tres cosas que no se pueden romper sin que nadie se entere:
+  //   a) lo horneado coincide con exporter/retos.md y no falta ningún bloque;
+  //   b) «lo que el clon no hace» está en la MISMA tarjeta que «cómo propone» —
+  //      contado a medias, esto parece vigilancia (decisión de MAD, P-7);
+  //   c) en la fase 0 la página no pinta cifras: no hay retos suficientes para que
+  //      una media signifique algo, y un número inventado es peor que ninguno.
+  {
+    const retos = generarRetos()
+
+    if (retos.avisos.length) {
+      retos.avisos.forEach(a => falla('copia-retos-incompleta', `exporter/retos.md: ${a}`))
+    }
+
+    const horneadoRetos = leerSiExiste(new URL('../src/lib/copia-retos.ts', import.meta.url))
+
+    if (horneadoRetos !== retos.cuerpo) {
+      falla('copia-retos-desfasada',
+        'src/lib/copia-retos.ts no coincide con exporter/retos.md — regenera con ' +
+        '`node scripts/build-copia-retos.mjs`')
+    }
+
+    const pagina = leerSiExiste(new URL('../src/app/(dashboard)/retos/page.tsx', import.meta.url))
+
+    if (!pagina) {
+      falla('retos-sin-pagina', 'src/app/(dashboard)/retos/page.tsx no existe: el menú apuntaría a un 404')
+    } else {
+      const iCom = pagina.indexOf('data-como-propone')
+      const iNo = pagina.indexOf('data-no-hace')
+      const cierre = iCom === -1 ? -1 : pagina.indexOf('</Card>', iCom)
+
+      if (iCom === -1 || iNo === -1 || iNo < iCom || (cierre !== -1 && iNo > cierre)) {
+        falla('contrapeso-separado',
+          '«lo que el clon no hace» (data-no-hace) tiene que ir DENTRO de la misma tarjeta que ' +
+          '«cómo propone» (data-como-propone): separarlos deja media verdad en una web pública')
+      }
+
+      if (!pagina.includes('data-sin-cifras')) {
+        falla('retos-sin-aviso-de-cifras',
+          'la fase 0 no publica agregados: la página debe llevar el bloque data-sin-cifras que lo dice')
+      }
+    }
+
+    notas.push(`copia de retos ${Object.keys(retos.bloques).length} bloques`)
   }
 
   return { fallos, avisos, notas }
