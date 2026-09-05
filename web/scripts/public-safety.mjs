@@ -731,6 +731,7 @@ const OUTPUT_ROUTE_DIRECTORIES = new Set([
   'flota',
   'historia',
   'preguntas',
+  'retos',
   'salud',
   'tokens'
 ])
