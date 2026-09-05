@@ -37,6 +37,45 @@ import sys
 from datetime import date, datetime, timezone
 from pathlib import Path
 
+# ---------------------------------------------------------------- avisos del lote
+
+class Avisos(list):
+    """Los avisos de una pasada, separando los que IMPIDEN publicar de los que no.
+
+    POR QUÉ EXISTE (05/09/2026). El escaparate público se quedó tres noches con
+    las cifras del 02/09. El reloj no falló, el exportador no falló y el vault
+    estaba entero: lo único que pasaba es que `exporter/historia.md` llevaba 22
+    días sin capítulo. Ese aviso es una REGAÑINA EDITORIAL —no dice que ningún
+    dato esté mal—, pero `front_office_cordura.py` trataba cualquier entrada de
+    `avisos` como «el exportador no encontró una fuente» y tumbaba el lote
+    entero. Resultado: un capítulo sin escribir dejaba congeladas también la
+    salud, los tokens, la flota y la serie, que estaban perfectas.
+
+    La regla, a partir de hoy: **bloquea lo que haría que lo publicado fuese
+    FALSO o estuviese VIEJO** (una fuente que no aparece, una que lleva un día
+    sin regenerarse, una redacción de privacidad que no se pudo aplicar, un
+    capítulo que se cae por mal formado). Lo que solo pide trabajo a MAD se dice
+    en voz alta —sigue en `avisos`, sigue imprimiéndose y sigue viajando en el
+    manifest— y se publica igual.
+
+    `avisos.append(...)` = bloqueante (el caso por defecto, el conservador).
+    `avisos.nota(...)`   = se cuenta, no congela.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self._leves = set()   # índices de esta misma lista que NO bloquean
+
+    def nota(self, texto: str) -> None:
+        """Aviso que no impide publicar: se ve, pero no congela el escaparate."""
+        self._leves.add(len(self))
+        self.append(texto)
+
+    @property
+    def bloqueantes(self) -> list:
+        return [a for i, a in enumerate(self) if i not in self._leves]
+
+
 # ---------------------------------------------------------------- utilidades
 
 def num_es(s: str):
@@ -316,7 +355,8 @@ def aplica_privacidad_clones(tokens: dict, vault: Path, avisos: list) -> None:
                     privada[campo] = a + b
     if tocados:
         tokens["por_clon"] = filas
-        avisos.append(f"🔒 por_clon: {len(tocados)} fila(s) de grupo redactadas a «privado»")
+        # La privacidad FUNCIONANDO no es una avería: se cuenta, no bloquea.
+        avisos.nota(f"🔒 por_clon: {len(tocados)} fila(s) de grupo redactadas a «privado»")
 
 
 def aplica_conexiones(sistema: dict, avisos: list) -> None:
@@ -484,7 +524,10 @@ def parse_historia(fichero_hitos: Path, dir_handoffs: Path, hoy: date, avisos: l
         ultimo = date.fromisoformat(hitos[-1]["fecha"])
         historia["dias_sin_capitulo"] = max((hoy - ultimo).days, 0)
         if historia["dias_sin_capitulo"] > DIAS_HISTORIA_RANCIA:
-            avisos.append(
+            # Leve A PROPÓSITO: que la narración vaya atrasada no hace falsa ni
+            # una sola cifra. Congelar por esto es lo que dejó el escaparate en
+            # el 02/09 durante tres días (ver la clase Avisos).
+            avisos.nota(
                 f"⚠️ la historia lleva {historia['dias_sin_capitulo']} días sin capítulo "
                 f"(último {historia['ultimo_hito']}): añade un bloque a exporter/historia.md"
             )
@@ -507,7 +550,10 @@ def preserva_historia(nueva: dict, overview_previo: Path, avisos: list) -> dict:
 
     antes = previa.get("hitos") or []
     if len(antes) > len(nueva.get("hitos") or []):
-        avisos.append(
+        # Leve: la pérdida YA está reparada aquí mismo (se conservan los de antes),
+        # así que lo que se publica no encoge. Bloquear además sería castigar dos
+        # veces —y con el escaparate entero— un fallo que este método ya cura.
+        avisos.nota(
             f"⚠️ historia: el lote nuevo trae {len(nueva.get('hitos') or [])} capítulos y el "
             f"anterior tenía {len(antes)} — se conservan los del lote anterior"
         )
@@ -648,7 +694,7 @@ def main() -> int:
     outdir = Path(args.out).expanduser().resolve()
     s00 = vault / "00_SISTEMA"
 
-    avisos = []
+    avisos = Avisos()
     for rel in ["Vistas-Principales/PANEL-CLON.md", "Vistas-Principales/PANEL-TOKENS.md",
                 "cuadros-de-mando/SISTEMA-COMPLETO.md", "Monitorizacion/tokens/serie-kpi.jsonl"]:
         if not (s00 / rel).exists():
@@ -693,7 +739,12 @@ def main() -> int:
 
     ahora = datetime.now(timezone.utc).isoformat(timespec="seconds")
     salidas = {
-        "manifest.json": {"generado": ahora, "version": 1, "avisos": avisos,
+        # `avisos` sigue siendo TODO lo que hay que decir (contrato viejo, nada se
+        # esconde). `avisos_bloqueantes` es el subconjunto por el que se decide no
+        # publicar: lo escribe quien conoce el significado de cada aviso —este
+        # exportador— y no quien solo ve la cadena de texto (ver la clase Avisos).
+        "manifest.json": {"generado": ahora, "version": 1, "avisos": list(avisos),
+                          "avisos_bloqueantes": avisos.bloqueantes,
                           "fuentes": ["PANEL-CLON", "PANEL-TOKENS", "cuadros-de-mando",
                                       "Monitorizacion/tokens"]},
         "overview.json": overview,
@@ -718,8 +769,11 @@ def main() -> int:
         (outdir / nombre).write_text(json.dumps(obj, ensure_ascii=False, indent=2),
                                      encoding="utf-8")
     print(f"✅ exportados {len(salidas)} ficheros a {outdir}")
+    bloqueantes = avisos.bloqueantes
     for a in avisos:
-        print(a)
+        # Que en el log nocturno se lea de un vistazo cuál de los dos es: un aviso
+        # que no bloquea y uno que sí se parecían demasiado leyéndolos a las 03:43.
+        print(f"{'⛔' if a in bloqueantes else '·'} {a}")
     print(f"   crons={len(overview.get('crons', []))} clones={len(sistema['clones'])} "
           f"integraciones={len(sistema['integraciones'])} "
           f"kpis={sum(len(v) for v in tokens['kpis'].values())} "
