@@ -37,6 +37,9 @@ export type IdentidadClon = {
   titular: string
   titularCorto: string
 
+  /** Cómo se le nombra en público; puede ser más corto que `titular`. */
+  titularPublico: string
+
   /** Ruta pública SIN basePath (o null si este clon aún no tiene cara). */
   avatar: string | null
   retrato: string | null
@@ -52,6 +55,7 @@ export const IDENTIDAD_CLON: IdentidadClon = {
   iniciales: 'MC',
   titular: 'Miguel Ángel Domínguez Castellano',
   titularCorto: 'MAD',
+  titularPublico: 'Miguel Ángel Domínguez',
   avatar: 'identidad/avatar.png',
   retrato: 'identidad/retrato.png',
   generadasPorIa: true,
