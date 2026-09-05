@@ -1,0 +1,32 @@
+{
+  "schema": "clon.identidad.v1",
+  "actualizado": "2026-09-05",
+  "slug": "clon-mad",
+  "nombre": "MAD Clon",
+  "iniciales": "MC",
+  "titular": "Miguel Ángel Domínguez Castellano",
+  "titular_corto": "MAD",
+  "titular_publico": "Miguel Ángel Domínguez",
+  "avatar": "identidad/avatar.png",
+  "retrato": "identidad/retrato.png",
+  "generadas_por_ia": true,
+  "textos": {
+    "es": {
+      "es_el_clon": "Este es el clon",
+      "de_quien": "El clon de Miguel Ángel Domínguez (MAD)",
+      "quien_es_quien": "A la izquierda, MAD. A la derecha, su clon.",
+      "avatar_alt": "Cara del clon de MAD: un androide con la cúpula craneal cromada.",
+      "retrato_alt": "Miguel Ángel Domínguez, a la izquierda, junto a su clon, a la derecha: un androide con la cúpula craneal cromada.",
+      "aviso_ia": "Imagen generada con IA"
+    },
+    "en": {
+      "es_el_clon": "This is the clone",
+      "de_quien": "Miguel Ángel Domínguez's (MAD) clone",
+      "quien_es_quien": "On the left, MAD. On the right, his clone.",
+      "avatar_alt": "The face of MAD's clone: an android with a chrome skull dome.",
+      "retrato_alt": "Miguel Ángel Domínguez, on the left, next to his clone, on the right: an android with a chrome skull dome.",
+      "aviso_ia": "AI-generated image"
+    }
+  },
+  "_generado_por": "00_SISTEMA/identidad-visual-clon/repartir.py — no editar a mano"
+}
