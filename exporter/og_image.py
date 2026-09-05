@@ -105,6 +105,26 @@ def sparkline(base, serie, y_top, y_bot):
     base.alpha_composite(capa)
 
 
+def envolver(draw, texto, fnt, ancho):
+    """Parte el texto en líneas que caben en `ancho`, midiendo de verdad.
+
+    El tagline venía con el salto de línea escrito a mano y su primera línea
+    medía 1.309 px sobre un lienzo de 1.200: se salía por la derecha, y con
+    cualquier otro clon —otro nombre, otro titular— se saldría por otro sitio.
+    """
+    lineas, actual = [], ""
+    for palabra in texto.split():
+        prueba = f"{actual} {palabra}".strip()
+        if actual and draw.textlength(prueba, font=fnt) > ancho:
+            lineas.append(actual)
+            actual = palabra
+        else:
+            actual = prueba
+    if actual:
+        lineas.append(actual)
+    return "\n".join(lineas)
+
+
 def chip(draw, xy, texto, fnt, anclaje_x, punto=None):
     """Chip redondeado con texto; devuelve la x siguiente."""
     x, y = xy
@@ -127,6 +147,7 @@ def main():
     ap.add_argument("--data", default=str(raiz / "web" / "public" / "data"))
     ap.add_argument("--out", default=str(raiz / "web" / "public" / "images" / "og-madclon.png"))
     ap.add_argument("--logo", default=str(raiz / "web" / "public" / "images" / "logo-512.png"))
+    ap.add_argument("--avatar", default=str(raiz / "web" / "public" / "identidad" / "avatar.png"))
     args = ap.parse_args()
 
     data = Path(args.data)
@@ -158,15 +179,52 @@ def main():
     f_tag = font(REG, 33)
     f_fecha = font(REG, 24)
 
+    # La cara del clon ocupa la columna derecha; el texto se queda en la izquierda
+    # y no la pisa. Sin foto (`avatar.png` no existe para este clon) el texto
+    # recupera todo el ancho y la cabecera queda como estaba.
+    cara = Path(args.avatar)
+    lado_cara = 200
+    x_cara = W - 56 - lado_cara
+    ancho_texto = (x_cara - 72 - 32) if cara.is_file() else (W - 72 - 56)
+
     draw.text((300, 108), "MAD Clon", font=f_nombre, fill=(255, 255, 255, 255))
-    draw.text((303, 214), "Front Office · la sala de control, abierta", font=f_sub, fill=(255, 255, 255, 225))
+    draw.text((303, 214), "Front Office · la sala de control", font=f_sub, fill=(255, 255, 255, 225))
     draw.text(
         (72, 330),
-        "Un equipo de IA que trabaja mientras Miguel Ángel Domínguez (MAD) vive su vida —\nlos números del Clon de MAD, explicados para personas.",
+        envolver(
+            draw,
+            "Un equipo de IA que trabaja mientras Miguel Ángel Domínguez (MAD) vive su vida — "
+            "los números del Clon de MAD, explicados para personas.",
+            f_tag,
+            ancho_texto,
+        ),
         font=f_tag,
         fill=(255, 255, 255, 205),
         spacing=10,
     )
+
+    # Esta imagen es la que sale cuando alguien comparte el enlace: quien la ve en
+    # LinkedIn o en un WhatsApp tiene que reconocer al clon sin abrir nada. Y que
+    # la foto la hizo una IA se dice también aquí, no solo en la web.
+    if cara.is_file():
+        foto = Image.open(cara).convert("RGBA").resize((lado_cara, lado_cara), Image.LANCZOS)
+        mascara = Image.new("L", (lado_cara * 4, lado_cara * 4), 0)
+        ImageDraw.Draw(mascara).ellipse([0, 0, lado_cara * 4 - 1, lado_cara * 4 - 1], fill=255)
+        foto.putalpha(mascara.resize((lado_cara, lado_cara), Image.LANCZOS))
+        y_cara = 62
+        # Aro claro: sobre el degradado, un círculo a hueso se funde con el fondo.
+        draw.ellipse(
+            [x_cara - 5, y_cara - 5, x_cara + lado_cara + 5, y_cara + lado_cara + 5],
+            fill=(255, 255, 255, 70),
+        )
+        base.alpha_composite(foto, (x_cara, y_cara))
+        draw.text(
+            (W - 56, y_cara + lado_cara + 14),
+            "el clon · imagen generada con IA",
+            font=font(REG, 20),
+            fill=(255, 255, 255, 195),
+            anchor="ra",
+        )
 
     # --- pulso vivo de los últimos 30 días ---
     sparkline(base, serie, y_top=450, y_bot=505)
@@ -190,7 +248,7 @@ def main():
         x = chip(draw, (x, 552), texto, f_chip, x, punto=punto)
 
     # --- fecha de los datos, discreta ---
-    draw.text((W - 56, 40), f"datos del {fecha}", font=f_fecha, fill=(255, 255, 255, 150), anchor="ra")
+    draw.text((72, 44), f"datos del {fecha}", font=f_fecha, fill=(255, 255, 255, 150))
 
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)

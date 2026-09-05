@@ -17,6 +17,8 @@ import { pathToFileURL } from 'node:url'
 export const PUBLIC_SCHEMA = 'madclon.public-containment.v1'
 export const PUBLIC_DATA_FILES = ['manifest.json', 'overview.json', 'clones.json', 'tokens.json', 'serie.json', 'pulso.json']
 export const PUBLIC_PINNED_ASSET_FILES = [
+  'identidad/avatar.png',
+  'identidad/retrato.png',
   'images/avatars/1.png',
   'images/hero-ambiental.png',
   'images/logo-192.png',

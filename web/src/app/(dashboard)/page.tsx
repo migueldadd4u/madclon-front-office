@@ -22,6 +22,7 @@ import ProgresoDia from '@/components/dashboard/ProgresoDia'
 import ConsolaClon from '@/components/dashboard/ConsolaClon'
 import HeroAmbiental from '@/components/dashboard/HeroAmbiental'
 import DatoRancio from '@/components/dashboard/DatoRancio'
+import { TarjetaDelClon } from '@/components/identidad/CaraDelClon'
 
 // Hook Imports
 import { useLang } from '@/lib/i18n'
@@ -162,6 +163,10 @@ const InicioPage = () => {
               <Card className='relative overflow-hidden'>
                 <HeroAmbiental />
                 <CardContent className='relative flex flex-col gap-3'>
+                  {/* Lo primero que se ve del escaparate es a QUIÉN pertenece todo
+                      esto. Quien entra sin saber nada sale sabiendo que hay un
+                      clon, de quién es y qué cara tiene. */}
+                  <TarjetaDelClon />
                   <div className='flex flex-wrap items-center gap-3'>
                     <ConsolaClon data={data} diasVida={diasVida} />
                     <Typography component='h1' variant='h4'>{t('home_titulo')}</Typography>

@@ -49,6 +49,8 @@ await caches.delete(vieja)
 const SAFETY_CLI = fileURLToPath(new URL('./public-safety.mjs', import.meta.url))
 
 const FIXTURE_PUBLIC_ASSETS = {
+  'identidad/avatar.png': 'fixture-identidad-avatar',
+  'identidad/retrato.png': 'fixture-identidad-retrato',
   'images/avatars/1.png': 'fixture-avatar',
   'images/hero-ambiental.png': 'fixture-hero',
   'images/logo-192.png': 'fixture-logo-192',

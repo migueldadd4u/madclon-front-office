@@ -1,6 +1,14 @@
 {
   "schema": "madclon.public-assets.v1",
   "assets": {
+    "identidad/avatar.png": {
+      "size": 223568,
+      "sha256": "b97f73b06e282b86f464d5c1a7d4a242f0ec94678170cb9a56f66077157aee19"
+    },
+    "identidad/retrato.png": {
+      "size": 323291,
+      "sha256": "52bd9e56395e2e7b9ab03fd7c93b26c1df5cd54e4ccebbe8d5e714443e8437de"
+    },
     "images/avatars/1.png": {
       "size": 8032,
       "sha256": "08a2c8d8d736f8e74e45f562d1acd061f66c5e4fa74a92814749102354f8eed0"
@@ -18,8 +26,8 @@
       "sha256": "c169150707c24729c0ab6ecb8cdbd0c69e83ad3d06054f91ae70c4191deabaf7"
     },
     "images/og-madclon.png": {
-      "size": 116796,
-      "sha256": "f172e5b8d1136f2a359515784117418d3afd5357af9d8a5c31ddca7007e4098e"
+      "size": 186894,
+      "sha256": "8ebbcba5576c2e618b76e25c5f1d0e3fd2d3b43cd09e322308874b63da42d3c9"
     },
     "manifest.webmanifest": {
       "size": 689,

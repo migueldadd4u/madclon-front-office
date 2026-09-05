@@ -12,9 +12,9 @@ import type { VerticalNavContextProps } from '@menu/contexts/verticalNavContext'
 
 // Component Imports
 import MadClonLogo from './MadClonLogo'
+import { AvatarClon } from '@components/identidad/CaraDelClon'
 
-// Config Imports
-import themeConfig from '@configs/themeConfig'
+import { IDENTIDAD_CLON } from '@/lib/identidad-clon'
 
 // Hook Imports
 import useVerticalNav from '@menu/hooks/useVerticalNav'
@@ -73,7 +73,9 @@ const Logo = ({ color }: { color?: CSSProperties['color'] }) => {
 
   return (
     <div className='flex items-center min-bs-[24px]'>
-      <MadClonLogo />
+      {/* La cara del clon manda; la marca de la casa es el respaldo de un clon
+          que todavía no tiene foto (`avatar: null` en su identidad). */}
+      {IDENTIDAD_CLON.avatar ? <AvatarClon tamano={30} /> : <MadClonLogo />}
       <LogoText
         color={color}
         ref={logoTextRef}
@@ -82,7 +84,7 @@ const Logo = ({ color }: { color?: CSSProperties['color'] }) => {
         transitionDuration={transitionDuration}
         isBreakpointReached={isBreakpointReached}
       >
-        {themeConfig.templateName}
+        {IDENTIDAD_CLON.nombre}
       </LogoText>
     </div>
   )
