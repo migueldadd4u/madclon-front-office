@@ -175,5 +175,14 @@ export const HITOS_BUILD: Hito[] = [
     "es_texto": "Esta línea de tiempo deja de estar escrita a mano dentro de la web: los capítulos y las cifras salen del refresco nocturno, y si un capítulo se retrasa la propia página lo dice.",
     "en_titulo": "The story tells itself",
     "en_texto": "This timeline stops being hand-written inside the site: chapters and figures now come from the nightly refresh, and if a chapter runs late the page says so itself."
+  },
+  {
+    "fecha": "2026-09-05",
+    "icono": "ri-focus-3-line",
+    "color": "primary",
+    "es_titulo": "Nace el reto",
+    "es_texto": "El clon deja de ordenar la vida en listas y empieza a ordenarla en retos: cosas que se empiezan para terminarlas, con su plan, sus pasos y un avance que se ve. Cuando le llega su momento, el panel privado enseña uno solo y aparta todo lo demás.",
+    "en_titulo": "The challenge is born",
+    "en_texto": "The clone stops arranging life as lists and starts arranging it as challenges: things you begin in order to finish them, with a plan, steps and progress you can see. When its moment comes, the private panel shows one and sets everything else aside."
   }
 ]

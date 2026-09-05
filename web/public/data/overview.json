@@ -1,31 +1,31 @@
 {
   "gtd": {
     "propuestas": null,
-    "bandeja": 35,
+    "bandeja": 94,
     "esperas_vencidas": 11,
     "decisiones": null,
-    "acciones_hoy": 26,
+    "acciones_hoy": 32,
     "esperas_listadas": 8
   },
   "personas": {
-    "fichas_curadas": 861,
+    "fichas_curadas": 865,
     "staged": 0
   },
   "automejora": {
-    "hechas": 256,
-    "bloqueadas": 55,
-    "aparcadas": 63,
-    "pendientes": 4,
-    "llamadas": 160,
+    "hechas": 266,
+    "bloqueadas": 58,
+    "aparcadas": 67,
+    "pendientes": 6,
+    "llamadas": 773,
     "metered": 0,
-    "top": "grok 78, codex_cli 66, minimax 15, kimi_cli 1"
+    "top": "grok 610, local 114, codex_cli 18, minimax 18"
   },
   "crons": [
     {
       "nombre": "Briefing COO 08:05",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "31/08 09:15"
+      "ultima": "04/09 09:08"
     },
     {
       "nombre": "Higiene Semanal del Sistema",
@@ -37,31 +37,31 @@
       "nombre": "Triage correos del día",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "31/08 08:55"
+      "ultima": "04/09 08:55"
     },
     {
       "nombre": "Auto-mejora nocturna clon",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "31/08 03:40"
+      "ultima": "04/09 03:40"
     },
     {
       "nombre": "Resumen diario de Spam",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "31/08 21:30"
+      "ultima": "04/09 21:30"
     },
     {
       "nombre": "Morning briefing",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "31/08 08:00"
+      "ultima": "04/09 08:00"
     },
     {
       "nombre": "Important-mail monitor",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "01/09 03:00"
+      "ultima": "05/09 02:30"
     },
     {
       "nombre": "Weekly review",
@@ -73,13 +73,13 @@
       "nombre": "Topic news digest",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "31/08 18:03"
+      "ultima": "04/09 18:06"
     },
     {
       "nombre": "Repaso ¿Qué necesito?",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "31/08 08:30"
+      "ultima": "04/09 08:30"
     },
     {
       "nombre": "Clon ↔ Jarvis weekly mutual-improvemen",
@@ -91,7 +91,7 @@
       "nombre": "Guardia de tiradas programadas",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "01/09 02:38"
+      "ultima": "05/09 02:38"
     },
     {
       "nombre": "Radar Buzz semanal",
@@ -123,12 +123,12 @@
   ],
   "crons_en_error": 0,
   "tokens_resumen": {
-    "tokens_30d": 114050198,
-    "cobertura_pct": 90,
-    "indice_eficiencia": 145461
+    "tokens_30d": 89409960,
+    "cobertura_pct": 91,
+    "indice_eficiencia": 192717
   },
   "salud_global": "🟢 Todo OK",
-  "watchdog_ts": "2026-09-01T16:20:21.437234Z",
+  "watchdog_ts": "2026-09-05T16:02:48.341248Z",
   "historia": {
     "hitos": [
       {
@@ -301,12 +301,21 @@
         "es_texto": "Esta línea de tiempo deja de estar escrita a mano dentro de la web: los capítulos y las cifras salen del refresco nocturno, y si un capítulo se retrasa la propia página lo dice.",
         "en_titulo": "The story tells itself",
         "en_texto": "This timeline stops being hand-written inside the site: chapters and figures now come from the nightly refresh, and if a chapter runs late the page says so itself."
+      },
+      {
+        "fecha": "2026-09-05",
+        "icono": "ri-focus-3-line",
+        "color": "primary",
+        "es_titulo": "Nace el reto",
+        "es_texto": "El clon deja de ordenar la vida en listas y empieza a ordenarla en retos: cosas que se empiezan para terminarlas, con su plan, sus pasos y un avance que se ve. Cuando le llega su momento, el panel privado enseña uno solo y aparta todo lo demás.",
+        "en_titulo": "The challenge is born",
+        "en_texto": "The clone stops arranging life as lists and starts arranging it as challenges: things you begin in order to finish them, with a plan, steps and progress you can see. When its moment comes, the private panel shows one and sets everything else aside."
       }
     ],
     "bitacoras": 186,
     "nacimiento": "2026-04-14",
     "ultima_bitacora": "2026-08-15",
-    "ultimo_hito": "2026-08-12",
-    "dias_sin_capitulo": 20
+    "ultimo_hito": "2026-09-05",
+    "dias_sin_capitulo": 0
   }
 }
