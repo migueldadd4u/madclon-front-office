@@ -17,7 +17,17 @@
 //     Así que una parada de publicación se paga DOS veces: los días que dura, y
 //     hasta 24 h más después de arreglarla. Subir VERSION es la única forma de
 //     desalojar eso en el navegador de todo el mundo a la vez.
-const VERSION = 'v4'
+// v5 (06/09/2026): misma película que la v4, cuatro noches después. El refresco
+//     nocturno se paró del 03 al 06/09 (un aviso editorial —«la historia lleva 22
+//     días sin capítulo»— tumbaba el lote entero) y, arreglado y republicado a las
+//     08:10 del 06/09, MAD seguía viendo la franja «estos números son del 2/9, 111 h
+//     sin correr»: su navegador tenía sellado el lote muerto y esta caché no
+//     revalida. Producción servía el lote bueno; su copia local, no.
+//     Ésa es la factura fija del diseño aprobado el 03/08 (caché de un día, que es
+//     lo que da el modo avión): cada parada se paga dos veces. Mientras el diseño
+//     siga así, ARREGLAR LA PUBLICACIÓN NO TERMINA HASTA SUBIR ESTA VERSIÓN, que es
+//     lo único que desaloja el lote muerto en el navegador de todo el mundo a la vez.
+const VERSION = 'v5'
 const ESTATICA = `madclon-estatica-${VERSION}`
 const PAGINAS = `madclon-paginas-${VERSION}`
 const DATOS = `madclon-datos-${VERSION}`
