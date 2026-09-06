@@ -28,7 +28,7 @@ import { auditPublicSafety, formatFinding } from './public-safety.mjs'
 const RAIZ = resolve(process.cwd())
 const BASE = '/madclon-front-office'
 const PUERTO = Number(process.env.GATE_PORT || 4173)
-const PAGINAS = ['', 'flota', 'salud', 'tokens', 'eficiencia', 'actividad', 'historia', 'preguntas']
+const PAGINAS = ['', 'retos', 'flota', 'salud', 'tokens', 'eficiencia', 'actividad', 'historia', 'preguntas']
 const rapido = process.argv.includes('--rapido')
 const ANCHOS_AXE = rapido ? [375, 1440] : [375, 390, 834, 1440]
 const ANCHOS_OVERFLOW = [320, 375, 390, 834, 1440]

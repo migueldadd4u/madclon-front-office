@@ -18,6 +18,7 @@ import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent'
 import DataGate from '@/components/dashboard/DataGate'
 import Insignias from '@/components/dashboard/Insignias'
 import StatCard from '@/components/dashboard/StatCard'
+import Link from '@/components/Link'
 
 // Hook Imports
 import { useLang } from '@/lib/i18n'
@@ -159,6 +160,15 @@ const HistoriaPage = () => {
                   <Typography variant='h4'>{t('his_titulo')}</Typography>
                   <Typography color='text.secondary' className='max-is-2xl'>
                     {t('his_intro')}
+                  </Typography>
+                  {/* Ida y vuelta con /retos (T-05.1): quien lee el capítulo del 5 de septiembre
+                      llega a la explicación, y al revés. */}
+                  <Typography variant='body2'>
+                    {/* Objetivo táctil ≥ 44 px (check 8 del gate): un enlace de texto suelto
+                        mide 16 px de alto y no se puede pulsar con el dedo. */}
+                    <Link href='/retos' className='inline-flex items-center min-bs-[44px]'>
+                      {lang === 'es' ? 'Qué es un reto →' : 'What a challenge is →'}
+                    </Link>
                   </Typography>
                 </CardContent>
               </Card>

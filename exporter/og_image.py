@@ -8,6 +8,11 @@ la imagen social 1200x630: marca + tagline (como siempre) + pulso de tokens de 3
 Uso:  python exporter/og_image.py
       python exporter/og_image.py --data web/public/data --out web/public/images/og-madclon.png
 
+Quién es el clon (nombre, titular, aviso de IA, foto) sale de `identidad/identidad.json`,
+que reparte `00_SISTEMA/identidad-visual-clon/repartir.py` desde el vault: aquí no hay
+ningún nombre escrito a mano. Sin ese fichero, la cabecera sigue saliendo con los textos
+de respaldo de más abajo.
+
 Solo lee datos ya públicos; no toca el vault. Script nuevo e independiente:
 NO forma parte de export_panel.py ni de la automatización nocturna (zona roja;
 cablearlo al job nocturno requiere OK de MAD).
@@ -105,6 +110,58 @@ def sparkline(base, serie, y_top, y_bot):
     base.alpha_composite(capa)
 
 
+# Respaldo si un repo todavía no tiene la identidad repartida: la cabecera sale
+# igual, con lo que decía este script antes de que existiera el manifiesto.
+IDENTIDAD_RESPALDO = {
+    "nombre": "MAD Clon",
+    "titular_publico": "Miguel Ángel Domínguez",
+    "titular_corto": "MAD",
+    "avatar": None,
+    "textos": {"es": {"aviso_ia": "imagen generada con IA"}},
+}
+
+
+def leer_identidad(raiz, fichero=None):
+    """Quién es el clon, del manifiesto repartido. Nunca revienta la og-image."""
+    fichero = Path(fichero) if fichero else Path(raiz) / "identidad" / "identidad.json"
+    try:
+        datos = json.loads(fichero.read_text(encoding="utf-8"))
+    except Exception:
+        return IDENTIDAD_RESPALDO
+
+    # Se leen solo las claves que esta imagen usa, y cada una con su respaldo: un
+    # manifiesto a medias no debe dejar la tarjeta social con un hueco.
+    fusion = dict(IDENTIDAD_RESPALDO)
+    for clave in ("nombre", "titular_publico", "titular_corto", "avatar"):
+        if datos.get(clave):
+            fusion[clave] = datos[clave]
+    aviso = (datos.get("textos", {}).get("es", {}) or {}).get("aviso_ia")
+    if aviso:
+        fusion["textos"] = {"es": {"aviso_ia": aviso}}
+    fusion["generadas_por_ia"] = bool(datos.get("generadas_por_ia", True))
+    return fusion
+
+
+def envolver(draw, texto, fnt, ancho):
+    """Parte el texto en líneas que caben en `ancho`, midiendo de verdad.
+
+    El tagline venía con el salto de línea escrito a mano y su primera línea
+    medía 1.309 px sobre un lienzo de 1.200: se salía por la derecha, y con
+    cualquier otro clon —otro nombre, otro titular— se saldría por otro sitio.
+    """
+    lineas, actual = [], ""
+    for palabra in texto.split():
+        prueba = f"{actual} {palabra}".strip()
+        if actual and draw.textlength(prueba, font=fnt) > ancho:
+            lineas.append(actual)
+            actual = palabra
+        else:
+            actual = prueba
+    if actual:
+        lineas.append(actual)
+    return "\n".join(lineas)
+
+
 def chip(draw, xy, texto, fnt, anclaje_x, punto=None):
     """Chip redondeado con texto; devuelve la x siguiente."""
     x, y = xy
@@ -127,7 +184,17 @@ def main():
     ap.add_argument("--data", default=str(raiz / "web" / "public" / "data"))
     ap.add_argument("--out", default=str(raiz / "web" / "public" / "images" / "og-madclon.png"))
     ap.add_argument("--logo", default=str(raiz / "web" / "public" / "images" / "logo-512.png"))
+    ap.add_argument("--avatar", default=None, help="por defecto, la que diga identidad/identidad.json")
+    ap.add_argument("--identidad", default=None, help="otro manifiesto (para probar la tarjeta de otro clon)")
     args = ap.parse_args()
+
+    identidad = leer_identidad(raiz, args.identidad)
+    nombre_clon = identidad["nombre"]
+    titular = f"{identidad['titular_publico']} ({identidad['titular_corto']})"
+    # El aviso viene del manifiesto tal cual («Imagen generada con IA»), así que el
+    # pie se arma con el NOMBRE delante y no con un «el clon ·» que dejaría la
+    # mayúscula del aviso a media frase.
+    pie_cara = f"{nombre_clon} · {identidad['textos']['es']['aviso_ia']}" if identidad["generadas_por_ia"] else nombre_clon
 
     data = Path(args.data)
     overview = json.loads((data / "overview.json").read_text())
@@ -158,15 +225,55 @@ def main():
     f_tag = font(REG, 33)
     f_fecha = font(REG, 24)
 
-    draw.text((300, 108), "MAD Clon", font=f_nombre, fill=(255, 255, 255, 255))
-    draw.text((303, 214), "Front Office · la sala de control, abierta", font=f_sub, fill=(255, 255, 255, 225))
+    # La cara del clon ocupa la columna derecha; el texto se queda en la izquierda
+    # y no la pisa. Sin foto (`avatar.png` no existe para este clon) el texto
+    # recupera todo el ancho y la cabecera queda como estaba.
+    # `avatar` del manifiesto es la ruta PÚBLICA («identidad/avatar.png»), o sea
+    # que en disco cuelga de web/public/. Confundirlas dejaba la tarjeta sin cara
+    # y sin avisar: el único síntoma era un PNG 60 KB más pequeño.
+    cara = Path(args.avatar) if args.avatar else (raiz / "web" / "public" / (identidad["avatar"] or "identidad/avatar.png"))
+    lado_cara = 200
+    x_cara = W - 56 - lado_cara
+    ancho_texto = (x_cara - 72 - 32) if cara.is_file() else (W - 72 - 56)
+
+    draw.text((300, 108), nombre_clon, font=f_nombre, fill=(255, 255, 255, 255))
+    draw.text((303, 214), "Front Office · la sala de control", font=f_sub, fill=(255, 255, 255, 225))
     draw.text(
         (72, 330),
-        "Un equipo de IA que trabaja mientras Miguel Ángel Domínguez (MAD) vive su vida —\nlos números del Clon de MAD, explicados para personas.",
+        envolver(
+            draw,
+            f"Un equipo de IA que trabaja mientras {titular} vive su vida — "
+            f"los números de {nombre_clon}, explicados para personas.",
+            f_tag,
+            ancho_texto,
+        ),
         font=f_tag,
         fill=(255, 255, 255, 205),
         spacing=10,
     )
+
+    # Esta imagen es la que sale cuando alguien comparte el enlace: quien la ve en
+    # LinkedIn o en un WhatsApp tiene que reconocer al clon sin abrir nada. Y que
+    # la foto la hizo una IA se dice también aquí, no solo en la web.
+    if cara.is_file():
+        foto = Image.open(cara).convert("RGBA").resize((lado_cara, lado_cara), Image.LANCZOS)
+        mascara = Image.new("L", (lado_cara * 4, lado_cara * 4), 0)
+        ImageDraw.Draw(mascara).ellipse([0, 0, lado_cara * 4 - 1, lado_cara * 4 - 1], fill=255)
+        foto.putalpha(mascara.resize((lado_cara, lado_cara), Image.LANCZOS))
+        y_cara = 62
+        # Aro claro: sobre el degradado, un círculo a hueso se funde con el fondo.
+        draw.ellipse(
+            [x_cara - 5, y_cara - 5, x_cara + lado_cara + 5, y_cara + lado_cara + 5],
+            fill=(255, 255, 255, 70),
+        )
+        base.alpha_composite(foto, (x_cara, y_cara))
+        draw.text(
+            (W - 56, y_cara + lado_cara + 14),
+            pie_cara,
+            font=font(REG, 20),
+            fill=(255, 255, 255, 195),
+            anchor="ra",
+        )
 
     # --- pulso vivo de los últimos 30 días ---
     sparkline(base, serie, y_top=450, y_bot=505)
@@ -190,7 +297,7 @@ def main():
         x = chip(draw, (x, 552), texto, f_chip, x, punto=punto)
 
     # --- fecha de los datos, discreta ---
-    draw.text((W - 56, 40), f"datos del {fecha}", font=f_fecha, fill=(255, 255, 255, 150), anchor="ra")
+    draw.text((72, 44), f"datos del {fecha}", font=f_fecha, fill=(255, 255, 255, 150))
 
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)

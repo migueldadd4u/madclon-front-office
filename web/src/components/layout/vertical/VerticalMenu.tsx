@@ -73,6 +73,9 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         <MenuItem href='/' icon={<i className='ri-dashboard-3-line' />}>
           {t('nav_panel')}
         </MenuItem>
+        <MenuItem href='/retos' icon={<i className='ri-focus-3-line' />}>
+          {t('nav_retos')}
+        </MenuItem>
         <MenuItem href='/flota' icon={<i className='ri-robot-2-line' />}>
           {t('nav_flota')}
         </MenuItem>

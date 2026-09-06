@@ -1,6 +1,14 @@
 {
   "schema": "madclon.public-assets.v1",
   "assets": {
+    "identidad/avatar.png": {
+      "size": 223568,
+      "sha256": "b97f73b06e282b86f464d5c1a7d4a242f0ec94678170cb9a56f66077157aee19"
+    },
+    "identidad/retrato.png": {
+      "size": 323291,
+      "sha256": "52bd9e56395e2e7b9ab03fd7c93b26c1df5cd54e4ccebbe8d5e714443e8437de"
+    },
     "images/avatars/1.png": {
       "size": 8032,
       "sha256": "08a2c8d8d736f8e74e45f562d1acd061f66c5e4fa74a92814749102354f8eed0"
@@ -18,8 +26,8 @@
       "sha256": "c169150707c24729c0ab6ecb8cdbd0c69e83ad3d06054f91ae70c4191deabaf7"
     },
     "images/og-madclon.png": {
-      "size": 116796,
-      "sha256": "f172e5b8d1136f2a359515784117418d3afd5357af9d8a5c31ddca7007e4098e"
+      "size": 187350,
+      "sha256": "475e29ea836731f303e46751568904d2059b2985ed1872e22c1108867dc5d508"
     },
     "manifest.webmanifest": {
       "size": 689,
@@ -42,8 +50,8 @@
       "sha256": "6de949686d9b0e343d666d7d5ae111131c1782b3c00898fdb75c84a3172a45ac"
     },
     "sw.js": {
-      "size": 6046,
-      "sha256": "dee0869093b404a384284649a1cd6582d8f613dade9c51636a44655e8f96baa6"
+      "size": 6896,
+      "sha256": "206acc113ae27e70875aee818377ca4fb8193b196490a3217d1b1aecfbca786d"
     }
   },
   "app_assets": {

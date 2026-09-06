@@ -21,6 +21,7 @@ const STR = {
   nav_tokens: { es: 'Tokens', en: 'Tokens' },
   nav_eficiencia: { es: 'Eficiencia', en: 'Efficiency' },
   nav_actividad: { es: 'Actividad', en: 'Activity' },
+  nav_retos: { es: 'Retos', en: 'Challenges' },
   nav_historia: { es: 'Historia', en: 'Story' },
   nav_preguntas: { es: 'Preguntas', en: 'FAQ' },
 

@@ -1,118 +1,134 @@
 {
   "gtd": {
     "propuestas": null,
-    "bandeja": 1,
+    "bandeja": 111,
     "esperas_vencidas": 11,
     "decisiones": null,
-    "acciones_hoy": 20,
+    "acciones_hoy": 32,
     "esperas_listadas": 8
   },
   "personas": {
-    "fichas_curadas": 858,
+    "fichas_curadas": 865,
     "staged": 0
   },
   "automejora": {
-    "hechas": 210,
-    "bloqueadas": 44,
-    "aparcadas": 50,
-    "pendientes": 7,
-    "llamadas": 266,
+    "hechas": 271,
+    "bloqueadas": 59,
+    "aparcadas": 69,
+    "pendientes": 8,
+    "llamadas": 945,
     "metered": 0,
-    "top": "codex_cli 157, grok 45, minimax 20, local 19"
+    "top": "grok 764, local 122, minimax 22, agy_cli 21"
   },
   "crons": [
     {
       "nombre": "Briefing COO 08:05",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "18/08 09:10"
+      "ultima": "06/09 09:07"
     },
     {
       "nombre": "Higiene Semanal del Sistema",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "16/08 04:00"
+      "ultima": "06/09 04:00"
     },
     {
       "nombre": "Triage correos del día",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "18/08 08:53"
+      "ultima": "06/09 08:55"
     },
     {
       "nombre": "Auto-mejora nocturna clon",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "18/08 03:40"
+      "ultima": "06/09 03:40"
     },
     {
       "nombre": "Resumen diario de Spam",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "17/08 21:30"
+      "ultima": "05/09 21:30"
     },
     {
       "nombre": "Morning briefing",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "18/08 08:00"
+      "ultima": "06/09 08:00"
     },
     {
       "nombre": "Important-mail monitor",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "18/08 13:30"
+      "ultima": "06/09 19:30"
     },
     {
       "nombre": "Weekly review",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "16/08 18:00"
+      "ultima": "06/09 18:00"
     },
     {
       "nombre": "Topic news digest",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "17/08 18:05"
+      "ultima": "04/09 18:06"
     },
     {
       "nombre": "Repaso ¿Qué necesito?",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "18/08 08:30"
+      "ultima": "06/09 08:30"
     },
     {
       "nombre": "Clon ↔ Jarvis weekly mutual-improvemen",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "16/08 19:15"
+      "ultima": "06/09 19:15"
     },
     {
       "nombre": "Guardia de tiradas programadas",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "18/08 13:38"
+      "ultima": "06/09 18:38"
+    },
+    {
+      "nombre": "Radar Buzz semanal",
+      "ambito": "clon",
+      "estado": "ok",
+      "ultima": "31/08 09:00"
+    },
+    {
+      "nombre": "Scorecard Buzz mensual",
+      "ambito": "clon",
+      "estado": "ok",
+      "ultima": "31/08 09:15"
+    },
+    {
+      "nombre": "Decision Buzz 22-11-2026",
+      "ambito": "clon",
+      "estado": "—",
+      "ultima": "nunca"
     }
   ],
   "gateways": [
-    "gateway",
     "gateway-ceo",
     "gateway-clon",
     "gateway-ideas",
     "gateway-licitador",
     "gateway-padre",
     "gateway-patrimonio",
-    "gateway-tecnico",
-    "whatsapp-bridge-clon"
+    "gateway-tecnico"
   ],
   "crons_en_error": 0,
   "tokens_resumen": {
-    "tokens_30d": 269068591,
+    "tokens_30d": 89014512,
     "cobertura_pct": 91,
-    "indice_eficiencia": 397960
+    "indice_eficiencia": 237435
   },
-  "salud_global": "🔴 Hay incidencias activas",
-  "watchdog_ts": "2026-08-18T12:16:28.637550Z",
+  "salud_global": "🟢 Todo OK",
+  "watchdog_ts": "2026-09-06T16:09:53.355441Z",
   "historia": {
     "hitos": [
       {
@@ -285,12 +301,21 @@
         "es_texto": "Esta línea de tiempo deja de estar escrita a mano dentro de la web: los capítulos y las cifras salen del refresco nocturno, y si un capítulo se retrasa la propia página lo dice.",
         "en_titulo": "The story tells itself",
         "en_texto": "This timeline stops being hand-written inside the site: chapters and figures now come from the nightly refresh, and if a chapter runs late the page says so itself."
+      },
+      {
+        "fecha": "2026-09-05",
+        "icono": "ri-focus-3-line",
+        "color": "primary",
+        "es_titulo": "Nace el reto",
+        "es_texto": "El clon deja de ordenar la vida en listas y empieza a ordenarla en retos: cosas que se empiezan para terminarlas, con su plan, sus pasos y un avance que se ve. Cuando le llega su momento, el panel privado enseña uno solo y aparta todo lo demás.",
+        "en_titulo": "The challenge is born",
+        "en_texto": "The clone stops arranging life as lists and starts arranging it as challenges: things you begin in order to finish them, with a plan, steps and progress you can see. When its moment comes, the private panel shows one and sets everything else aside."
       }
     ],
     "bitacoras": 186,
     "nacimiento": "2026-04-14",
     "ultima_bitacora": "2026-08-15",
-    "ultimo_hito": "2026-08-12",
-    "dias_sin_capitulo": 6
+    "ultimo_hito": "2026-09-05",
+    "dias_sin_capitulo": 1
   }
 }
