@@ -1,7 +1,7 @@
 {
   "gtd": {
     "propuestas": null,
-    "bandeja": 111,
+    "bandeja": 122,
     "esperas_vencidas": 11,
     "decisiones": null,
     "acciones_hoy": 32,
@@ -12,13 +12,13 @@
     "staged": 0
   },
   "automejora": {
-    "hechas": 271,
-    "bloqueadas": 59,
+    "hechas": 276,
+    "bloqueadas": 60,
     "aparcadas": 69,
-    "pendientes": 8,
-    "llamadas": 945,
+    "pendientes": 7,
+    "llamadas": 1023,
     "metered": 0,
-    "top": "grok 764, local 122, minimax 22, agy_cli 21"
+    "top": "grok 801, local 162, minimax 22, agy_cli 21"
   },
   "crons": [
     {
@@ -43,13 +43,13 @@
       "nombre": "Auto-mejora nocturna clon",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "06/09 03:40"
+      "ultima": "07/09 03:40"
     },
     {
       "nombre": "Resumen diario de Spam",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "05/09 21:30"
+      "ultima": "06/09 21:30"
     },
     {
       "nombre": "Morning briefing",
@@ -61,7 +61,7 @@
       "nombre": "Important-mail monitor",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "06/09 19:30"
+      "ultima": "07/09 03:30"
     },
     {
       "nombre": "Weekly review",
@@ -91,7 +91,7 @@
       "nombre": "Guardia de tiradas programadas",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "06/09 18:38"
+      "ultima": "07/09 03:38"
     },
     {
       "nombre": "Radar Buzz semanal",
@@ -123,12 +123,12 @@
   ],
   "crons_en_error": 0,
   "tokens_resumen": {
-    "tokens_30d": 89014512,
+    "tokens_30d": 95364495,
     "cobertura_pct": 91,
-    "indice_eficiencia": 237435
+    "indice_eficiencia": 224963
   },
   "salud_global": "🟢 Todo OK",
-  "watchdog_ts": "2026-09-06T16:09:53.355441Z",
+  "watchdog_ts": "2026-09-07T00:12:24.190311Z",
   "historia": {
     "hitos": [
       {
@@ -316,6 +316,6 @@
     "nacimiento": "2026-04-14",
     "ultima_bitacora": "2026-08-15",
     "ultimo_hito": "2026-09-05",
-    "dias_sin_capitulo": 1
+    "dias_sin_capitulo": 2
   }
 }
