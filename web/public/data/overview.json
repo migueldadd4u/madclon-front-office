@@ -1,7 +1,7 @@
 {
   "gtd": {
     "propuestas": null,
-    "bandeja": 213,
+    "bandeja": 233,
     "esperas_vencidas": 11,
     "decisiones": null,
     "acciones_hoy": 32,
@@ -12,20 +12,20 @@
     "staged": 0
   },
   "automejora": {
-    "hechas": 291,
-    "bloqueadas": 65,
-    "aparcadas": 73,
-    "pendientes": 5,
-    "llamadas": 747,
+    "hechas": 294,
+    "bloqueadas": 66,
+    "aparcadas": 75,
+    "pendientes": 4,
+    "llamadas": 596,
     "metered": 0,
-    "top": "grok 390, minimax 187, local 155, agy_cli 9"
+    "top": "grok 257, minimax 186, local 147, agy_cli 4"
   },
   "crons": [
     {
       "nombre": "Briefing COO 08:05",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "11/09 09:06"
+      "ultima": "12/09 09:13"
     },
     {
       "nombre": "Higiene Semanal del Sistema",
@@ -37,31 +37,31 @@
       "nombre": "Triage correos del día",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "11/09 08:55"
+      "ultima": "12/09 08:55"
     },
     {
       "nombre": "Auto-mejora nocturna clon",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "12/09 03:40"
+      "ultima": "13/09 03:40"
     },
     {
       "nombre": "Resumen diario de Spam",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "11/09 21:30"
+      "ultima": "12/09 21:30"
     },
     {
       "nombre": "Morning briefing",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "11/09 08:00"
+      "ultima": "12/09 08:00"
     },
     {
       "nombre": "Important-mail monitor",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "12/09 03:30"
+      "ultima": "13/09 03:30"
     },
     {
       "nombre": "Weekly review",
@@ -79,7 +79,7 @@
       "nombre": "Repaso ¿Qué necesito?",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "11/09 08:30"
+      "ultima": "12/09 08:30"
     },
     {
       "nombre": "Clon ↔ Jarvis weekly mutual-improvemen",
@@ -91,7 +91,7 @@
       "nombre": "Guardia de tiradas programadas",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "12/09 03:38"
+      "ultima": "13/09 03:38"
     },
     {
       "nombre": "Radar Buzz semanal",
@@ -123,12 +123,12 @@
   ],
   "crons_en_error": 0,
   "tokens_resumen": {
-    "tokens_30d": 112524054,
+    "tokens_30d": 113980927,
     "cobertura_pct": 91,
-    "indice_eficiencia": 160242
+    "indice_eficiencia": 128283
   },
   "salud_global": "🟢 Todo OK",
-  "watchdog_ts": "2026-09-12T00:12:29.903359Z",
+  "watchdog_ts": "2026-09-13T00:21:28.744852Z",
   "historia": {
     "hitos": [
       {
@@ -316,6 +316,6 @@
     "nacimiento": "2026-04-14",
     "ultima_bitacora": "2026-08-15",
     "ultimo_hito": "2026-09-05",
-    "dias_sin_capitulo": 7
+    "dias_sin_capitulo": 8
   }
 }
