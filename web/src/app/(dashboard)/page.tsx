@@ -3,8 +3,6 @@
 // React Imports
 import { useState } from 'react'
 
-import Link from 'next/link'
-
 // MUI Imports
 import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
@@ -12,12 +10,12 @@ import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import Chip from '@mui/material/Chip'
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import { BarChart, Bar, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
 // Component Imports
 import DataGate from '@/components/dashboard/DataGate'
 import StatCard from '@/components/dashboard/StatCard'
+import HeroClon from '@/components/dashboard/HeroClon'
 import ClonOpina from '@/components/dashboard/ClonOpina'
 import EstaNoche from '@/components/dashboard/EstaNoche'
 import Latido from '@/components/dashboard/Latido'
@@ -25,7 +23,6 @@ import DiaEnLaVida from '@/components/dashboard/DiaEnLaVida'
 import ProgresoDia from '@/components/dashboard/ProgresoDia'
 import ConsolaClon from '@/components/dashboard/ConsolaClon'
 import DatoRancio from '@/components/dashboard/DatoRancio'
-import { TarjetaDelClon } from '@/components/identidad/CaraDelClon'
 
 // Hook Imports
 import { useLang } from '@/lib/i18n'
@@ -163,33 +160,9 @@ const InicioPage = () => {
 
             {/* Identidad, utilidad y siguiente gesto antes del detalle del sistema. */}
             <Grid size={12}>
-              <Card variant='outlined' data-bienvenida>
-                <CardContent sx={{ p: { xs: 4, sm: 6 }, '&:last-child': { pb: { xs: 4, sm: 6 } } }}>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 4, sm: 5 }, maxInlineSize: 850 }}>
-                    <TarjetaDelClon compacta />
-                    <Box>
-                      <Typography component='h1' variant='h3' sx={{ fontSize: { xs: '1.85rem', sm: '2.75rem' }, lineHeight: 1.15, letterSpacing: '-0.025em', maxInlineSize: '22ch' }}>
-                        {t('home_titulo')}
-                      </Typography>
-                      <Typography color='text.secondary' sx={{ mt: 3, maxInlineSize: '58ch', lineHeight: 1.6 }}>
-                        {t('home_resumen')}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, '& a:focus-visible': { outline: '3px solid', outlineColor: 'text.primary', outlineOffset: 3 } }}>
-                      <Button component={Link} href='/retos/' variant='contained' disableElevation data-bienvenida-explorar
-                        endIcon={<i className='ri-arrow-right-line' aria-hidden />} sx={{ minBlockSize: 48, px: 5, bgcolor: 'primary.dark', '&:hover': { bgcolor: 'primary.dark' } }}>
-                        {t('home_explorar')}
-                      </Button>
-                      <Button component='a' href='#como-funciona' variant='outlined' sx={{ minBlockSize: 48, px: 5, color: 'text.primary', borderColor: 'text.secondary' }}>
-                        {t('home_como')}
-                      </Button>
-                    </Box>
-                    <Typography variant='caption' color='text.secondary'>
-                      {t('home_caption_datos')}
-                    </Typography>
-                  </Box>
-                </CardContent>
-              </Card>
+              <HeroClon
+                frescura={`${lang === 'en' ? 'data generated on' : 'datos generados el'} ${fmtFecha(manifest.generado)}`}
+              />
               <Box sx={{ mt: 3, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 3 }}>
                 <Box component='details' sx={{ flex: '1 1 240px', minInlineSize: 0 }}>
                   <Box component='summary' sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 2, minBlockSize: 48, cursor: 'pointer', '&:focus-visible': { outline: '2px solid', outlineColor: 'primary.main', outlineOffset: 3, borderRadius: 1 } }}>
@@ -209,9 +182,6 @@ const InicioPage = () => {
                     <Latido crons={overview.crons} generado={manifest.generado} />
                   </Box>
                 </Box>
-                <Typography variant='caption' color='text.secondary'>
-                    {lang === 'en' ? 'data generated on' : 'datos generados el'} {fmtFecha(manifest.generado)} · {t('home_caption_datos')}
-                </Typography>
               </Box>
             </Grid>
 
