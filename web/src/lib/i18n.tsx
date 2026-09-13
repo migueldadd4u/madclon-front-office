@@ -61,6 +61,13 @@ const STR = {
 
   // ------------------------------------------------------------- portada
   home_titulo: { es: 'La sala de control del Clon de MAD', en: 'The MAD Clone control room' },
+  home_resumen: {
+    es: 'Organiza lo que llega, prepara decisiones y deja su trabajo a la vista. Explora qué hace y cómo funciona.',
+    en: 'It organizes what comes in, prepares decisions and makes its work visible. Explore what it does and how it works.'
+  },
+  home_explorar: { es: 'Explorar los retos', en: 'Explore the challenges' },
+  home_como: { es: 'Cómo funciona', en: 'How it works' },
+  home_estado: { es: 'Estado del sistema', en: 'System status' },
   home_intro: {
     es: 'Un equipo de inteligencia artificial que trabaja mientras Miguel Ángel Domínguez (MAD) vive su vida: lee el correo, clasifica lo importante, prepara decisiones, vigila el patrimonio y se mejora a sí mismo cada noche. Esta web es su cuadro de mandos — los mismos números que ve él, explicados para personas.',
     en: "A team of artificial intelligence that works while Miguel Ángel Domínguez (MAD) lives his life: it reads the mail, sorts what matters, prepares decisions, watches over the family's assets and improves itself every night. This website is its dashboard — the same numbers it sees, explained for people."

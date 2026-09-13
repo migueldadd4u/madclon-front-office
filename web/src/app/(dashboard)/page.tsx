@@ -3,12 +3,16 @@
 // React Imports
 import { useState } from 'react'
 
+import Link from 'next/link'
+
 // MUI Imports
 import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import Chip from '@mui/material/Chip'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import { BarChart, Bar, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
 // Component Imports
@@ -20,7 +24,6 @@ import Latido from '@/components/dashboard/Latido'
 import DiaEnLaVida from '@/components/dashboard/DiaEnLaVida'
 import ProgresoDia from '@/components/dashboard/ProgresoDia'
 import ConsolaClon from '@/components/dashboard/ConsolaClon'
-import HeroAmbiental from '@/components/dashboard/HeroAmbiental'
 import DatoRancio from '@/components/dashboard/DatoRancio'
 import { TarjetaDelClon } from '@/components/identidad/CaraDelClon'
 
@@ -158,18 +161,40 @@ const InicioPage = () => {
               </Typography>
             </Grid>
 
-            {/* Bienvenida — con atmósfera viva de marca detrás */}
+            {/* Identidad, utilidad y siguiente gesto antes del detalle del sistema. */}
             <Grid size={12}>
-              <Card className='relative overflow-hidden'>
-                <HeroAmbiental />
-                <CardContent className='relative flex flex-col gap-3'>
-                  {/* Lo primero que se ve del escaparate es a QUIÉN pertenece todo
-                      esto. Quien entra sin saber nada sale sabiendo que hay un
-                      clon, de quién es y qué cara tiene. */}
-                  <TarjetaDelClon />
-                  <div className='flex flex-wrap items-center gap-3'>
-                    <ConsolaClon data={data} diasVida={diasVida} />
-                    <Typography component='h1' variant='h4'>{t('home_titulo')}</Typography>
+              <Card variant='outlined' data-bienvenida>
+                <CardContent sx={{ p: { xs: 4, sm: 6 }, '&:last-child': { pb: { xs: 4, sm: 6 } } }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 4, sm: 5 }, maxInlineSize: 850 }}>
+                    <TarjetaDelClon compacta />
+                    <Box>
+                      <Typography component='h1' variant='h3' sx={{ fontSize: { xs: '1.85rem', sm: '2.75rem' }, lineHeight: 1.15, letterSpacing: '-0.025em', maxInlineSize: '22ch' }}>
+                        {t('home_titulo')}
+                      </Typography>
+                      <Typography color='text.secondary' sx={{ mt: 3, maxInlineSize: '58ch', lineHeight: 1.6 }}>
+                        {t('home_resumen')}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, '& a:focus-visible': { outline: '3px solid', outlineColor: 'text.primary', outlineOffset: 3 } }}>
+                      <Button component={Link} href='/retos/' variant='contained' disableElevation data-bienvenida-explorar
+                        endIcon={<i className='ri-arrow-right-line' aria-hidden />} sx={{ minBlockSize: 48, px: 5, bgcolor: 'primary.dark', '&:hover': { bgcolor: 'primary.dark' } }}>
+                        {t('home_explorar')}
+                      </Button>
+                      <Button component='a' href='#como-funciona' variant='outlined' sx={{ minBlockSize: 48, px: 5, color: 'text.primary', borderColor: 'text.secondary' }}>
+                        {t('home_como')}
+                      </Button>
+                    </Box>
+                    <Typography variant='caption' color='text.secondary'>
+                      {t('home_caption_datos')}
+                    </Typography>
+                  </Box>
+                </CardContent>
+              </Card>
+              <Box sx={{ mt: 3, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 3 }}>
+                <Box component='details' sx={{ flex: '1 1 240px', minInlineSize: 0 }}>
+                  <Box component='summary' sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 2, minBlockSize: 48, cursor: 'pointer', '&:focus-visible': { outline: '2px solid', outlineColor: 'primary.main', outlineOffset: 3, borderRadius: 1 } }}>
+                    <i className='ri-arrow-down-s-line' aria-hidden />
+                    <Typography component='span' variant='body2'>{t('home_estado')}</Typography>
                     <Chip
                       size='small'
                       color={saludOk ? 'success' : 'warning'}
@@ -177,22 +202,17 @@ const InicioPage = () => {
                       icon={<i className={saludOk ? 'ri-checkbox-circle-line' : 'ri-alert-line'} />}
                       label={overview.salud_global?.replace(/[🟢🟡🔴]/g, '').trim() || '—'}
                     />
+                  </Box>
+                  <Typography variant='body2' sx={{ py: 2 }}>{fraseEstado(data, lang, t)}</Typography>
+                  <Box className='flex flex-wrap items-center gap-3'>
+                    <ConsolaClon data={data} diasVida={diasVida} />
                     <Latido crons={overview.crons} generado={manifest.generado} />
-                  </div>
-                  <Typography color='text.secondary' className='max-is-3xl'>
-                    {t('home_intro')}
-                  </Typography>
-                  <Card variant='outlined' className='border-success'>
-                    <CardContent className='flex items-start gap-3'>
-                      <i className='ri-double-quotes-l text-2xl text-success' />
-                      <Typography fontWeight={500}>{fraseEstado(data, lang, t)}</Typography>
-                    </CardContent>
-                  </Card>
-                  <Typography variant='caption' color='text.disabled' className='font-mono'>
+                  </Box>
+                </Box>
+                <Typography variant='caption' color='text.secondary'>
                     {lang === 'en' ? 'data generated on' : 'datos generados el'} {fmtFecha(manifest.generado)} · {t('home_caption_datos')}
-                  </Typography>
-                </CardContent>
-              </Card>
+                </Typography>
+              </Box>
             </Grid>
 
             {/* El clon opina */}
@@ -251,10 +271,11 @@ const InicioPage = () => {
 
             {/* Qué es */}
             <Grid size={12}>
-              <Typography variant='h5' className='mbe-1'>
+              <Typography id='como-funciona' tabIndex={-1} component='h2' variant='h5' className='mbe-1' sx={{ scrollMarginBlockStart: 100 }}>
                 {t('home_quees_titulo').replace('{n}', String(PASOS.length))}
               </Typography>
               <Typography color='text.secondary'>{t('home_quees_sub')}</Typography>
+              <Typography color='text.secondary' sx={{ mt: 2, maxInlineSize: '75ch' }}>{t('home_intro')}</Typography>
             </Grid>
             {PASOS.map((p, i) => (
               <Grid key={p.icon} size={{ xs: 12, sm: 6, lg: 3 }}>

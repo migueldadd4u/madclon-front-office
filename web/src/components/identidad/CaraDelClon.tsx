@@ -78,19 +78,22 @@ export const AvatarClon = ({ tamano = 40, alt = null, className }: PropsAvatar) 
  *
  * Sin retrato cae al avatar; sin ninguna foto, a las iniciales.
  */
-export const TarjetaDelClon = () => {
+export const TarjetaDelClon = ({ compacta = false }: { compacta?: boolean }) => {
   const { lang } = useLang()
   const textos = textosIdentidad(lang)
 
   return (
-    <Box className='flex flex-wrap items-center gap-4'>
+    <Box
+      className={compacta ? 'grid items-center gap-3' : 'flex flex-wrap items-center gap-4'}
+      sx={compacta ? { gridTemplateColumns: '64px minmax(0, 1fr)' } : undefined}
+    >
       {RETRATO ? (
         <Box
           component='img'
           src={RETRATO}
           alt={textos.retratoAlt}
           sx={{
-            inlineSize: { xs: 96, sm: 124 },
+            inlineSize: compacta ? 64 : { xs: 96, sm: 124 },
             blockSize: 'auto',
             borderRadius: '16px',
             flexShrink: 0,
@@ -100,20 +103,20 @@ export const TarjetaDelClon = () => {
           }}
         />
       ) : (
-        <AvatarClon tamano={96} alt={textos.avatarAlt} />
+        <AvatarClon tamano={compacta ? 64 : 96} alt={textos.avatarAlt} />
       )}
       <Box className='flex flex-col gap-1 min-is-0'>
-        <Typography variant='overline' color='text.secondary' lineHeight={1.4}>
+        <Typography variant={compacta ? 'caption' : 'overline'} color='text.secondary' lineHeight={1.4}>
           {textos.esElClon}
         </Typography>
-        <Typography variant='h5' component='p' className='font-semibold'>
+        <Typography variant={compacta ? 'h6' : 'h5'} component='p' className='font-semibold'>
           {IDENTIDAD_CLON.nombre}
         </Typography>
         <Typography variant='body2' color='text.secondary'>
           {textos.deQuien}
         </Typography>
         {RETRATO && (
-          <Typography variant='body2' color='text.secondary'>
+          <Typography variant={compacta ? 'caption' : 'body2'} color='text.secondary'>
             {textos.quienEsQuien}
           </Typography>
         )}

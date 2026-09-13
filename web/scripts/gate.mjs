@@ -318,6 +318,65 @@ async function navegador() {
   }
 
   log('\n▸ Navegador')
+  // P-01: el siguiente gesto debe caber en la primera pantalla, también en EN.
+  const problemasBienvenida = []
+
+  for (const lang of ['es', 'en']) {
+    for (const [width, height] of [[390, 844], [1440, 900]]) {
+      const ctxInicio = await navegadorPw.newContext({ viewport: { width, height } })
+      await ctxInicio.addInitScript(l => localStorage.setItem('madclon-lang', l), lang)
+      const inicio = await ctxInicio.newPage()
+
+      try {
+        await inicio.goto(url(''))
+        const explorar = inicio.locator('[data-bienvenida-explorar]')
+        await explorar.waitFor({ state: 'visible' })
+        const caja = await explorar.boundingBox()
+
+        if (!caja || caja.x < 0 || caja.x + caja.width > width || caja.y < 0 || caja.y + caja.height > height || caja.height < 44) {
+          problemasBienvenida.push(`${lang}@${width}: acción principal fuera de pantalla o menor de 44px`)
+        }
+        const como = inicio.locator('[data-bienvenida] a[href="#como-funciona"]')
+        const cajaComo = await como.boundingBox()
+
+        if (!cajaComo || cajaComo.x < 0 || cajaComo.x + cajaComo.width > width || cajaComo.y < 0 || cajaComo.y + cajaComo.height > height || cajaComo.height < 44) {
+          problemasBienvenida.push(`${lang}@${width}: explicación fuera de pantalla o menor de 44px`)
+        }
+        await inicio.locator('h1').evaluate(el => { el.setAttribute('tabindex', '-1'); el.focus() })
+        for (const accion of [explorar, como]) {
+          await inicio.keyboard.press('Tab')
+          const foco = await accion.evaluate(el => {
+            const estilo = getComputedStyle(el)
+            return el === document.activeElement && el.matches(':focus-visible') && estilo.outlineStyle !== 'none' && parseFloat(estilo.outlineWidth) >= 2
+          })
+          if (!foco) problemasBienvenida.push(`${lang}@${width}: acción sin foco visible al tabular`)
+        }
+        await como.press('Enter')
+        const destino = inicio.locator('h2#como-funciona')
+        const focoDestino = await destino.evaluate(el => el === document.activeElement)
+        await inicio.waitForTimeout(500)
+        const cajaDestino = await destino.boundingBox()
+
+        if (!(await destino.isVisible()) || !focoDestino || !cajaDestino || cajaDestino.y < 80 || cajaDestino.y + cajaDestino.height > height || !inicio.url().endsWith('#como-funciona')) {
+          problemasBienvenida.push(`${lang}@${width}: explicación sin navegación o foco`)
+        }
+        await inicio.goto(url(''))
+        const resumen = inicio.locator('details > summary')
+        await resumen.focus()
+        await resumen.press('Enter')
+        if (!(await inicio.locator('details[open]').count())) problemasBienvenida.push(`${lang}@${width}: estado no abre con teclado`)
+        await resumen.press('Enter')
+        if (await inicio.locator('details[open]').count()) problemasBienvenida.push(`${lang}@${width}: estado no cierra con teclado`)
+        await explorar.click()
+        await inicio.waitForURL('**/retos/')
+      } catch (e) {
+        problemasBienvenida.push(`${lang}@${width}: ${String(e.message).slice(0, 150)}`)
+      } finally {
+        await ctxInicio.close()
+      }
+    }
+  }
+  marca(16, 'bienvenida: siguiente gesto, explicación y estado con teclado', problemasBienvenida.length === 0, problemasBienvenida.join(' | ') || 'ES/EN · 390×844 y 1440×900')
 
   for (const lang of IDIOMAS) {
     for (const contraste of CONTRASTES) {
