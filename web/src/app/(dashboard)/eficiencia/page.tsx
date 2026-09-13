@@ -44,7 +44,7 @@ const EficienciaPage = () => {
       return (
         <Grid container spacing={6}>
           <Grid size={12}>
-            <Typography variant='h4' className='mbe-1'>{t('ef_titulo')}</Typography>
+            <Typography component='h1' variant='h4' className='mbe-1'>{t('ef_titulo')}</Typography>
             <Typography color='text.secondary' className='max-is-3xl'>
               {tokens.linea_base_fecha
                 ? `${t('ef_intro_1')} ${tokens.linea_base_fecha} ${t('ef_intro_2')}`

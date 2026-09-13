@@ -6,6 +6,8 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 
+import { usePathname } from 'next/navigation'
+
 export type Lang = 'es' | 'en'
 
 const STR = {
@@ -665,12 +667,24 @@ const STR = {
 
 export type StrKey = keyof typeof STR
 
+const SECCIONES: Record<string, StrKey> = {
+  retos: 'nav_retos',
+  flota: 'nav_flota',
+  salud: 'nav_salud',
+  tokens: 'nav_tokens',
+  eficiencia: 'nav_eficiencia',
+  actividad: 'nav_actividad',
+  historia: 'nav_historia',
+  preguntas: 'nav_preguntas'
+}
+
 type LangCtx = { lang: Lang; setLang: (l: Lang) => void; t: (k: StrKey) => string }
 
 const Ctx = createContext<LangCtx>({ lang: 'es', setLang: () => {}, t: k => STR[k].es })
 
 export const LangProvider = ({ children }: { children: ReactNode }) => {
   const [lang, setLangState] = useState<Lang>('es')
+  const pathname = usePathname()
 
   useEffect(() => {
     const guardado = window.localStorage.getItem('madclon-lang')
@@ -679,7 +693,8 @@ export const LangProvider = ({ children }: { children: ReactNode }) => {
   }, [])
 
   useEffect(() => {
-    const title = STR.document_title[lang]
+    const seccion = SECCIONES[pathname.replace(/^\/|\/$/g, '')]
+    const title = seccion ? `${STR[seccion][lang]} — ${STR.document_title[lang]}` : STR.document_title[lang]
 
     const syncDocument = () => {
       document.documentElement.lang = lang
@@ -692,7 +707,7 @@ export const LangProvider = ({ children }: { children: ReactNode }) => {
     observer.observe(document.head, { childList: true, subtree: true, characterData: true })
 
     return () => observer.disconnect()
-  }, [lang])
+  }, [lang, pathname])
 
   const setLang = (l: Lang) => {
     setLangState(l)

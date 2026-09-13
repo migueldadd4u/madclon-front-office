@@ -9,3 +9,9 @@ Referencia examinada: [inicio ChatGPT en Mobbin](https://mobbin.com/screens/efb5
 Cambios: bienvenida compacta, retrato con identidad y atribución IA intactos, enlaces reales, estado secundario, explicación ampliada en su sección. Sin nuevas dependencias, exportación, datos, permisos o rutas. Mantener todas las guardias existentes. Reversión: revertir el commit de esta pieza.
 
 Verificación: gate público completo (GATE_PORT=9310), guardia adicional en ese gate para CTAs visibles y navegación a explicación, inspección visual con navegador, Critic independiente. No hay permiso de despliegue implícito en un gate verde. No afirmar paridad con líderes ni producción excelente hasta verificar los recorridos completos.
+
+## P-03 · Orientación entre secciones
+
+Base del corte: 6dc9f1a. Reproducción en navegador de /salud/: cero h1, título de pestaña genérico y ningún enlace con aria-current=page. La configuración exporta rutas con barra final, mientras el menú las compara contra rutas sin barra.
+
+Aceptación: un h1 por sección, título de pestaña con el nombre de sección en el idioma elegido y exactamente un enlace actual que corresponda a la ruta. Conservar apariencia, navegación y contrato del 404. Verificar acceso directo y cambio de ruta mediante enlace, ES/EN, responsive y gate completo. Sin nuevas páginas ni cambios de contenido editorial de Retos. Critic independiente antes de integración; reversión por commit separado.

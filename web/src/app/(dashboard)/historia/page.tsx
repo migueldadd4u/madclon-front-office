@@ -157,7 +157,7 @@ const HistoriaPage = () => {
             <Grid size={12}>
               <Card>
                 <CardContent className='flex flex-col gap-2'>
-                  <Typography variant='h4'>{t('his_titulo')}</Typography>
+                  <Typography component='h1' variant='h4'>{t('his_titulo')}</Typography>
                   <Typography color='text.secondary' className='max-is-2xl'>
                     {t('his_intro')}
                   </Typography>

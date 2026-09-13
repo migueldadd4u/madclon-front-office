@@ -44,7 +44,7 @@ const SaludPage = () => {
       <Grid container spacing={6}>
         <Grid size={12} className='flex flex-wrap items-end justify-between gap-4'>
           <div>
-            <Typography variant='h4' className='mbe-1'>{t('salud_titulo')}</Typography>
+            <Typography component='h1' variant='h4' className='mbe-1'>{t('salud_titulo')}</Typography>
             <Typography color='text.secondary' className='max-is-2xl'>
               {t('salud_intro')}
             </Typography>

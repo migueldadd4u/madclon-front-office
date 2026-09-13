@@ -95,7 +95,7 @@ const FlotaPage = () => {
       return (
         <Grid container spacing={6}>
           <Grid size={12}>
-            <Typography variant='h4' className='mbe-1'>{cifra(t('flota_titulo'))}</Typography>
+            <Typography component='h1' variant='h4' className='mbe-1'>{cifra(t('flota_titulo'))}</Typography>
             <Typography color='text.secondary' className='max-is-3xl'>
               {cifra(t('flota_intro_1'))} <em>{t('flota_intro_2')}</em>{t('flota_intro_3')}
             </Typography>

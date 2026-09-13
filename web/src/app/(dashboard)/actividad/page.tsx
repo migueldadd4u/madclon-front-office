@@ -55,7 +55,7 @@ const ActividadPage = () => {
       return (
         <Grid container spacing={6}>
           <Grid size={12}>
-            <Typography variant='h4' className='mbe-1'>{t('act_titulo')}</Typography>
+            <Typography component='h1' variant='h4' className='mbe-1'>{t('act_titulo')}</Typography>
             <Typography color='text.secondary' className='max-is-2xl'>
               {t('act_intro')}
             </Typography>

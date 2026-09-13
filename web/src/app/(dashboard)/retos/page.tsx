@@ -49,7 +49,7 @@ const RetosPage = () => {
       <Grid size={12}>
         <Card>
           <CardContent className='flex flex-col gap-2'>
-            <Typography variant='h4'>{titulo('que-es')}</Typography>
+            <Typography component='h1' variant='h4'>{titulo('que-es')}</Typography>
             <Typography color='text.secondary' className='max-is-2xl'>
               {texto('que-es')}
             </Typography>

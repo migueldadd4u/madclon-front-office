@@ -40,6 +40,17 @@ const TITULOS_DOCUMENTO = {
   en: "MAD Clon — Miguel Ángel Domínguez's Clone"
 }
 
+const SECCIONES = {
+  retos: { es: 'Retos', en: 'Challenges' },
+  flota: { es: 'La flota', en: 'The fleet' },
+  salud: { es: 'Salud', en: 'Health' },
+  tokens: { es: 'Tokens', en: 'Tokens' },
+  eficiencia: { es: 'Eficiencia', en: 'Efficiency' },
+  actividad: { es: 'Actividad', en: 'Activity' },
+  historia: { es: 'Historia', en: 'Story' },
+  preguntas: { es: 'Preguntas', en: 'FAQ' }
+}
+
 const TITULOS_PORTADA = {
   es: 'La sala de control del Clon de MAD',
   en: 'The MAD Clone control room'
@@ -418,18 +429,25 @@ async function navegador() {
         const documento = await pg.evaluate(() => ({
           lang: document.documentElement.lang,
           title: document.title,
-          h1: [...document.querySelectorAll('h1')].map(item => item.textContent?.trim())
+          h1: [...document.querySelectorAll('h1')].map(item => item.textContent?.trim()),
+          actual: [...document.querySelectorAll('a[aria-current="page"]')].map(item => ({ href: item.getAttribute('href'), activa: item.classList.contains('ts-active') }))
         }))
 
-        if (documento.lang !== lang || documento.title !== TITULOS_DOCUMENTO[lang]) {
+        const tituloEsperado = p ? `${SECCIONES[p][lang]} — ${TITULOS_DOCUMENTO[lang]}` : TITULOS_DOCUMENTO[lang]
+
+        if (documento.lang !== lang || documento.title !== tituloEsperado) {
           problemasIdioma.push(
             `${p || 'portada'} ${lang}${contraste ? '/AC' : ''}: lang=${documento.lang} title=${JSON.stringify(documento.title)}`
           )
         }
 
-        if (!p && (documento.h1.length !== 1 || documento.h1[0] !== TITULOS_PORTADA[lang])) {
+        if (documento.actual.length !== 1 || documento.actual[0].href !== `${BASE}/${p ? `${p}/` : ''}` || !documento.actual[0].activa) {
+          problemasIdioma.push(`${p || 'portada'} ${lang}: seleccion=${JSON.stringify(documento.actual)}`)
+        }
+
+        if (documento.h1.length !== 1 || !documento.h1[0] || (!p && documento.h1[0] !== TITULOS_PORTADA[lang])) {
           problemasIdioma.push(
-            `portada ${lang}${contraste ? '/AC' : ''}: h1=${JSON.stringify(documento.h1)}`
+            `${p || 'portada'} ${lang}${contraste ? '/AC' : ''}: h1=${JSON.stringify(documento.h1)}`
           )
         }
 
@@ -599,7 +617,7 @@ async function navegador() {
     5,
     `axe + idioma semántico (${matriz})`,
     violaciones.length === 0 && problemasIdioma.length === 0,
-    [...violaciones, ...problemasIdioma].slice(0, 6).join(' | ') || '0 violaciones · lang/title/h1 404 correctos'
+    [...violaciones, ...problemasIdioma].slice(0, 6).join(' | ') || '0 violaciones · idioma, titulo por seccion, h1 y seleccion de ruta correctos; 404 intacto'
   )
   marca(
     6,
