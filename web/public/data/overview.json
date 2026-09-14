@@ -1,7 +1,7 @@
 {
   "gtd": {
     "propuestas": null,
-    "bandeja": 233,
+    "bandeja": 239,
     "esperas_vencidas": 11,
     "decisiones": null,
     "acciones_hoy": 32,
@@ -12,62 +12,62 @@
     "staged": 0
   },
   "automejora": {
-    "hechas": 294,
-    "bloqueadas": 66,
+    "hechas": 297,
+    "bloqueadas": 67,
     "aparcadas": 75,
-    "pendientes": 4,
-    "llamadas": 596,
+    "pendientes": 5,
+    "llamadas": 684,
     "metered": 0,
-    "top": "grok 257, minimax 186, local 147, agy_cli 4"
+    "top": "grok 385, minimax 188, local 108, kimi_cli 2"
   },
   "crons": [
     {
       "nombre": "Briefing COO 08:05",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "12/09 09:13"
+      "ultima": "13/09 09:08"
     },
     {
       "nombre": "Higiene Semanal del Sistema",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "06/09 04:00"
+      "ultima": "13/09 04:00"
     },
     {
       "nombre": "Triage correos del día",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "12/09 08:55"
+      "ultima": "13/09 08:52"
     },
     {
       "nombre": "Auto-mejora nocturna clon",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "13/09 03:40"
+      "ultima": "14/09 03:40"
     },
     {
       "nombre": "Resumen diario de Spam",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "12/09 21:30"
+      "ultima": "13/09 21:30"
     },
     {
       "nombre": "Morning briefing",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "12/09 08:00"
+      "ultima": "13/09 08:00"
     },
     {
       "nombre": "Important-mail monitor",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "13/09 03:30"
+      "ultima": "14/09 03:30"
     },
     {
       "nombre": "Weekly review",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "06/09 18:00"
+      "ultima": "13/09 18:00"
     },
     {
       "nombre": "Topic news digest",
@@ -79,19 +79,19 @@
       "nombre": "Repaso ¿Qué necesito?",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "12/09 08:30"
+      "ultima": "13/09 08:30"
     },
     {
       "nombre": "Clon ↔ Jarvis weekly mutual-improvemen",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "06/09 19:15"
+      "ultima": "13/09 19:15"
     },
     {
       "nombre": "Guardia de tiradas programadas",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "13/09 03:38"
+      "ultima": "14/09 03:38"
     },
     {
       "nombre": "Radar Buzz semanal",
@@ -123,12 +123,12 @@
   ],
   "crons_en_error": 0,
   "tokens_resumen": {
-    "tokens_30d": 113980927,
+    "tokens_30d": 111440120,
     "cobertura_pct": 91,
-    "indice_eficiencia": 128283
+    "indice_eficiencia": 142860
   },
   "salud_global": "🟢 Todo OK",
-  "watchdog_ts": "2026-09-13T00:21:28.744852Z",
+  "watchdog_ts": "2026-09-14T00:28:48.427697Z",
   "historia": {
     "hitos": [
       {
@@ -316,6 +316,6 @@
     "nacimiento": "2026-04-14",
     "ultima_bitacora": "2026-08-15",
     "ultimo_hito": "2026-09-05",
-    "dias_sin_capitulo": 8
+    "dias_sin_capitulo": 9
   }
 }
