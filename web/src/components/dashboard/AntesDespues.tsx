@@ -108,7 +108,7 @@ const AntesDespues = ({ serie }: Props) => {
       <CardContent className='flex flex-col gap-4'>
         <div className='flex flex-wrap items-baseline justify-between gap-2'>
           <Typography variant='h6'>{t('ab_titulo')}</Typography>
-          <Typography variant='caption' color='text.disabled'>{t('ab_caption')}</Typography>
+          <Typography variant='caption' color='text.secondary'>{t('ab_caption')}</Typography>
         </div>
         {filas.map(({ m, base, ahora, max, delta, bueno }) => (
           <Box key={m.id} className='flex flex-col gap-1'>
@@ -123,7 +123,7 @@ const AntesDespues = ({ serie }: Props) => {
             </div>
             {/* barra base */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              <Typography variant='caption' color='text.disabled' sx={{ inlineSize: 92, flexShrink: 0 }} className='font-mono'>
+              <Typography variant='caption' color='text.secondary' sx={{ inlineSize: 92, flexShrink: 0 }} className='font-mono'>
                 {t('ab_antes')} {fechaBase.slice(5).split('-').reverse().join('/')}
               </Typography>
               <Box sx={{ flexGrow: 1, blockSize: 14, bgcolor: 'action.hover', borderRadius: 1, overflow: 'hidden' }}>

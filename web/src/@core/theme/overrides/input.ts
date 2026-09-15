@@ -189,7 +189,20 @@ const input: Theme['components'] = {
         lineHeight: 1,
         letterSpacing: 'unset',
         marginBlockStart: theme.spacing(1),
-        marginInline: theme.spacing(4)
+        marginInline: theme.spacing(4),
+
+        // El texto de AYUDA de un campo apagado sigue siendo información, no un
+        // control. MUI lo pinta con `text.disabled` cuando el campo se
+        // deshabilita —en claro, #A8AAB4 sobre blanco: 2,31:1— y deja de leerse
+        // justo cuando más falta hace (el diálogo de captura apaga el campo en
+        // cuanto el apunte está hecho, y la ayuda explica qué pasó). La señal de
+        // «esto está apagado» la da el propio campo: borde y valor atenuados.
+        // La ayuda se queda en `text.secondary` (#676B7B, 5,30:1 sobre blanco).
+        // Medido el 15/09/2026, al poner el claro por defecto: era lo que
+        // tumbaba el check 24 del gate del panel.
+        '&.Mui-disabled': {
+          color: 'var(--mui-palette-text-secondary)'
+        }
       })
     }
   }

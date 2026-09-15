@@ -121,7 +121,7 @@ const LoginV2 = ({ mode }: { mode: Mode }) => {
             />
             <div className='flex justify-between items-center flex-wrap gap-x-3 gap-y-1'>
               <FormControlLabel control={<Checkbox />} label='Remember me' />
-              <Typography className='text-end' color='primary.main' component={Link}>
+              <Typography className='text-end' color='customColors.textoMarca' component={Link}>
                 Forgot password?
               </Typography>
             </div>
@@ -130,7 +130,7 @@ const LoginV2 = ({ mode }: { mode: Mode }) => {
             </Button>
             <div className='flex justify-center items-center flex-wrap gap-2'>
               <Typography>New on our platform?</Typography>
-              <Typography component={Link} color='primary.main'>
+              <Typography component={Link} color='customColors.textoMarca'>
                 Create an account
               </Typography>
             </div>

@@ -60,7 +60,7 @@ const TokensPage = () => {
           <Grid size={{ xs: 12, md: 4 }}>
             <Card className='bs-full fo-card-hover border border-solid border-success'>
               <CardContent className='flex flex-col gap-1'>
-                <Typography variant='body2' color='success.main' fontWeight={600}>{t('tokens_medido')}</Typography>
+                <Typography variant='body2' color='customColors.textoLogro' fontWeight={600}>{t('tokens_medido')}</Typography>
                 <Typography variant='h3' className='font-mono'><CountUp to={c.medido_tokens} format={fmtCorto} /></Typography>
                 <Typography variant='caption' color='text.secondary' className='font-mono'>
                   {fmt(c.medido_tokens)} tokens · {fmt(c.medido_llamadas)} {t('tokens_llamadas')}
@@ -144,8 +144,8 @@ const TokensPage = () => {
                     <CountUp to={c.ventana_30d !== null && c.ventana_30d !== undefined ? (c.ventana_30d / 1_000_000) * 3 : null} format={n => `~ ${fmt(Math.round(n))} €`} />
                   </Typography>
                 </div>
-                <Typography variant='caption' color='text.disabled'>{t('eur_nota')}</Typography>
-                <Typography variant='caption' color='success.main' fontWeight={600}>{t('eur_cero')}</Typography>
+                <Typography variant='caption' color='text.secondary'>{t('eur_nota')}</Typography>
+                <Typography variant='caption' color='customColors.textoLogro' fontWeight={600}>{t('eur_cero')}</Typography>
               </CardContent>
             </Card>
           </Grid>

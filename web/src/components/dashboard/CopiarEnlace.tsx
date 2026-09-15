@@ -51,7 +51,11 @@ const CopiarEnlace = () => {
       onClick={copiar}
       startIcon={<i className={copiado ? 'ri-check-line' : 'ri-link'} />}
       aria-live='polite'
-      sx={{ minBlockSize: 44, ...(copiado ? {} : { color: 'primary.light' }) }}
+      // El rótulo, con la tinta del texto; el color de marca se queda en el icono.
+      // Escrito con `primary.light` daba 2,80:1 sobre la página en claro (medido el
+      // 15/09/2026, al poner el claro por defecto) y en verde, ya copiado, aún menos.
+      // Es el mismo patrón que ya usa MigaDeCapas: el color señala, el texto se lee.
+      sx={{ minBlockSize: 44, color: 'text.primary', '& i': { color: copiado ? 'success.main' : 'primary.light' } }}
     >
       {copiado ? t('share_copiado') : t('share_copiar')}
     </Button>

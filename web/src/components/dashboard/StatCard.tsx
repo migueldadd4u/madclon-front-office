@@ -45,7 +45,7 @@ const StatCard = ({ icon, valor, label, detalle, color = 'primary', countTo, cou
         {sinDato ? (
           <Typography variant='caption' color='text.secondary'>{t('sin_dato_pie')}</Typography>
         ) : (
-          detalle && <Typography variant='caption' color='text.disabled' className='font-mono'>{detalle}</Typography>
+          detalle && <Typography variant='caption' color='text.secondary' className='font-mono'>{detalle}</Typography>
         )}
       </div>
     </CardContent>

@@ -102,7 +102,7 @@ const SaludPage = () => {
               </Table>
             </TableContainer>
             <CardContent>
-              <Typography variant='caption' color='text.disabled' className='font-mono'>
+              <Typography variant='caption' color='text.secondary' className='font-mono'>
                 {t('salud_ultimo_chequeo')}: {fmtFecha(overview.watchdog_ts)}
               </Typography>
             </CardContent>

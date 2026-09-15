@@ -142,7 +142,7 @@ const ClonOpina = ({ data }: { data: PanelData }) => {
           <Typography fontWeight={500} className='italic'>
             “{texto}”
           </Typography>
-          <Typography variant='caption' color='text.disabled'>
+          <Typography variant='caption' color='text.secondary'>
             {t('opina_caption')}
           </Typography>
         </div>

@@ -63,7 +63,7 @@ const Insignias = ({ data, diasVida }: Props) => {
       <CardContent className='flex flex-col gap-4'>
         <div className='flex flex-wrap items-baseline justify-between gap-2'>
           <Typography variant='h6'>{t('ins_titulo')}</Typography>
-          <Typography variant='caption' color='text.disabled'>{t('ins_caption')}</Typography>
+          <Typography variant='caption' color='text.secondary'>{t('ins_caption')}</Typography>
         </div>
         <Grid container spacing={4}>
           {INSIGNIAS.map(ins => {
@@ -104,7 +104,7 @@ const Insignias = ({ data, diasVida }: Props) => {
                           color='primary'
                           aria-label={`${rotulo(ins)}: ${ins.formato(ins.actual)} / ${ins.formato(ins.objetivo)}`}
                         />
-                        <Typography variant='caption' color='text.disabled' className='font-mono'>
+                        <Typography variant='caption' color='text.secondary' className='font-mono'>
                           {ins.formato(ins.actual)} / {ins.formato(ins.objetivo)}
                         </Typography>
                       </div>

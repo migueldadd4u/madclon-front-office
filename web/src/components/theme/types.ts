@@ -91,6 +91,11 @@ declare module '@mui/material/styles' {
   interface Palette {
     customColors: {
       bodyBg: string
+      textoAlerta: string
+      textoAviso: string
+      textoInfo: string
+      textoLogro: string
+      textoMarca: string
       chatBg: string
       greyLightBg: string
       inputBorder: string
@@ -102,6 +107,11 @@ declare module '@mui/material/styles' {
   interface PaletteOptions {
     customColors?: {
       bodyBg?: string
+      textoAlerta?: string
+      textoAviso?: string
+      textoInfo?: string
+      textoLogro?: string
+      textoMarca?: string
       chatBg?: string
       greyLightBg?: string
       inputBorder?: string

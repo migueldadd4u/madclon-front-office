@@ -111,7 +111,7 @@ const DiaEnLaVida = ({ crons }: Props) => {
       <CardContent className='flex flex-col gap-3'>
         <div className='flex flex-wrap items-baseline justify-between gap-2'>
           <Typography variant='h6'>{t('dia_titulo')}</Typography>
-          <Typography variant='caption' color='text.disabled'>{t('dia_caption')}</Typography>
+          <Typography variant='caption' color='text.secondary'>{t('dia_caption')}</Typography>
         </div>
         <Box sx={{ position: 'relative' }}>
           <Box
@@ -136,7 +136,7 @@ const DiaEnLaVida = ({ crons }: Props) => {
                 }}
               >
                 <Box sx={{ width: 1, height: 8, bgcolor: 'divider', mx: 'auto' }} />
-                <Typography variant='caption' color='text.disabled' className='font-mono' sx={{ fontSize: 10 }} aria-hidden>
+                <Typography variant='caption' color='text.secondary' className='font-mono' sx={{ fontSize: 10 }} aria-hidden>
                   {String(h).padStart(2, '0')}:00
                 </Typography>
               </Box>
@@ -230,7 +230,7 @@ const DiaEnLaVida = ({ crons }: Props) => {
           {sombra.der && !deslizado && (
             <Typography
               variant='caption'
-              color='text.disabled'
+              color='text.secondary'
               component='span'
               className='fo-no-print'
               sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, whiteSpace: 'nowrap' }}

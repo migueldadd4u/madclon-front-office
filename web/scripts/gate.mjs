@@ -218,6 +218,20 @@ function estaticas() {
   marca('4b', 'check-contrato (historia + flota)', k.fallos.length === 0,
     [k.notas.join(' · '), ...k.fallos.map(f => `${f.regla}: ${f.evidencia}`), ...k.avisos.map(a => `AVISO ${a}`)]
       .filter(Boolean).join(' · '))
+
+  // 4c · el color de arranque. Norma de MAD del 15/09/2026: los frontales del
+  // clon salen SIEMPRE en claro. Vive aquí porque es la única forma de que una
+  // rama vieja no lo devuelva a oscuro sin que nadie se entere: el gate lo mide
+  // antes de publicar, y la prueba lee el VALOR exportado, no el comentario.
+  try {
+    sh('node --test scripts/tema-claro.test.mjs')
+    marca('4c', 'tema claro por defecto (norma 15/09/2026)', true, "themeConfig.mode = 'light'")
+  } catch (e) {
+    const salida = String(e.stdout || e.message || e)
+    const motivo = (salida.match(/^\s*(?:Error: )?(.*(?:exige 'light'|oscuro literal).*)$/m) || [, ''])[1]
+
+    marca('4c', 'tema claro por defecto (norma 15/09/2026)', false, (motivo || salida).trim().slice(0, 300))
+  }
 }
 
 // ── servidor estático mínimo para web/out bajo la subruta real ──────────────────

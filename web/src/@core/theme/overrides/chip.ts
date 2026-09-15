@@ -2,6 +2,12 @@
 import type { Theme } from '@mui/material/styles'
 
 const chip: Theme['components'] = {
+  // El texto de los chips «tonal» es el color de marca rebajado a la mitad de luz
+  // en claro, y el tono vivo en oscuro. Estaba al 55 % y el 15/09/2026, con el
+  // claro ya por defecto, el gate del escaparate midió la etiqueta verde en
+  // 4,39:1 sobre su propio relleno — AA pide 4,5. Al 50 % el peor de los seis se
+  // queda en 5,15 y hay margen para los rellenos que caen sobre la página (#F7F7F9)
+  // y no sobre el papel. El relleno, el borde y el icono no se tocan.
   MuiChip: {
     styleOverrides: {
       root: ({ ownerState, theme }) => ({
@@ -10,7 +16,7 @@ const chip: Theme['components'] = {
             props: { variant: 'tonal', color: 'primary' },
             style: {
               backgroundColor: 'var(--mui-palette-primary-lightOpacity)',
-              color: 'var(--mui-palette-primary-main)',
+              color: 'color-mix(in srgb, var(--mui-palette-primary-main) 50%, #000)',
               ...theme.applyStyles('dark', {
                 color: 'color-mix(in srgb, var(--mui-palette-primary-main) 45%, #fff)'
               }),
@@ -33,7 +39,7 @@ const chip: Theme['components'] = {
             props: { variant: 'tonal', color: 'secondary' },
             style: {
               backgroundColor: 'var(--mui-palette-secondary-lightOpacity)',
-              color: 'var(--mui-palette-secondary-main)',
+              color: 'color-mix(in srgb, var(--mui-palette-secondary-main) 50%, #000)',
               ...theme.applyStyles('dark', {
                 color: 'color-mix(in srgb, var(--mui-palette-secondary-main) 45%, #fff)'
               }),
@@ -56,7 +62,7 @@ const chip: Theme['components'] = {
             props: { variant: 'tonal', color: 'error' },
             style: {
               backgroundColor: 'var(--mui-palette-error-lightOpacity)',
-              color: 'var(--mui-palette-error-main)',
+              color: 'color-mix(in srgb, var(--mui-palette-error-main) 50%, #000)',
               ...theme.applyStyles('dark', {
                 color: 'color-mix(in srgb, var(--mui-palette-error-main) 45%, #fff)'
               }),
@@ -79,7 +85,7 @@ const chip: Theme['components'] = {
             props: { variant: 'tonal', color: 'warning' },
             style: {
               backgroundColor: 'var(--mui-palette-warning-lightOpacity)',
-              color: 'var(--mui-palette-warning-main)',
+              color: 'color-mix(in srgb, var(--mui-palette-warning-main) 50%, #000)',
               ...theme.applyStyles('dark', {
                 color: 'color-mix(in srgb, var(--mui-palette-warning-main) 45%, #fff)'
               }),
@@ -102,7 +108,7 @@ const chip: Theme['components'] = {
             props: { variant: 'tonal', color: 'info' },
             style: {
               backgroundColor: 'var(--mui-palette-info-lightOpacity)',
-              color: 'var(--mui-palette-info-main)',
+              color: 'color-mix(in srgb, var(--mui-palette-info-main) 50%, #000)',
               ...theme.applyStyles('dark', {
                 color: 'color-mix(in srgb, var(--mui-palette-info-main) 45%, #fff)'
               }),
@@ -125,7 +131,7 @@ const chip: Theme['components'] = {
             props: { variant: 'tonal', color: 'success' },
             style: {
               backgroundColor: 'var(--mui-palette-success-lightOpacity)',
-              color: 'var(--mui-palette-success-main)',
+              color: 'color-mix(in srgb, var(--mui-palette-success-main) 50%, #000)',
               ...theme.applyStyles('dark', {
                 color: 'color-mix(in srgb, var(--mui-palette-success-main) 45%, #fff)'
               }),
@@ -148,7 +154,11 @@ const chip: Theme['components'] = {
         ...theme.typography.body2,
         fontWeight: theme.typography.fontWeightMedium,
         '&.MuiChip-outlined:not(.MuiChip-colorDefault)': {
-          borderColor: `var(--mui-palette-${ownerState.color}-main)`
+          borderColor: `var(--mui-palette-${ownerState.color}-main)`,
+
+          // El borde conserva el semáforo; el texto usa la tinta AA del tema.
+          // En oscuro, error.main daba 3,75:1 sobre el fondo de /espejo.
+          color: 'var(--mui-palette-text-primary)'
         },
         '& .MuiChip-deleteIcon': {
           ...(ownerState.size === 'small'

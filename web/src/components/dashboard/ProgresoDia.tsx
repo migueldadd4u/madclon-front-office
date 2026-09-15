@@ -50,7 +50,7 @@ const ProgresoDia = ({ data }: { data: PanelData }) => {
         <Typography variant='body2' fontWeight={500}>
           {reemplaza(t('pd_frase'), { pct: String(pct), tokens: fmtCorto(ultimo), media: fmtCorto(Math.round(media)) })}
         </Typography>
-        <Typography variant='caption' color='text.disabled' className='font-mono'>
+        <Typography variant='caption' color='text.secondary' className='font-mono'>
           {pct} %
         </Typography>
       </div>

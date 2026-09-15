@@ -252,7 +252,7 @@ const HistoriaPage = () => {
                   {/* Nada muere en silencio: si la narración se retrasa, se dice. */}
                   {ultimoHito && (
                     <div className='flex flex-wrap items-center gap-2'>
-                      <Typography variant='caption' color='text.disabled'>
+                      <Typography variant='caption' color='text.secondary'>
                         {reemplaza(t('his_ultimo'), { fecha: fechaLarga(ultimoHito, lang) })}
                       </Typography>
                       {rancia && (

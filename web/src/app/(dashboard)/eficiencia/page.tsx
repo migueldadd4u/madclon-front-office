@@ -51,7 +51,7 @@ const EficienciaPage = () => {
                 : t('ef_intro_sin_fecha')}
             </Typography>
             {tokens.soporte && (
-              <Typography variant='caption' color='text.disabled' className='font-mono'>
+              <Typography variant='caption' color='text.secondary' className='font-mono'>
                 {t('ef_soporte')}: {tokens.soporte}
               </Typography>
             )}
@@ -83,7 +83,7 @@ const EficienciaPage = () => {
                           />
                         </div>
                         <Typography variant='h4' className='font-mono'>{k.ahora}</Typography>
-                        <Typography variant='caption' color='text.disabled' className='font-mono'>{t('ef_base')}: {k.base}</Typography>
+                        <Typography variant='caption' color='text.secondary' className='font-mono'>{t('ef_base')}: {k.base}</Typography>
                         <Typography variant='caption' color='text.secondary' className='line-clamp-3'>{k.significado}</Typography>
                       </CardContent>
                     </Card>
@@ -157,7 +157,7 @@ const EficienciaPage = () => {
                   <div key={idx} className='flex gap-3'>
                     <Typography component='span'>{i.estado}</Typography>
                     <div>
-                      <Typography variant='caption' color='text.disabled' className='font-mono'>{i.fecha}</Typography>
+                      <Typography variant='caption' color='text.secondary' className='font-mono'>{i.fecha}</Typography>
                       <Typography variant='body2'>{i.cambio}</Typography>
                       <Typography variant='caption' color='text.secondary'>{i.efecto}</Typography>
                     </div>

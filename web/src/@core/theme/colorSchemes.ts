@@ -99,10 +99,24 @@ const colorSchemes = (skin: Skin): Theme['colorSchemes'] => {
           selectedChannel: 'var(--mui-mainColorChannels-light)'
         },
         Alert: {
-          errorColor: 'var(--mui-palette-error-main)',
-          warningColor: 'var(--mui-palette-warning-main)',
-          infoColor: 'var(--mui-palette-info-main)',
-          successColor: 'var(--mui-palette-success-main)',
+          // El TEXTO del aviso, no su adorno. El tono de marca (`*-main`) luce
+          // sobre el fondo oscuro y se apaga sobre el claro: el aviso ámbar de la
+          // portada daba 1,66:1 sobre #F7F7F9 —medido el 15/09/2026, al poner el
+          // claro por defecto— cuando AA pide 4,5. Aquí va el mismo color al 50 %
+          // de luz: sigue siendo el color del aviso y ya se lee. El borde y el
+          // icono se quedan con `*-main` (overrides/alerts.tsx), así que el aviso
+          // se sigue reconociendo de un vistazo.
+          // Son los mismos tonos de `customColors` que ya usaba el panel para
+          // escribir sobre claro (`textoAlerta`, `textoAviso`), aquí extendidos a
+          // las cuatro severidades para que la casa hable de un solo color:
+          //   alerta #C62828 sobre #F7F7F9 = 5,25 · sobre su fondo tenue = 4,64
+          //   aviso  #8A5300               = 5,92 ·                        5,76
+          //   info   #13637C               = 6,32 ·                        6,01
+          //   logro  #397014               = 5,60 ·                        5,47
+          errorColor: 'var(--mui-palette-customColors-textoAlerta)',
+          warningColor: 'var(--mui-palette-customColors-textoAviso)',
+          infoColor: 'var(--mui-palette-customColors-textoInfo)',
+          successColor: 'var(--mui-palette-customColors-textoLogro)',
           errorStandardBg: 'var(--mui-palette-error-lightOpacity)',
           warningStandardBg: 'var(--mui-palette-warning-lightOpacity)',
           infoStandardBg: 'var(--mui-palette-info-lightOpacity)',
@@ -156,6 +170,23 @@ const colorSchemes = (skin: Skin): Theme['colorSchemes'] => {
           border: 'var(--mui-palette-divider)'
         },
         customColors: {
+          // Los colores con los que se ESCRIBE sobre fondo claro. Los tonos de
+          // marca son de relleno: como texto se apagan sobre blanco (el ámbar da
+          // 1,8:1 y el rojo 2,5:1) y axe los tumba. Éstos llegan a AA y sólo se
+          // usan para escribir — los rellenos, bordes e iconos siguen con su
+          // `*-main` de siempre, así que nada cambia de forma. Medido el
+          // 15/09/2026 sobre los tres fondos donde de verdad caen (la página
+          // #F7F7F9, el papel #FFFFFF y el relleno tenue del propio color):
+          //   textoAlerta #C62828 → 5,25 · 5,62 · 4,64
+          //   textoAviso  #8A5300 → 5,92 · 6,33 · 5,76
+          //   textoInfo   #13637C → 6,32 · 6,77 · 6,01
+          //   textoLogro  #397014 → 5,60 · 6,00 · 5,47
+          //   textoMarca  #333680 → 9,91 · 10,61 · 8,72
+          textoAlerta: '#C62828',
+          textoAviso: '#8A5300',
+          textoInfo: '#13637C',
+          textoLogro: '#397014',
+          textoMarca: '#333680',
           bodyBg: '#F7F7F9',
           chatBg: '#F7F6FA',
           greyLightBg: '#FAFAFA',
@@ -316,6 +347,13 @@ const colorSchemes = (skin: Skin): Theme['colorSchemes'] => {
           border: 'var(--mui-palette-divider)'
         },
         customColors: {
+          // En oscuro los tonos vivos YA cumplen sobre su relleno: no se toca lo
+          // que funciona, y así el mismo componente conserva su color en cada modo.
+          textoAlerta: '#FF716D',
+          textoAviso: '#FDB528',
+          textoInfo: 'var(--mui-palette-info-main)',
+          textoLogro: 'var(--mui-palette-success-main)',
+          textoMarca: 'var(--mui-palette-primary-main)',
           bodyBg: '#282A42',
           chatBg: '#343752',
           greyLightBg: '#333851',

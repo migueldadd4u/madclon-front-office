@@ -31,7 +31,7 @@ const FooterContent = () => {
       </p>
       <div className='flex items-center gap-3 flex-wrap'>
         {!isBreakpointReached && (
-          <span className='text-textDisabled text-sm'>
+          <span className='text-textSecondary text-sm'>
             {t('chrome_footer_2')}
           </span>
         )}

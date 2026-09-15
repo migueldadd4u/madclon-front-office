@@ -58,7 +58,7 @@ const EstaNoche = ({ data }: { data: PanelData }) => {
             <i className='ri-moon-clear-line text-2xl text-primary' aria-hidden='true' />
             <Typography variant='h6'>{t('noche_titulo')}</Typography>
           </div>
-          <Typography variant='caption' color='text.disabled'>
+          <Typography variant='caption' color='text.secondary'>
             {reemplaza(t('noche_caption'), { fecha })}
           </Typography>
         </div>

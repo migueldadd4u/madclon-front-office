@@ -154,7 +154,7 @@ const ActividadPage = () => {
                     <Typography variant='body2' color='text.secondary'>{t('act_fichas')}</Typography>
                   </div>
                   <div>
-                    <Typography variant='h3' className='font-mono' color='warning.main'><CountUp to={personas.staged} /></Typography>
+                    <Typography variant='h3' className='font-mono' color='customColors.textoAviso'><CountUp to={personas.staged} /></Typography>
                     <Typography variant='body2' color='text.secondary'>{t('act_staged')}</Typography>
                   </div>
                 </div>

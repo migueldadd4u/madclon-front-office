@@ -331,15 +331,23 @@ html:not(.fo-kiosk) .fo-kiosk-salir {
 /* ---------------------------------------------------------- modo alto contraste */
 /* Sube la opacidad de los textos secundarios/atenuados y refuerza los divisores.
    Se activa con el botón de la cabecera (persistido) o solo, si el sistema pide más contraste. */
+/* El canal es `text-primaryChannel`, NO `mainColorChannels-dark`. Los dos eran lo
+   mismo mientras el arranque era oscuro, y por eso el fallo estuvo escondido hasta
+   el 15/09/2026: `mainColorChannels-dark` es el tono claro del texto (234 234 255)
+   y está fijo, así que al pasar el arranque a claro el alto contraste pintaba
+   texto casi blanco sobre fondo casi blanco — 1,1:1 medido, es decir, la ayuda
+   para quien peor ve se quedaba en blanco. `text-primaryChannel` lo declara cada
+   esquema (claro: 38 43 67 · oscuro: 234 234 255), así que sube el contraste en
+   los dos. Es lo que el panel privado ya hacía bien. */
 :root.fo-contraste {
-  --mui-palette-text-secondary: rgb(var(--mui-mainColorChannels-dark) / 0.9);
-  --mui-palette-text-disabled: rgb(var(--mui-mainColorChannels-dark) / 0.82);
-  --mui-palette-divider: rgb(var(--mui-mainColorChannels-dark) / 0.3);
+  --mui-palette-text-secondary: rgb(var(--mui-palette-text-primaryChannel) / 0.9);
+  --mui-palette-text-disabled: rgb(var(--mui-palette-text-primaryChannel) / 0.82);
+  --mui-palette-divider: rgb(var(--mui-palette-text-primaryChannel) / 0.3);
 }
 @media (prefers-contrast: more) {
   :root {
-    --mui-palette-text-secondary: rgb(var(--mui-mainColorChannels-dark) / 0.9);
-    --mui-palette-text-disabled: rgb(var(--mui-mainColorChannels-dark) / 0.82);
+    --mui-palette-text-secondary: rgb(var(--mui-palette-text-primaryChannel) / 0.9);
+    --mui-palette-text-disabled: rgb(var(--mui-palette-text-primaryChannel) / 0.82);
   }
 }
 

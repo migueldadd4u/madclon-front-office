@@ -253,7 +253,7 @@ const InicioPage = () => {
                   <CardContent className='flex flex-col gap-2'>
                     <div className='flex items-center justify-between'>
                       <i className={`${p.icon} text-3xl text-primary`} />
-                      <Typography variant='caption' color='text.disabled' className='font-mono'>0{i + 1}</Typography>
+                      <Typography variant='caption' color='text.secondary' className='font-mono'>0{i + 1}</Typography>
                     </div>
                     <Typography variant='h6'>{p[lang].titulo}</Typography>
                     <Typography variant='body2' color='text.secondary'>{p[lang].texto}</Typography>
@@ -273,7 +273,7 @@ const InicioPage = () => {
                 <CardContent className='flex flex-col gap-2'>
                   <div className='flex flex-wrap items-baseline justify-between gap-2'>
                     <Typography variant='h6'>{t('home_pulso_titulo')}</Typography>
-                    <Typography variant='caption' color='text.disabled'>
+                    <Typography variant='caption' color='text.secondary'>
                       {t('home_pulso_caption')}
                     </Typography>
                   </div>
@@ -390,7 +390,7 @@ const InicioPage = () => {
                       <span className='inline-block bs-2.5 is-2.5 rounded-sm' style={{ background: '#06C9A8' }} />
                       <Typography variant='caption' color='text.secondary'>{t('home_pulso_leyenda_tareas')}</Typography>
                     </span>
-                    <Typography variant='caption' color='text.disabled' className='mis-auto fo-no-print'>
+                    <Typography variant='caption' color='text.secondary' className='mis-auto fo-no-print'>
                       {t('pulso_explora_hint')}
                     </Typography>
                   </div>
