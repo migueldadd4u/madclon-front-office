@@ -30,12 +30,16 @@ exportador FALLA y no escribe nada.
 from __future__ import annotations
 
 import argparse
+import runpy
 import hashlib
 import json
 import re
 import sys
 from datetime import date, datetime, timezone
 from pathlib import Path
+
+# Also works when monitors load this file through importlib, outside exporter/.
+collect_public_hardware = runpy.run_path(str(Path(__file__).with_name("hardware_publico.py")))["collect_public_hardware"]
 
 # ---------------------------------------------------------------- avisos del lote
 
@@ -744,6 +748,8 @@ def main() -> int:
             if raw.get("fecha") == itv["fecha"] and len(raw.get("que", "")) > len(itv["cambio"]):
                 itv["cambio"] = raw["que"]
                 break
+
+    overview["hardware"] = collect_public_hardware()
 
     ahora = datetime.now(timezone.utc).isoformat(timespec="seconds")
     salidas = {

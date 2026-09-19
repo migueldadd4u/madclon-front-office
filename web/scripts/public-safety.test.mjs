@@ -471,16 +471,7 @@ test('el postbuild distingue el transporte inerte de Next de una mutación de ap
 })
 
 
-test('Hardware solo permite el href exacto en el menú, sin ampliar acceso de red', () => {
-  const file = 'src/components/layout/vertical/VerticalMenu.tsx'
+test('Hardware público no admite el antiguo enlace privado como excepción', () => {
   const url = 'https://macstudio-de-clon.tail89283c.ts.net/hardware'
-  assert.deepEqual(auditRuntimeSource(`<MenuItem href='${url}'>Hardware</MenuItem>`, file), [])
-  for (const [source, ruta] of [
-    [`<a href='${url}'>x</a>`, 'src/app/otro.tsx'],
-    [`<a href='${url}/../api/hardware'>x</a>`, file],
-    [`<a href='${url}?otra=1'>x</a>`, file],
-    [`<img src='${url}'/>`, file],
-    [`fetch('${url}')`, file],
-    [`window.location='${url}'`, file]
-  ]) assert.ok(auditRuntimeSource(source, ruta).length > 0, source)
+  assert.ok(auditRuntimeSource(`<a href='${url}'>Hardware</a>`, 'src/components/layout/vertical/VerticalMenu.tsx').length > 0)
 })

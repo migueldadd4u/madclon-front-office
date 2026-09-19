@@ -16,6 +16,7 @@ import { BarChart, Bar, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer } from 
 import DataGate from '@/components/dashboard/DataGate'
 import StatCard from '@/components/dashboard/StatCard'
 import HeroClon from '@/components/dashboard/HeroClon'
+import HardwareOverview from '@/components/dashboard/HardwareOverview'
 import ClonOpina from '@/components/dashboard/ClonOpina'
 import EstaNoche from '@/components/dashboard/EstaNoche'
 import Latido from '@/components/dashboard/Latido'
@@ -117,7 +118,7 @@ const InicioPage = () => {
   const [diaSel, setDiaSel] = useState<number | null>(null)
 
   return (
-    <DataGate necesita={['overview', 'tokens', 'clones', 'manifest', 'serie']}>
+    <DataGate necesita={['overview', 'tokens', 'clones', 'manifest', 'serie']} fallback={partial => <HardwareOverview hardware={partial.overview?.hardware} />}>
       {data => {
         const { overview, tokens, clones, manifest } = data
         const saludOk = (overview.salud_global ?? '').includes('🟢')
@@ -183,6 +184,10 @@ const InicioPage = () => {
                   </Box>
                 </Box>
               </Box>
+            </Grid>
+
+            <Grid size={12}>
+              <HardwareOverview hardware={overview.hardware} />
             </Grid>
 
             {/* El clon opina */}

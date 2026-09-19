@@ -41,6 +41,9 @@ jobs:
         working-directory: web
         run: yarn test:public-safety
 
+      - name: Public hardware collector regressions
+        run: python3 -m unittest discover -s exporter -p test_hardware_publico.py
+
       - name: Public safety gate (source)
         working-directory: web
         run: yarn check:public-safety

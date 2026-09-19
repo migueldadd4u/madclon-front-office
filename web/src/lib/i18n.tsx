@@ -19,11 +19,7 @@ const STR = {
   // ------------------------------------------------------------- navegación
   nav_panel: { es: 'Panel', en: 'Home' },
   nav_flota: { es: 'La flota', en: 'The fleet' },
-  nav_hardware: { es: 'Hardware · privado', en: 'Hardware · private' },
-  nav_hardware_ayuda: {
-    es: 'Mac Studio y DGX: requiere Tailscale e iniciar sesión en el panel privado',
-    en: 'Mac Studio and DGX: requires Tailscale and signing in to the private panel'
-  },
+  nav_hardware: { es: 'Hardware', en: 'Hardware' },
   nav_salud: { es: 'Salud', en: 'Health' },
   nav_tokens: { es: 'Tokens', en: 'Tokens' },
   nav_eficiencia: { es: 'Eficiencia', en: 'Efficiency' },
@@ -676,6 +672,7 @@ const SECCIONES: Record<string, StrKey> = {
   retos: 'nav_retos',
   flota: 'nav_flota',
   salud: 'nav_salud',
+  hardware: 'nav_hardware',
   tokens: 'nav_tokens',
   eficiencia: 'nav_eficiencia',
   actividad: 'nav_actividad',

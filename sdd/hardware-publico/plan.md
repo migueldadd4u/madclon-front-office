@@ -1,0 +1,5 @@
+# Hardware público
+
+Añadir recolector Python agentless solo lectura en exporter/hardware_publico.py y hook overview.hardware del exportador existente. Muestreo Mac sysctl/top/vm_stat/IORegistry y DGX SSH fijo /proc+nvidia-smi con timeouts. Selección explícita numeric-only al salir; no stderr. Inventario verificado se guarda en módulo de datos público, con fuente/fecha y límites. UI /hardware con tarjetas, fecha y estados, snapshot agregado en overview. Validación estricta hardware compartida entre gate/cliente. Retirar salida externa Hardware, conservar solo sello privado preexistente. Sitemap y matriz UI actualizados. Entrega por GitHub Pages existente; fast-forward canónico preservando cambios ajenos.
+
+La portada incorpora HardwareOverview bajo la bienvenida. DataGate conserva el resumen con datos parciales cuando otro documento falla. Sus tarjetas navegan por teclado y ratón a /hardware. La publicación se hará desde el worktree validado; si el checkout principal conserva trabajo ajeno sin confirmar, se mantiene intacto y se documenta la integración pendiente.

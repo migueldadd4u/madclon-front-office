@@ -64,19 +64,22 @@ type DataGateProps = {
    * Por defecto exige los cinco (comportamiento histórico).
    */
   necesita?: DocNombre[]
+  fallback?: (data: Partial<PanelData>) => ReactNode
 }
 
-const DataGate = ({ children, necesita }: DataGateProps) => {
+const DataGate = ({ children, necesita, fallback }: DataGateProps) => {
   const requeridos = necesita ?? DOCS
   const { data, faltantes, sinNada, retenido, cargando } = usePanelData()
   const { lang, t } = useLang()
+
+  const conFallback = (content: ReactNode, safeData: Partial<PanelData> = data) => <>{content}{fallback?.(safeData)}</>
 
   const faltanRequeridos = requeridos.some(d => faltantes.includes(d))
   const listos = requeridos.every(d => data[d] !== undefined)
 
   // Instantánea retenida por la fuente: estado protegido explícito, no un fallo
   if (retenido && !cargando) {
-    return (
+    return conFallback(
       <div className='flex flex-col items-center gap-3 p-8 text-center' role='status'>
         <i className='ri-shield-check-line text-5xl text-success' aria-hidden='true' />
         <Typography variant='h5'>{t('retenido_titulo')}</Typography>
@@ -86,14 +89,14 @@ const DataGate = ({ children, necesita }: DataGateProps) => {
         <Typography variant='caption' color='text.secondary'>
           {t('retenido_fecha').replace('{fecha}', new Date(retenido).toLocaleString(lang === 'en' ? 'en-GB' : 'es-ES'))}
         </Typography>
-      </div>
+      </div>, {}
     )
   }
 
   if (sinNada && !cargando) {
     // Sin conexión y sin caché (primera visita offline): mensaje amable, no técnico
     if (typeof navigator !== 'undefined' && !navigator.onLine) {
-      return (
+      return conFallback(
         <div className='flex flex-col items-center gap-2 p-8 text-center' role='status'>
           <i className='ri-wifi-off-line text-4xl text-textSecondary' aria-hidden='true' />
           <Typography fontWeight={600}>{t('offline_titulo')}</Typography>
@@ -105,12 +108,12 @@ const DataGate = ({ children, necesita }: DataGateProps) => {
     }
 
     // Con red pero sin un solo documento válido: el panel entero, en revisión
-    return <EnRevision />
+    return conFallback(<EnRevision />)
   }
 
-  if (cargando && !listos) return <SkeletonPanel />
+  if (cargando && !listos) return conFallback(<SkeletonPanel />, {})
 
-  if (faltanRequeridos || !listos) return <EnRevision />
+  if (faltanRequeridos || !listos) return conFallback(<EnRevision />)
 
   return <>{children(data as PanelData)}</>
 }

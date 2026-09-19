@@ -1,0 +1,11 @@
+# Hardware público
+
+CA1-7 cubiertos por P1-P3. No depende de quitar autenticación privada. Reutiliza publicación nocturna; fallos de hardware degradan sólo snapshot. Riesgo: exfiltrar texto de comandos, mitigado proyección cerrada y test canario. Riesgo: medición vieja, mitigado fecha propia y umbral36h. Modelo heredado suficiente; tareas concretas y Critic independiente.
+
+CA8 amplía la portada: CPU, GPU y RAM por equipo, tarjetas enlazadas a /hardware y capacidad visible incluso si falta otro documento. El Critic encontró que DataGate ocultaba inicialmente el resumen al fallar tokens; corregido mediante fallback de datos parciales (vacío si la fuente retiene la instantánea). Revisión independiente posterior: PASS acotado, sin hallazgos materiales abiertos. Guard17 cubre teclado, ES/EN, 390/1440 y fallo503 de tokens; bloquea service workers en esa prueba para que la caché no oculte el fallo simulado. Las pruebas generales de caché siguen activas.
+
+Productor: 13 pruebas Python. Consumidor/privacidad: 20 pruebas Node. El dato real del 19/09 pasa el mismo validador cerrado. Exportador probado por importlib y auditoría de privacidad. Renovación operativa: el trabajo nocturno existente toma origin/main y ejecuta el exportador a las03:43; configuración instalada contrastada en lectura, sin modificarla. No se promete telemetría en directo ni una medición de máximo de proceso actual.
+
+Ronda de accesibilidad: el primer gate completo terminó 19OK/1FAIL por contraste del enlace de portada (3,8:1 en tema claro). Corregido con color de texto principal y subrayado; se repite el gate completo antes de publicar. La ronda anterior pasó privacidad, navegación, fallo503, desbordes, objetivos táctiles, teclado, frescura, enlaces y degradación. Comprobación visual manual en escritorio y móvil390: tarjetas legibles, sin desbordes y jerarquía bajo la bienvenida.
+
+Gate final del 19/09: 20OK, 0DEUDA, 0FAIL. Incluye build, contratos, privacidad, 10 páginas ES/EN con contraste normal/alto y anchuras375/390/834/1440 sin violaciones axe; desbordes desde320, teclado, objetivos44px, enlaces200 y degradación. Critic final del delta: PASS. Pendiente en el momento de este commit: confirmación del despliegue y recorrido en producción.

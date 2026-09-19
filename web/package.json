@@ -21,7 +21,7 @@
     "check:contrato": "node scripts/check-contrato.mjs",
     "check:public-safety": "node scripts/public-safety.mjs --source",
     "check:public-safety:out": "node scripts/public-safety.mjs --out",
-    "test:public-safety": "node --test scripts/public-safety.test.mjs"
+    "test:public-safety": "node --test scripts/public-safety.test.mjs scripts/hardware-public.test.mjs"
   },
   "dependencies": {
     "@emotion/cache": "11.14.0",

@@ -10,6 +10,7 @@ export type Manifest = {
 export type Cron = { nombre: string; ambito: string; estado: string; ultima: string }
 
 export type Overview = {
+  hardware?: unknown
   gtd: {
     propuestas: number | null
     bandeja: number | null

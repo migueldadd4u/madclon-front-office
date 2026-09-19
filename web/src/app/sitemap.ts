@@ -22,7 +22,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = lastModifiedFromBuild()
 
   // Las 8 páginas publicadas; todas muestran datos que se regeneran cada noche.
-  const paths = ['', '/flota', '/salud', '/tokens', '/eficiencia', '/actividad', '/historia', '/preguntas']
+  const paths = ['', '/flota', '/hardware', '/salud', '/tokens', '/eficiencia', '/actividad', '/historia', '/preguntas']
 
   return paths.map(path => ({
     url: `${base}${path}`,

@@ -317,5 +317,36 @@
     "ultima_bitacora": "2026-08-15",
     "ultimo_hito": "2026-09-05",
     "dias_sin_capitulo": 14
+  },
+  "hardware": {
+    "version": 1,
+    "hosts": [
+      {
+        "id": "mac",
+        "sampled_at": "2026-09-19T15:40:19Z",
+        "cpu_percent": 20.799999999999997,
+        "ram_total_bytes": 103079215104,
+        "ram_available_bytes": 30911152128,
+        "swap_used_bytes": 37751619584,
+        "gpu_percent": 23,
+        "gpu_temperature_c": null,
+        "gpu_power_w": null,
+        "disk_total_bytes": 994662584320,
+        "disk_available_bytes": 147304026112
+      },
+      {
+        "id": "dgx",
+        "sampled_at": "2026-09-19T15:40:19Z",
+        "cpu_percent": 0.0,
+        "ram_total_bytes": 130661203968,
+        "ram_available_bytes": 124428705792,
+        "swap_used_bytes": 0,
+        "gpu_percent": 0.0,
+        "gpu_temperature_c": 41.0,
+        "gpu_power_w": 10.38,
+        "disk_total_bytes": 4031871553536,
+        "disk_available_bytes": 3671133741056
+      }
+    ]
   }
 }

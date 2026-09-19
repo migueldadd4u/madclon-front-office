@@ -80,9 +80,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           {t('nav_flota')}
         </MenuItem>
         <MenuItem
-          href='https://macstudio-de-clon.tail89283c.ts.net/hardware'
-          rel='noreferrer'
-          title={t('nav_hardware_ayuda')}
+          href='/hardware'
           icon={<i className='ri-computer-line' />}
         >
           {t('nav_hardware')}

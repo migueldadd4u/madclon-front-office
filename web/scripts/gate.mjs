@@ -28,7 +28,7 @@ import { auditPublicSafety, formatFinding } from './public-safety.mjs'
 const RAIZ = resolve(process.cwd())
 const BASE = '/madclon-front-office'
 const PUERTO = Number(process.env.GATE_PORT || 4173)
-const PAGINAS = ['', 'retos', 'flota', 'salud', 'tokens', 'eficiencia', 'actividad', 'historia', 'preguntas']
+const PAGINAS = ['', 'retos', 'flota', 'hardware', 'salud', 'tokens', 'eficiencia', 'actividad', 'historia', 'preguntas']
 const rapido = process.argv.includes('--rapido')
 const ANCHOS_AXE = rapido ? [375, 1440] : [375, 390, 834, 1440]
 const ANCHOS_OVERFLOW = [320, 375, 390, 834, 1440]
@@ -43,6 +43,7 @@ const TITULOS_DOCUMENTO = {
 const SECCIONES = {
   retos: { es: 'Retos', en: 'Challenges' },
   flota: { es: 'La flota', en: 'The fleet' },
+  hardware: { es: 'Hardware', en: 'Hardware' },
   salud: { es: 'Salud', en: 'Health' },
   tokens: { es: 'Tokens', en: 'Tokens' },
   eficiencia: { es: 'Eficiencia', en: 'Efficiency' },
@@ -132,6 +133,13 @@ function estaticas() {
       ? '0 hallazgos'
       : `${seguridad.length} hallazgos · ${seguridad.slice(0, 3).map(formatFinding).join(' | ')}`
   )
+
+  try {
+    execSync('npm run test:public-safety && python3 -m unittest discover -s ../exporter -p test_hardware_publico.py', { cwd: RAIZ, stdio: 'pipe' })
+    marca('0b', 'contrato y privacidad Hardware: productor + consumidor', true, 'regresiones numéricas y canarios verdes')
+  } catch {
+    marca('0b', 'contrato y privacidad Hardware: productor + consumidor', false, 'falló una regresión de la proyección pública')
+  }
 
   // 1 · build
   if (process.argv.includes('--saltar-build')) {
@@ -402,6 +410,48 @@ async function navegador() {
     }
   }
   marca(16, 'bienvenida: siguiente gesto, explicación y estado con teclado', problemasBienvenida.length === 0, problemasBienvenida.join(' | ') || 'ES/EN · 390×844 y 1440×900')
+
+  const problemasHardware = []
+
+  for (const lang of ['es', 'en']) {
+    for (const width of [390, 1440]) {
+      const ctx = await navegadorPw.newContext({ viewport: { width, height: 900 }, serviceWorkers: 'block' })
+      await ctx.addInitScript(l => localStorage.setItem('madclon-lang', l), lang)
+      vigilarSuperficie(ctx, `hardware@${width}/${lang}`)
+      // Synthetic numeric fixture: a host being offline must not break the gate.
+      const hardwareFixture = { version: 1, hosts: ['mac', 'dgx'].map(id => ({
+        id, sampled_at: new Date().toISOString(), cpu_percent: 20, gpu_percent: 0,
+        ram_total_bytes: 1024, ram_available_bytes: 512, swap_used_bytes: 0,
+        gpu_temperature_c: null, gpu_power_w: null, disk_total_bytes: null, disk_available_bytes: null
+      })) }
+      const overviewFixture = JSON.parse(readFileSync(join(RAIZ, 'public/data/overview.json'), 'utf8'))
+      await ctx.route('**/data/overview.json', route => route.fulfill({ json: { ...overviewFixture, hardware: hardwareFixture } }))
+      const p = await ctx.newPage()
+      try {
+        await p.goto(url(''))
+        const section = p.locator('section[aria-labelledby="hardware-home-title"]')
+        await section.getByRole('progressbar').first().waitFor()
+        if (await section.getByRole('progressbar').count() !== 6) problemasHardware.push(`indicadores@${width}/${lang}`)
+        const card = section.getByRole('link', { name: /Mac Studio/ })
+        if (!(await card.getAttribute('href'))?.endsWith('/hardware/')) problemasHardware.push('destino público incorrecto')
+        await card.focus()
+        await card.press('Enter')
+        await p.waitForURL(url('hardware/'))
+        if (await p.getByRole('heading', { level: 1 }).textContent() !== 'Hardware') problemasHardware.push('no llega al detalle anónimo')
+        if (!await p.getByRole('heading', { name: 'DGX Spark', exact: true }).isVisible()) problemasHardware.push('falta DGX')
+        await ctx.route('**/data/tokens.json', route => route.fulfill({ status: 503, body: '' }))
+        await p.goto(url(''))
+        await p.getByRole('status').first().waitFor()
+        await section.getByRole('link', { name: /Mac Studio/ }).waitFor()
+        if (!await section.isVisible() || await section.getByRole('progressbar').count() !== 6) problemasHardware.push('Hardware desaparece al fallar tokens')
+      } catch (e) {
+        problemasHardware.push(`${width}/${lang}: ${String(e.message).slice(0, 120)}`)
+      }
+      await ctx.close()
+    }
+  }
+  marca(17, 'Hardware: portada → detalle anónimo y tolerancia a fallo ajeno', problemasHardware.length === 0, problemasHardware.join(' | ') || 'ES/EN · 390/1440 · CPU/GPU/RAM por host · tokens503 no lo oculta')
+
 
   for (const lang of IDIOMAS) {
     for (const contraste of CONTRASTES) {

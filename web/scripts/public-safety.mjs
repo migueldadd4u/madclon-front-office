@@ -9,6 +9,8 @@
 //   - despliegue: artefacto estático, sin endpoints;
 //   - privacidad del propio gate: nunca imprime valores inspeccionados.
 
+import { isPublicHardware } from '../src/lib/hardware-public.mjs'
+
 import { createHash } from 'node:crypto'
 import { existsSync, lstatSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { extname, join, relative, resolve, sep } from 'node:path'
@@ -171,6 +173,10 @@ function validateLegacyDocument(name, value, source, file, findings) {
     findings.push(finding('PUBLIC_DATA_LEGACY_SHAPE_INVALID', file, 'schema'))
 
     return
+  }
+
+  if (name === 'overview.json' && Object.hasOwn(value, 'hardware') && !isPublicHardware(value.hardware)) {
+    findings.push(finding('PUBLIC_HARDWARE_INVALID', file, 'hardware'))
   }
 
   if (SENSITIVE_DATA_PATTERNS.some(pattern => pattern.test(source))) {
@@ -524,13 +530,9 @@ export const SALIDA_NAVEGABLE_DECLARADA = {
 }
 
 function descontarSalidaDeclarada(source, file) {
-  // MAD solicita este acceso el 19/09/2026: enlace privado, nunca telemetría pública.
-  const declarada = [SALIDA_NAVEGABLE_DECLARADA, {
-    fichero: 'src/components/layout/vertical/VerticalMenu.tsx',
-    destino: 'https://macstudio-de-clon.tail89283c.ts.net/hardware'
-  }].find(salida => salida.fichero === file)
+  const declarada = SALIDA_NAVEGABLE_DECLARADA
 
-  if (!declarada) return source
+  if (file !== declarada.fichero) return source
 
   const destino = declarada.destino.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
@@ -737,6 +739,7 @@ const OUTPUT_ROUTE_DIRECTORIES = new Set([
   'actividad',
   'eficiencia',
   'flota',
+  'hardware',
   'historia',
   'preguntas',
   'retos',
