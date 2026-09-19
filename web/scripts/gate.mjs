@@ -25,6 +25,7 @@ import { join, extname, resolve } from 'node:path'
 import { comprobarContrato } from './check-contrato.mjs'
 import { comprobarCopy } from './check-copy.mjs'
 import { comprobarHardcode } from './check-hardcode.mjs'
+import { esperarDomAsentado, esperarQuietudDeMovimiento } from './esperas.mjs'
 import { modosAxe } from './modos-color.mjs'
 import { resolverPlaywrightHome } from './playwright-home.mjs'
 import { auditPublicSafety, formatFinding } from './public-safety.mjs'
@@ -767,6 +768,16 @@ async function navegador() {
       const abridor = pg.locator('[data-anatomia-abrir]').first()
 
       if ((await abridor.count()) === 0) continue
+
+      // Y aquí, DESPUÉS del resize, no antes: `setViewportSize` es justo lo que
+      // dispara la transición de ancho del nav lateral (300 ms), y `.click()` no
+      // pulsa hasta que el elemento está «visible, enabled and stable». Con la
+      // máquina cargada eso agotaba los 30 s de actionability y tumbaba el gate
+      // ENTERO por aquí (19/09/2026). Esperar antes del resize no serviría de
+      // nada: se estaría esperando a que se calme una página que aún no se ha
+      // movido.
+      await esperarDomAsentado(pg)
+      await esperarQuietudDeMovimiento(pg)
       await abridor.click()
       await pg.waitForTimeout(700)
       await pg.evaluate(axeSrc)
@@ -920,6 +931,11 @@ async function navegador() {
   await k.goto(url('flota'), { waitUntil: 'domcontentloaded' })
   await k.waitForTimeout(1600)
 
+  // Recorrer la página a Tab exige que la página EXISTA entera: con el DOM aún
+  // creciendo, el abridor de la capa 2 puede no estar todavía y el check diría
+  // «Tab no llega» sobre una /flota a medio construir.
+  await esperarDomAsentado(k)
+
   const pasosTeclado = []
   const abridor = k.locator('[data-anatomia-abrir], button:has-text("ver qué hay debajo")').first()
   const hayAbridor = (await abridor.count()) > 0
@@ -1001,6 +1017,13 @@ async function navegador() {
   const capa = { migas: false, distintivo: false, atras: false }
 
   if (hayAbridor) {
+    // `.click()` no pulsa hasta que el elemento está «visible, enabled and
+    // stable», y la transición de ancho del nav lateral recoloca el contenido
+    // debajo: con la máquina cargada eso agotaba los 30 s de actionability y
+    // tumbaba el gate ENTERO, no solo este check (19/09/2026). Se espera al
+    // estado —DOM construido y sin movimiento transitorio— antes de pulsar.
+    await esperarDomAsentado(k)
+    await esperarQuietudDeMovimiento(k)
     await abridor.click()
     await k.waitForTimeout(700)
     capa.migas = await k.evaluate(() => !!document.querySelector('[data-migas], nav[aria-label*="miga" i], nav[aria-label*="breadcrumb" i]'))
@@ -1116,6 +1139,21 @@ async function navegador() {
   // 13 · movimiento reducido: la preferencia del sistema llega a la app y no
   // queda movimiento, vídeo, error de consola ni tráfico distinto de GET/HEAD
   // al mismo origen en ninguna de las ocho páginas.
+  //
+  // MIDE LA PÁGINA EN REPOSO, y desde el 19/09/2026 espera a ese reposo en vez de
+  // a un reloj. Medía tras `waitForTimeout(1600)` y bajo carga cazaba tres
+  // familias de TRANSICIONES finitas —nav lateral (width 300 ms), fade de
+  // contenido (opacity 350 ms) y las barras de progreso determinadas
+  // (transform 400 ms)— que en máquina quieta ya habían terminado: FALLO espurio
+  // con el gate entero verde al repetirlo en un Mac libre. El porqué completo,
+  // con la reproducción por frenado de CPU y las dos salidas que se barajaron,
+  // está en `scripts/esperas.mjs`.
+  //
+  // La espera NO puede tapar: lo perpetuo (`iterations: Infinity`) se canta en la
+  // primera muestra y lo que no drena en plazo sale como `no-para`. Esa frontera
+  // la fija `scripts/esperas.test.mjs`, y se corre aquí mismo: si alguien
+  // convierte la espera en «espero a que pare y digo que no se movía», este check
+  // cae con ella.
   const ctxReducido = await navegadorPw.newContext({
     viewport: { width: 375, height: 900 },
     reducedMotion: 'reduce'
@@ -1156,9 +1194,26 @@ async function navegador() {
     if (!/ERR_ABORTED/.test(error)) problemasReducido.push(`red: ${error || 'fallo'}`)
   })
 
+  // La guardia de la propia espera, antes de fiarse de ella.
+  try {
+    sh('node --test scripts/esperas.test.mjs')
+  } catch (e) {
+    const salida = String(e.stdout || e.message || e)
+    const motivo = (salida.match(/^\s*(?:AssertionError.*|Error: )?(.*(?:perpetu|drenar|no-para|quieta?|tapando|DOM).*)$/m) || [, ''])[1]
+
+    problemasReducido.push(`la espera por estado no cumple su contrato: ${(motivo || salida).trim().slice(0, 200)}`)
+  }
+
   for (const p of PAGINAS) {
     await pr.goto(url(p), { waitUntil: 'domcontentloaded' })
+
+    // El suelo de 1.600 ms se queda: garantiza que el dato haya llegado y que no
+    // se mida una página que aún no ha empezado a pintar —medir demasiado pronto
+    // sería el verde falso simétrico—. Lo que se añade encima es el ESTADO.
     await pr.waitForTimeout(1600)
+    await esperarDomAsentado(pr)
+
+    const quietud = await esperarQuietudDeMovimiento(pr)
 
     const estado = await pr.evaluate(() => ({
       preferencia: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
@@ -1174,7 +1229,17 @@ async function navegador() {
     }))
 
     if (!estado.preferencia) problemasReducido.push(`${p || 'portada'}: preferencia no aplicada`)
-    if (estado.animaciones.length) problemasReducido.push(`${p || 'portada'}: ${estado.animaciones.join(', ')}`)
+
+    if (quietud.estado === 'perpetuo') {
+      problemasReducido.push(`${p || 'portada'}: movimiento perpetuo · ${quietud.movimiento.join(', ')}`)
+    } else if (quietud.estado === 'no-para') {
+      problemasReducido.push(`${p || 'portada'}: el movimiento no paró en 15 s · ${quietud.movimiento.join(', ')}`)
+    } else if (estado.animaciones.length) {
+      // Quieto al esperar y moviéndose al medir: algo arrancó en medio. Se canta
+      // igual, que para eso el snapshot sigue siendo el juez final.
+      problemasReducido.push(`${p || 'portada'}: ${estado.animaciones.join(', ')}`)
+    }
+
     if (estado.videosActivos) problemasReducido.push(`${p || 'portada'}: ${estado.videosActivos} vídeo(s) activo(s)`)
   }
 
