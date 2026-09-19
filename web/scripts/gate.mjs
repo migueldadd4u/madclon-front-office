@@ -53,39 +53,44 @@ const CONTRASTES = rapido ? [false] : [false, true]
 // sería el oscuro el que nadie mira, y cambiar otra vez el default no movería
 // esto ni un milímetro.
 //
-// POR QUÉ EL OSCURO NO REPITE LA MATRIZ ENTERA. Duplicar 9 páginas × 4 anchos ×
-// 2 idiomas × normal+AC son 144 pasadas de axe más, y el gate se corre a mano
-// antes de cada publicación: lo que se alarga se deja de correr. El corte no es
-// a ojo, está medido (19/09/2026, inventario de tinta sobre `web/out`: cada par
-// color-texto→fondo que axe llega a evaluar, en las 8 combinaciones):
+// POR QUÉ EL OSCURO NO REPITE LA MATRIZ ENTERA. Duplicarla son 160 pasadas de axe
+// más, y el gate se corre a mano antes de cada publicación: lo que se alarga se
+// deja de correr. El corte no es a ojo, está medido (19/09/2026, inventario de
+// tinta sobre `web/out` con las 10 páginas: cada par color-texto→fondo que axe
+// llega a evaluar, en las 8 combinaciones, 2.983 muestras en cada una):
 //
-//   · los dos modos pintan EXACTAMENTE los mismos elementos —448 elementos, 707
-//     pares elemento×color en claro y en oscuro—; lo único que cambia es la
-//     TINTA: 16 de los 17 pares de color del oscuro no existen en claro. Por eso
-//     el modo hay que barrerlo, y por eso basta con VER cada elemento una vez.
-//   · anchos: {375, 1440} ve 707/707 (100 %). 390 y 834 no aportan ni un
-//     elemento exclusivo (0 cada uno); 1440 aporta 118 que el móvil no enseña y
+//   · los dos modos pintan EXACTAMENTE los mismos elementos —494 elementos, 771
+//     pares elemento×color, idénticos en claro y en oscuro—; lo único que cambia
+//     es la TINTA: 17 de los 18 pares de color del oscuro no existen en claro.
+//     Por eso el modo hay que barrerlo, y por eso basta con VER cada elemento
+//     una vez.
+//   · anchos: {375, 1440} ve 771/771 (100 %). 390 y 834 no aportan ni un
+//     elemento exclusivo (0 cada uno); 1440 aporta 140 que el móvil no enseña y
 //     375 aporta 9 que el escritorio no enseña. Los extremos bastan, el medio no.
-//   · idioma: el inglés no aporta NI UN par de color nuevo (17/17 con solo ES).
+//   · idioma: el inglés no aporta NI UN par de color nuevo (18/18 con solo ES).
 //     Lo único que cambia de sitio es un chip verde que en EN sale también en
 //     /retos; ese mismo par ya se mide en /eficiencia y /historia.
 //   · alto contraste: SÍ aporta tinta propia en oscuro (el aviso de /retos pasa
 //     de #b2bad2 a #d7daf0). No se recorta: es la superficie que peor lo pasó el
 //     15/09.
 //
-// Resultado: el oscuro mide 9 páginas × 2 anchos × ES × normal+AC —44 pasadas de
-// axe contando capa 2 y 404, en vez de las 176 de una duplicación literal— y aun
-// así mira el 100 % de su tinta. El claro, que es el de fábrica, no pierde nada:
-// sigue con la matriz entera.
+// ⚠ Medir esto exige máquina quieta. Con otro gate corriendo a la vez, la página
+// se audita a medio pintar y cada combinación mide una cosa distinta: los
+// recuentos se fueron de 180 a 494 elementos y el análisis «demostraba» que el
+// inglés aportaba tinta propia en las diez páginas. La medición buena se
+// reconoce en que las 8 combinaciones dan el MISMO número de muestras.
+//
+// Resultado: el oscuro mide 10 páginas × 2 anchos × ES × normal+AC —48 pasadas
+// de axe contando capa 2 y 404, en vez de las 192 de una duplicación literal— y
+// aun así mira el 100 % de su tinta. El claro, que es el de fábrica, no pierde
+// nada: sigue con la matriz entera.
 //
 // Lo que cuesta, cronometrado el 19/09/2026 sobre el mismo `web/out` y con la
-// sección de navegador aislada (`--solo-navegador`), dos pasadas seguidas:
-//     un modo  · 176 pasadas de axe · 233 s
-//     dos modos · 220 pasadas       · 323 s   → +90 s (+39 %)
-// Duplicar la matriz entera habrían sido ~466 s: el corte se ahorra unos dos
-// minutos y medio por gate sin dejar de mirar ni un par de color del oscuro. Con
-// esto el gate ENTERO —build incluido— sale en 5 min 51 s: sigue siendo un gate
-// que se corre antes de publicar sin pensárselo dos veces, que era la condición.
+// sección de navegador aislada (`--solo-navegador`), dos pasadas seguidas y con
+// las 9 páginas de entonces: 176 pasadas de axe en 233 s contra 220 pasadas en
+// 323 s, o sea +90 s (+39 %). Duplicar la matriz entera habrían sido ~466 s: el
+// corte se ahorra unos dos minutos y medio por gate sin dejar de mirar ni un par
+// de color del oscuro.
 //
 // Lo que NO se recorta, por si alguien tiene la tentación: la capa 2 de /flota y
 // el 404 tienen tinta que no sale en ninguna otra página, así que se abren y se
