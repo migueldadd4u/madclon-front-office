@@ -27,7 +27,8 @@
 //     lo que da el modo avión): cada parada se paga dos veces. Mientras el diseño
 //     siga así, ARREGLAR LA PUBLICACIÓN NO TERMINA HASTA SUBIR ESTA VERSIÓN, que es
 //     lo único que desaloja el lote muerto en el navegador de todo el mundo a la vez.
-const VERSION = 'v5'
+// v6 (19/09/2026): overview incorpora hardware; desalojar lotes sin indicadores.
+const VERSION = 'v6'
 const ESTATICA = `madclon-estatica-${VERSION}`
 const PAGINAS = `madclon-paginas-${VERSION}`
 const DATOS = `madclon-datos-${VERSION}`
