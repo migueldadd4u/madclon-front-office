@@ -93,6 +93,21 @@ const CONTRASTES = rapido ? [false] : [false, true]
 // corte se ahorra unos dos minutos y medio por gate sin dejar de mirar ni un par
 // de color del oscuro.
 //
+// Y LA PREMISA NO SE FÍA DE AQUELLA MEDICIÓN: se comprueba en cada pasada. Más
+// abajo, cada casilla que recorren los dos modos tiene que haber evaluado el
+// MISMO número de nodos de texto; si no, o hay una pieza que sólo existe en un
+// modo —y entonces el corte está ciego— o alguien midió una página a medio
+// pintar. Cualquiera de las dos tumba el check. Probado escondiendo UN solo
+// elemento en oscuro (opacidad 0 justo antes de axe): FALLO nombrando las
+// casillas y los números (35 nodos contra 34), que es exactamente el caso que
+// contar pasadas jamás habría cazado —0 violaciones y las 48 pasadas intactas—.
+// Para que esa comparación sea de fiar, el barrido espera a que el DOM deje de
+// crecer (`esperarDomAsentado`) antes de medir: son ~80 s más de gate, y son el
+// precio de que el número signifique algo. Medido con el Mac cargado a propósito
+// da los MISMOS 12.866 nodos en claro y 3.336 en oscuro que con el Mac quieto,
+// así que el guardián es determinista y no un generador de rojos falsos.
+// Gate entero: 21 OK · 0 FALLO, 7 min 30 s en reposo y 7 min 32 s bajo carga.
+//
 // Lo que NO se recorta, por si alguien tiene la tentación: la capa 2 de /flota y
 // el 404 tienen tinta que no sale en ninguna otra página, así que se abren y se
 // visitan también en oscuro. Lo que no se abre, no se mide.
@@ -482,6 +497,17 @@ async function navegador() {
   const pasadasAxe = Object.fromEntries(MODOS_AXE.map(m => [m.id, 0]))
   const problemasModo = []
 
+  // Cuánta TINTA ha llegado a mirar cada modo en cada casilla de la matriz.
+  // Contar pasadas dice que el bucle corrió; no dice que mirara algo. Un nodo
+  // que axe no llega a ver —porque está a opacidad 0, o porque la página aún no
+  // lo había pintado— no genera violación y la pasada cuenta igual: el modo
+  // tendría sus 48 pasadas habiendo mirado menos tinta de la que cree. Esto es
+  // lo que lo caza, y de paso VIGILA LA PREMISA DEL CORTE (ver MODOS_AXE): el
+  // oscuro puede medirse con menos anchos y un solo idioma porque los dos modos
+  // pintan los MISMOS elementos. Si eso deja de ser verdad, el corte se queda
+  // ciego — y aquí se entera el gate, no el que lo vuelva a medir a mano.
+  const tintaPorModo = Object.fromEntries(MODOS_AXE.map(m => [m.id, new Map()]))
+
   const vigilarSuperficie = (ctx, etiqueta) => {
     ctx.on('request', request => {
       const metodo = request.method().toUpperCase()
@@ -665,6 +691,12 @@ async function navegador() {
     for (const p of PAGINAS) {
       await pg.goto(url(p), { waitUntil: 'domcontentloaded' })
       await pg.waitForTimeout(1600)
+      // La página ENTERA antes de medir nada, no sólo el reloj. Hace falta para
+      // la comparación de tinta de más abajo: si una pasada audita una página a
+      // medio construir y la otra no, los dos modos ven distinto número de
+      // nodos y el check cantaría un desajuste que no existe. Además es lo que
+      // el propio axe necesita para mirar todo lo que hay que mirar.
+      await esperarDomAsentado(pg)
       if (!(await enModo(pg, modo, `${p || 'portada'} ${variante}`))) continue
 
       // El idioma semántico —lang, título por sección, h1 único y ruta
@@ -718,9 +750,20 @@ async function navegador() {
           await pg.evaluate(axeSrc)
           pasadasAxe[modo.id] += 1
 
-          const r = await pg.evaluate(async () =>
-            axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } })
-          )
+          const r = await pg.evaluate(async () => {
+            const res = await axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } })
+
+            // Los tres cubos sumados: que un nodo pase de «pasa» a «dudoso»
+            // —cosa que sí puede depender del esquema de color, por ejemplo
+            // sobre un degradado— no mueve este número. Que axe no lo VEA, sí.
+            const nodosTinta = [...res.passes, ...res.violations, ...res.incomplete]
+              .filter(x => x.id === 'color-contrast')
+              .reduce((n, x) => n + x.nodes.length, 0)
+
+            return { violations: res.violations, nodosTinta }
+          })
+
+          tintaPorModo[modo.id].set(`${p || 'portada'}@${w} ${lang}${contraste ? '/AC' : ''}`, r.nodosTinta)
 
           r.violations.forEach(v =>
             violaciones.push(
@@ -897,21 +940,65 @@ async function navegador() {
   ).join(' · ')
 
   const modosSinMedir = MODOS_AXE.filter(m => pasadasAxe[m.id] === 0).map(m => m.id)
-  const recuento = MODOS_AXE.map(m => `${m.id} ${pasadasAxe[m.id]} pasadas`).join(' · ')
+
+  // LA PREMISA DEL CORTE, COMPROBADA EN CADA PASADA. El oscuro se mide con menos
+  // anchos y un solo idioma porque está medido que los dos modos pintan los
+  // mismos elementos (ver MODOS_AXE). Aquí se exige: en cada casilla que los dos
+  // recorren —misma página, mismo ancho, mismo idioma, mismo contraste— axe tiene
+  // que haber evaluado el MISMO número de nodos de texto. Si no, una de dos, y
+  // las dos importan: o hay una pieza que sólo existe en un modo y el corte se
+  // ha quedado ciego, o una de las dos pasadas midió una página a medio pintar.
+  // Cualquiera de las dos invalida el barrido, así que tumba el check.
+  const referenciaAxe = MODOS_AXE.find(m => m.referencia)
+  const desajustesTinta = []
+  let casillasComunes = 0
+
+  for (const modo of MODOS_AXE) {
+    if (modo.referencia) continue
+
+    for (const [casilla, nodos] of tintaPorModo[modo.id]) {
+      const enReferencia = tintaPorModo[referenciaAxe.id].get(casilla)
+
+      // El corte del modo secundario es un SUBCONJUNTO del de referencia, así que
+      // toda casilla suya debería tener pareja. Si no la tiene, el corte se ha
+      // salido de la matriz del de fábrica y esto ya no compara nada: se dice.
+      if (enReferencia === undefined) {
+        desajustesTinta.push(`${casilla}: ${modo.id} la mide y ${referenciaAxe.id} no — el corte se salió de la matriz de referencia`)
+        continue
+      }
+
+      casillasComunes += 1
+      if (enReferencia !== nodos) {
+        desajustesTinta.push(`${casilla}: ${referenciaAxe.id} evaluó ${enReferencia} nodos y ${modo.id} ${nodos}`)
+      }
+    }
+  }
+
+  const tintaVista = MODOS_AXE.map(
+    m => `${m.id} ${pasadasAxe[m.id]} pasadas/${[...tintaPorModo[m.id].values()].reduce((a, b) => a + b, 0)} nodos de tinta`
+  ).join(' · ')
+  const recuento = tintaVista
 
   marca(
     5,
     `axe + idioma semántico (${matriz})`,
-    violaciones.length === 0 && problemasIdioma.length === 0 && modosSinMedir.length === 0 && problemasModo.length === 0,
-    modosSinMedir.length || problemasModo.length
+    violaciones.length === 0 &&
+      problemasIdioma.length === 0 &&
+      modosSinMedir.length === 0 &&
+      problemasModo.length === 0 &&
+      desajustesTinta.length === 0,
+    modosSinMedir.length || problemasModo.length || desajustesTinta.length
       ? [
           modosSinMedir.length ? `el barrido NO midió ${modosSinMedir.join(' ni ')} (${recuento})` : '',
-          ...problemasModo.slice(0, 3)
+          ...problemasModo.slice(0, 3),
+          desajustesTinta.length
+            ? `los modos no vieron la misma tinta en ${desajustesTinta.length} casilla(s) — ${desajustesTinta.slice(0, 2).join(' ; ')}`
+            : ''
         ]
           .filter(Boolean)
           .join(' | ')
       : [...violaciones, ...problemasIdioma].slice(0, 6).join(' | ') ||
-        `0 violaciones en ${recuento} · idioma, titulo por seccion, h1 y seleccion de ruta correctos; 404 intacto`
+        `0 violaciones en ${recuento} · los dos modos vieron la misma tinta en las ${casillasComunes} casillas comunes · idioma, titulo por seccion, h1 y seleccion de ruta correctos; 404 intacto`
   )
   marca(
     6,
