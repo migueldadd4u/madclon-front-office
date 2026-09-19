@@ -9,6 +9,9 @@
 //   node scripts/gate.mjs --rapido        → matriz reducida (para el bucle de bugfixing)
 //   node scripts/gate.mjs --rapido --saltar-build → reutiliza web/out sólo en el bucle local
 //
+// El barrido de accesibilidad recorre los DOS modos de color pidiendo cada uno
+// por su cookie, no el que toque venir de fábrica: ver MODOS_AXE.
+//
 // Playwright y axe-core se descubren en la ruta persistente compartida con el
 // panel privado. /tmp/pwshot queda solo como compatibilidad: macOS puede podarlo
 // dejando directorios a medias. PW_HOME sigue siendo la prioridad explícita.
@@ -22,6 +25,7 @@ import { join, extname, resolve } from 'node:path'
 import { comprobarContrato } from './check-contrato.mjs'
 import { comprobarCopy } from './check-copy.mjs'
 import { comprobarHardcode } from './check-hardcode.mjs'
+import { modosAxe } from './modos-color.mjs'
 import { resolverPlaywrightHome } from './playwright-home.mjs'
 import { auditPublicSafety, formatFinding } from './public-safety.mjs'
 
@@ -34,6 +38,64 @@ const ANCHOS_AXE = rapido ? [375, 1440] : [375, 390, 834, 1440]
 const ANCHOS_OVERFLOW = [320, 375, 390, 834, 1440]
 const IDIOMAS = rapido ? ['es'] : ['es', 'en']
 const CONTRASTES = rapido ? [false] : [false, true]
+
+// ── LOS DOS MODOS DE COLOR, Y POR QUÉ EL OSCURO VA CON CORTE ────────────────────
+// La web es estática: el modo lo resuelve el cliente leyendo la cookie de ajustes
+// (`madclon-front-office` = {"mode":"light"|"dark"}), así que un barrido que no
+// pone cookie mide SIEMPRE el modo de fábrica y ninguno más.
+//
+// Eso costó caro. Hasta el 15/09/2026 el de fábrica era el oscuro y el claro no
+// lo medía nadie: el día que MAD puso el claro de arranque, este gate destapó de
+// golpe siete focos de contraste que llevaban meses escondidos —avisos a 1,66:1,
+// chips a 3,35, pies de tarjeta a 2,31 y el modo de ALTO CONTRASTE a 1,1:1, o
+// sea inservible justo para quien lo necesita—. Están corregidos. Pedir los DOS
+// modos explícitamente es lo que impide que la ceguera se dé la vuelta: ahora
+// sería el oscuro el que nadie mira, y cambiar otra vez el default no movería
+// esto ni un milímetro.
+//
+// POR QUÉ EL OSCURO NO REPITE LA MATRIZ ENTERA. Duplicar 9 páginas × 4 anchos ×
+// 2 idiomas × normal+AC son 144 pasadas de axe más, y el gate se corre a mano
+// antes de cada publicación: lo que se alarga se deja de correr. El corte no es
+// a ojo, está medido (19/09/2026, inventario de tinta sobre `web/out`: cada par
+// color-texto→fondo que axe llega a evaluar, en las 8 combinaciones):
+//
+//   · los dos modos pintan EXACTAMENTE los mismos elementos —448 elementos, 707
+//     pares elemento×color en claro y en oscuro—; lo único que cambia es la
+//     TINTA: 16 de los 17 pares de color del oscuro no existen en claro. Por eso
+//     el modo hay que barrerlo, y por eso basta con VER cada elemento una vez.
+//   · anchos: {375, 1440} ve 707/707 (100 %). 390 y 834 no aportan ni un
+//     elemento exclusivo (0 cada uno); 1440 aporta 118 que el móvil no enseña y
+//     375 aporta 9 que el escritorio no enseña. Los extremos bastan, el medio no.
+//   · idioma: el inglés no aporta NI UN par de color nuevo (17/17 con solo ES).
+//     Lo único que cambia de sitio es un chip verde que en EN sale también en
+//     /retos; ese mismo par ya se mide en /eficiencia y /historia.
+//   · alto contraste: SÍ aporta tinta propia en oscuro (el aviso de /retos pasa
+//     de #b2bad2 a #d7daf0). No se recorta: es la superficie que peor lo pasó el
+//     15/09.
+//
+// Resultado: el oscuro mide 9 páginas × 2 anchos × ES × normal+AC —44 pasadas de
+// axe contando capa 2 y 404, en vez de las 176 de una duplicación literal— y aun
+// así mira el 100 % de su tinta. El claro, que es el de fábrica, no pierde nada:
+// sigue con la matriz entera.
+//
+// Lo que cuesta, cronometrado el 19/09/2026 sobre el mismo `web/out` y con la
+// sección de navegador aislada (`--solo-navegador`), dos pasadas seguidas:
+//     un modo  · 176 pasadas de axe · 233 s
+//     dos modos · 220 pasadas       · 323 s   → +90 s (+39 %)
+// Duplicar la matriz entera habrían sido ~466 s: el corte se ahorra unos dos
+// minutos y medio por gate sin dejar de mirar ni un par de color del oscuro. Con
+// esto el gate ENTERO —build incluido— sale en 5 min 51 s: sigue siendo un gate
+// que se corre antes de publicar sin pensárselo dos veces, que era la condición.
+//
+// Lo que NO se recorta, por si alguien tiene la tentación: la capa 2 de /flota y
+// el 404 tienen tinta que no sale en ninguna otra página, así que se abren y se
+// visitan también en oscuro. Lo que no se abre, no se mide.
+//
+// Si mañana el corte deja de valer (una pieza que solo se pinte a 834, o un
+// componente que solo exista en inglés), se arregla subiendo ese ancho o ese
+// idioma en `scripts/modos-color.mjs`. La premisa se vuelve a medir con el
+// inventario de tinta, no se supone.
+const MODOS_AXE = modosAxe({ anchos: ANCHOS_AXE, idiomas: IDIOMAS, contrastes: CONTRASTES, rapido })
 
 const TITULOS_DOCUMENTO = {
   es: 'MAD Clon — el Clon de Miguel Ángel Domínguez',
@@ -240,6 +302,20 @@ function estaticas() {
 
     marca('4c', 'tema claro por defecto (norma 15/09/2026)', false, (motivo || salida).trim().slice(0, 300))
   }
+
+  // 4d · y el reverso de 4c: que el barrido siga mirando LOS DOS modos. 4c vigila
+  // con cuál arranca la web; esto vigila que el otro no se quede sin medir, que
+  // es justo la ceguera que el 15/09 costó siete focos de contraste. Vive en
+  // `scripts/modos-color.mjs` para que la prueba lea el valor, no el comentario.
+  try {
+    sh('node --test scripts/modos-color.test.mjs')
+    marca('4d', 'el barrido mira los dos modos de color', true, MODOS_AXE.map(m => m.id).join(' + '))
+  } catch (e) {
+    const salida = String(e.stdout || e.message || e)
+    const motivo = (salida.match(/^\s*(?:AssertionError.*|Error: )?(.*(?:debe barrer|se quedó sin|no mide|perdió|misma cookie).*)$/m) || [, ''])[1]
+
+    marca('4d', 'el barrido mira los dos modos de color', false, (motivo || salida).trim().slice(0, 300))
+  }
 }
 
 // ── servidor estático mínimo para web/out bajo la subruta real ──────────────────
@@ -294,6 +370,66 @@ function servir() {
   return new Promise(ok => srv.listen(PUERTO, '127.0.0.1', () => ok(srv)))
 }
 
+// Un modo que no llega a aplicarse no es un fallo de accesibilidad: es el gate
+// midiendo otra página. Se distingue con su propio tipo para que el check 5 lo
+// cuente como lo que es —«no he podido mirar aquí»— y no se confunda con un
+// error de Playwright, que sí debe reventar.
+class ErrorModoNoAplicado extends Error {}
+
+/**
+ * Espera a que el modo de color TERMINE de aplicarse, ANTES de medir nada.
+ *
+ * El modo no está en el HTML servido: la web es estática, sale con el modo de
+ * fábrica pintado, y es React quien lo cambia tras hidratar leyendo la cookie de
+ * ajustes. Medido en `web/out` con la cookie de oscuro puesta:
+ *     t = 110 ms  html[data-light]  body=rgb(247,247,249)   ← todavía el de fábrica
+ *     t = 370 ms  html[data-dark]   body=rgb(40,42,66)      ← ya el pedido
+ * Auditar dentro de esa ventana es medir una página a medio cambiar: axe vería
+ * la tinta de un modo sobre el fondo del otro y cantaría contrastes que no
+ * existen. Es exactamente lo que tumbó 13 noches el gate del panel privado.
+ *
+ * No es un reintento a ciegas ni tapa un fallo: espera a que se cumpla la
+ * precondición que el propio check asume —que la página esté en el modo que dice
+ * auditar— y si no llega, LANZA. Un rojo que dice la verdad vale más que un
+ * verde por haber medido otra página.
+ */
+async function esperarModoAplicado(pg, modo) {
+  try {
+    await pg.waitForFunction(a => document.documentElement.hasAttribute(a), modo.atributo, { timeout: 15000 })
+  } catch {
+    const tiene = await pg.evaluate(() => [...document.documentElement.attributes].map(a => a.name).join(' '))
+
+    throw new ErrorModoNoAplicado(`el modo ${modo.id} no llegó a aplicarse en 15 s: <html> sigue sin ${modo.atributo} (tiene: ${tiene})`)
+  }
+
+  // Y esperar a que el tema DEJE DE MOVERSE: el atributo no es el final, el color
+  // del texto se anima después. Se mira el par tinta/fondo y se exige que no
+  // cambie durante 250 ms seguidos.
+  try {
+    await pg.waitForFunction(
+      () => {
+        const el = document.querySelector('main') || document.body
+        const ahora = `${getComputedStyle(el).color}|${getComputedStyle(document.body).backgroundColor}`
+
+        if (window.__gateTema !== ahora) {
+          window.__gateTema = ahora
+          window.__gateTemaDesde = performance.now()
+
+          return false
+        }
+
+        return performance.now() - window.__gateTemaDesde > 250
+      },
+      null,
+      { timeout: 15000, polling: 100 }
+    )
+  } catch {
+    const visto = await pg.evaluate(() => window.__gateTema ?? 'sin muestra')
+
+    throw new ErrorModoNoAplicado(`el tema del modo ${modo.id} no dejó de cambiar en 15 s (última muestra: ${visto})`)
+  }
+}
+
 // ── 5-13 · comprobaciones en navegador ──────────────────────────────────────────
 async function navegador() {
   let PW_HOME
@@ -331,6 +467,14 @@ async function navegador() {
   const tactiles = []
   const problemasIdioma = []
   const origenLocal = new URL(url('')).origin
+
+  // Cuántas veces ha corrido axe en cada modo. Un «0 violaciones» que no dice
+  // cuántas pasadas ha dado es el verde más barato que existe: si un día la
+  // cookie de modo deja de aplicarse y el bucle se salta entero, el gate seguiría
+  // en verde sin haber mirado nada. Aquí se cuenta, se imprime, y un modo con
+  // cero pasadas TUMBA el check.
+  const pasadasAxe = Object.fromEntries(MODOS_AXE.map(m => [m.id, 0]))
+  const problemasModo = []
 
   const vigilarSuperficie = (ctx, etiqueta) => {
     ctx.on('request', request => {
@@ -452,44 +596,76 @@ async function navegador() {
   }
   marca(17, 'Hardware: portada → detalle anónimo y tolerancia a fallo ajeno', problemasHardware.length === 0, problemasHardware.join(' | ') || 'ES/EN · 390/1440 · CPU/GPU/RAM por host · tokens503 no lo oculta')
 
+  // Una lista plana de combinaciones en vez de tres bucles anidados: cada modo
+  // trae SU corte (idiomas, anchos, contrastes), así que la matriz del oscuro no
+  // es la del claro y el cuerpo del barrido no tiene que saberlo.
+  const combinaciones = MODOS_AXE.flatMap(modo =>
+    modo.idiomas.flatMap(lang => modo.contrastes.map(contraste => ({ modo, lang, contraste })))
+  )
 
-  for (const lang of IDIOMAS) {
-    for (const contraste of CONTRASTES) {
-      const ctx = await navegadorPw.newContext({ viewport: { width: 1440, height: 900 } })
+  // Envoltorio único: si el modo no llega a aplicarse se anota y se ABANDONA esa
+  // página, en vez de medirla a medio cambiar. Cualquier otro error sigue
+  // reventando, que para eso es un error de verdad.
+  const enModo = async (pg, modo, donde) => {
+    try {
+      await esperarModoAplicado(pg, modo)
 
-      vigilarSuperficie(ctx, `${lang}${contraste ? '/AC' : ''}`)
+      return true
+    } catch (e) {
+      if (!(e instanceof ErrorModoNoAplicado)) throw e
+      problemasModo.push(`${donde}: ${e.message}`)
 
-      await ctx.addInitScript(
-        ([l, c]) => {
-          localStorage.setItem('madclon-lang', l)
-          localStorage.setItem('madclon-contraste', c)
-        },
-        [lang, contraste ? '1' : '0']
-      )
-      const pg = await ctx.newPage()
+      return false
+    }
+  }
 
-      pg.on('pageerror', e => erroresJs.push(`${lang}${contraste ? '/AC' : ''} ${e.message}`))
-      pg.on('console', m => {
-        // «Failed to load resource» ya lo cubren los dos vigilantes de red de abajo:
-        // contarlo aquí duplicaría el mismo hecho.
-        if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) {
-          erroresJs.push(`${lang} consola: ${m.text().slice(0, 120)}`)
-        }
-      })
-      pg.on('response', r => r.status() >= 400 && respuestasMalas.push(`${r.status()} ${r.url()}`))
+  for (const { modo, lang, contraste } of combinaciones) {
+    const variante = `${modo.id}/${lang}${contraste ? '/AC' : ''}`
+    const ctx = await navegadorPw.newContext({ viewport: { width: 1440, height: 900 } })
 
-      // ERR_ABORTED = prefetch de Next cancelado porque el gate navega/redimensiona
-      // deprisa. Es un efecto del propio barrido, no un fallo de la web.
-      pg.on('requestfailed', r => {
-        const err = r.failure()?.errorText || ''
+    vigilarSuperficie(ctx, variante)
 
-        if (!/ERR_ABORTED/.test(err)) respuestasMalas.push(`${err} ${r.url().slice(0, 90)}`)
-      })
+    // La cookie de ajustes es lo ÚNICO que decide el modo en una web estática.
+    // Se pide el modo aunque sea el de fábrica: así cambiar el default no
+    // convierte este barrido en «un modo medido y el otro por accidente».
+    await ctx.addCookies([{ name: 'madclon-front-office', value: modo.cookie, url: origenLocal }])
+    await ctx.addInitScript(
+      ([l, c]) => {
+        localStorage.setItem('madclon-lang', l)
+        localStorage.setItem('madclon-contraste', c)
+      },
+      [lang, contraste ? '1' : '0']
+    )
+    const pg = await ctx.newPage()
 
-      for (const p of PAGINAS) {
-        await pg.goto(url(p), { waitUntil: 'domcontentloaded' })
-        await pg.waitForTimeout(1600)
+    pg.on('pageerror', e => erroresJs.push(`${variante} ${e.message}`))
+    pg.on('console', m => {
+      // «Failed to load resource» ya lo cubren los dos vigilantes de red de abajo:
+      // contarlo aquí duplicaría el mismo hecho.
+      if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) {
+        erroresJs.push(`${variante} consola: ${m.text().slice(0, 120)}`)
+      }
+    })
+    pg.on('response', r => r.status() >= 400 && respuestasMalas.push(`${r.status()} ${r.url()}`))
 
+    // ERR_ABORTED = prefetch de Next cancelado porque el gate navega/redimensiona
+    // deprisa. Es un efecto del propio barrido, no un fallo de la web.
+    pg.on('requestfailed', r => {
+      const err = r.failure()?.errorText || ''
+
+      if (!/ERR_ABORTED/.test(err)) respuestasMalas.push(`${err} ${r.url().slice(0, 90)}`)
+    })
+
+    for (const p of PAGINAS) {
+      await pg.goto(url(p), { waitUntil: 'domcontentloaded' })
+      await pg.waitForTimeout(1600)
+      if (!(await enModo(pg, modo, `${p || 'portada'} ${variante}`))) continue
+
+      // El idioma semántico —lang, título por sección, h1 único y ruta
+      // seleccionada— no puede depender del color: lo pinta el mismo HTML en
+      // los dos modos. Se comprueba solo en el de referencia para no contar
+      // dos veces el mismo fallo y no comerse los huecos de la evidencia.
+      if (modo.referencia) {
         const documento = await pg.evaluate(() => ({
           lang: document.documentElement.lang,
           title: document.title,
@@ -514,126 +690,147 @@ async function navegador() {
             `${p || 'portada'} ${lang}${contraste ? '/AC' : ''}: h1=${JSON.stringify(documento.h1)}`
           )
         }
+      }
 
-        for (const w of ANCHOS_OVERFLOW) {
-          await pg.setViewportSize({ width: w, height: 900 })
-          await pg.waitForTimeout(320)
+      // El overflow y los objetivos táctiles son GEOMETRÍA: miden cajas, y las
+      // cajas son las mismas en los dos modos (medido: 448 elementos idénticos
+      // en claro y en oscuro). El modo de referencia recorre los cinco anchos
+      // del check 7; el otro solo visita los suyos de axe.
+      for (const w of modo.referencia ? ANCHOS_OVERFLOW : modo.anchos) {
+        await pg.setViewportSize({ width: w, height: 900 })
+        await pg.waitForTimeout(320)
 
+        if (modo.referencia) {
           const desborde = await pg.evaluate(
             () => document.documentElement.scrollWidth - window.innerWidth
           )
 
           if (desborde > 1) overflow.push(`${p || 'portada'} @${w} +${desborde}px (${lang})`)
+        }
 
-          if (ANCHOS_AXE.includes(w)) {
-            await pg.evaluate(axeSrc)
+        if (modo.anchos.includes(w)) {
+          await pg.evaluate(axeSrc)
+          pasadasAxe[modo.id] += 1
 
-            const r = await pg.evaluate(async () =>
-              axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } })
+          const r = await pg.evaluate(async () =>
+            axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } })
+          )
+
+          r.violations.forEach(v =>
+            violaciones.push(
+              `${p || 'portada'} @${w} ${variante}: ${v.id} (${v.impact || 'sin impacto'}) (${v.nodes.length})${resumirViolacionAxe(v)}`
             )
+          )
+        }
 
-            r.violations.forEach(v =>
-              violaciones.push(
-                `${p || 'portada'} @${w} ${lang}${contraste ? '/AC' : ''}: ${v.id} (${v.impact || 'sin impacto'}) (${v.nodes.length})${resumirViolacionAxe(v)}`
-              )
-            )
-          }
+        // 8 · objetivos táctiles, solo en móvil
+        if (w === 375 && !contraste && lang === 'es' && modo.referencia) {
+          const chicos = await pg.evaluate(blanca => {
+            const out = []
 
-          // 8 · objetivos táctiles, solo en móvil
-          if (w === 375 && !contraste && lang === 'es') {
-            const chicos = await pg.evaluate(blanca => {
-              const out = []
+            for (const el of document.querySelectorAll('a[href], button, [role="button"], input, select, summary')) {
+              if (blanca.some(s => el.closest(s))) continue
+              const r = el.getBoundingClientRect()
 
-              for (const el of document.querySelectorAll('a[href], button, [role="button"], input, select, summary')) {
-                if (blanca.some(s => el.closest(s))) continue
-                const r = el.getBoundingClientRect()
+              if (r.width === 0 || r.height === 0) continue
+              if (getComputedStyle(el).visibility === 'hidden') continue
 
-                if (r.width === 0 || r.height === 0) continue
-                if (getComputedStyle(el).visibility === 'hidden') continue
-
-                if (r.width < 44 || r.height < 44) {
-                  out.push(
-                    `${el.tagName.toLowerCase()}${el.className && typeof el.className === 'string' ? '.' + el.className.split(' ')[0] : ''} ${Math.round(r.width)}×${Math.round(r.height)} «${(el.getAttribute('aria-label') || el.textContent || '').trim().slice(0, 24)}»`
-                  )
-                }
+              if (r.width < 44 || r.height < 44) {
+                out.push(
+                  `${el.tagName.toLowerCase()}${el.className && typeof el.className === 'string' ? '.' + el.className.split(' ')[0] : ''} ${Math.round(r.width)}×${Math.round(r.height)} «${(el.getAttribute('aria-label') || el.textContent || '').trim().slice(0, 24)}»`
+                )
               }
+            }
 
-              return out
-            }, TACTIL_BLANCA.map(t => t.sel))
+            return out
+          }, TACTIL_BLANCA.map(t => t.sel))
 
-            chicos.forEach(c => tactiles.push(`${p || 'portada'}: ${c}`))
-          }
+          chicos.forEach(c => tactiles.push(`${p || 'portada'}: ${c}`))
         }
       }
-
-      // La capa 2 ABIERTA también se audita. Auditarla solo cerrada dejó pasar a
-      // producción tres botones a 3.01:1 en la entrega 3: lo que no se abre, no se mide.
-      for (const w of ANCHOS_AXE) {
-        await pg.goto(url('flota'), { waitUntil: 'domcontentloaded' })
-        await pg.waitForTimeout(1500)
-        await pg.setViewportSize({ width: w, height: 900 })
-        const abridor = pg.locator('[data-anatomia-abrir]').first()
-
-        if ((await abridor.count()) === 0) continue
-        await abridor.click()
-        await pg.waitForTimeout(700)
-        await pg.evaluate(axeSrc)
-
-        const r = await pg.evaluate(async () =>
-          axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } })
-        )
-
-        r.violations.forEach(v =>
-          violaciones.push(
-            `capa2 @${w} ${lang}${contraste ? '/AC' : ''}: ${v.id} (${v.impact || 'sin impacto'}) (${v.nodes.length})${resumirViolacionAxe(v)}`
-          )
-        )
-        await pg.keyboard.press('Escape')
-      }
-
-      await ctx.close()
     }
+
+    // La capa 2 ABIERTA también se audita. Auditarla solo cerrada dejó pasar a
+    // producción tres botones a 3.01:1 en la entrega 3: lo que no se abre, no se mide.
+    // Y por eso se abre TAMBIÉN en oscuro: su tinta no sale en ningún otro sitio
+    // del barrido, así que un modo que no la abre no la mide.
+    for (const w of modo.anchos) {
+      await pg.goto(url('flota'), { waitUntil: 'domcontentloaded' })
+      await pg.waitForTimeout(1500)
+      if (!(await enModo(pg, modo, `capa2 ${variante}@${w}`))) continue
+      await pg.setViewportSize({ width: w, height: 900 })
+      const abridor = pg.locator('[data-anatomia-abrir]').first()
+
+      if ((await abridor.count()) === 0) continue
+      await abridor.click()
+      await pg.waitForTimeout(700)
+      await pg.evaluate(axeSrc)
+      pasadasAxe[modo.id] += 1
+
+      const r = await pg.evaluate(async () =>
+        axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } })
+      )
+
+      r.violations.forEach(v =>
+        violaciones.push(
+          `capa2 @${w} ${variante}: ${v.id} (${v.impact || 'sin impacto'}) (${v.nodes.length})${resumirViolacionAxe(v)}`
+        )
+      )
+      await pg.keyboard.press('Escape')
+    }
+
+    await ctx.close()
   }
 
   // El 404 es parte de la superficie pública: conserva idioma, título, un único
-  // h1, navegación de vuelta, accesibilidad y anchura en los tres formatos.
-  for (const lang of IDIOMAS) {
-    for (const contraste of CONTRASTES) {
-      for (const w of ANCHOS_AXE) {
-        const variante = `${lang}${contraste ? '/AC' : ''}`
-        const etiqueta404 = `404/${variante}/${w}`
-        const ctx404 = await navegadorPw.newContext({ viewport: { width: w, height: 900 } })
+  // h1, navegación de vuelta, accesibilidad y anchura en los tres formatos. Y
+  // tiene tinta propia —su informativo no se pinta en ninguna otra página—, así
+  // que también se recorre en los dos modos, con el mismo corte.
+  for (const { modo, lang, contraste } of combinaciones) {
+    for (const w of modo.anchos) {
+      const variante = `${modo.id}/${lang}${contraste ? '/AC' : ''}`
+      const etiqueta404 = `404/${variante}/${w}`
+      const ctx404 = await navegadorPw.newContext({ viewport: { width: w, height: 900 } })
 
-        vigilarSuperficie(ctx404, etiqueta404)
-        await ctx404.addInitScript(
-          ([l, c]) => {
-            localStorage.setItem('madclon-lang', l)
-            localStorage.setItem('madclon-contraste', c)
-          },
-          [lang, contraste ? '1' : '0']
-        )
-        const pg404 = await ctx404.newPage()
-        const destino404 = url('__gate-404__')
+      vigilarSuperficie(ctx404, etiqueta404)
+      await ctx404.addCookies([{ name: 'madclon-front-office', value: modo.cookie, url: origenLocal }])
+      await ctx404.addInitScript(
+        ([l, c]) => {
+          localStorage.setItem('madclon-lang', l)
+          localStorage.setItem('madclon-contraste', c)
+        },
+        [lang, contraste ? '1' : '0']
+      )
+      const pg404 = await ctx404.newPage()
+      const destino404 = url('__gate-404__')
 
-        pg404.on('pageerror', e => erroresJs.push(`${etiqueta404} ${e.message}`))
-        pg404.on('console', m => {
-          if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) {
-            erroresJs.push(`${etiqueta404} consola: ${m.text().slice(0, 120)}`)
-          }
-        })
-        pg404.on('response', r => {
-          if (r.status() >= 400 && r.url() !== destino404) respuestasMalas.push(`${r.status()} ${r.url()}`)
-        })
-        pg404.on('requestfailed', r => {
-          const err = r.failure()?.errorText || ''
+      pg404.on('pageerror', e => erroresJs.push(`${etiqueta404} ${e.message}`))
+      pg404.on('console', m => {
+        if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) {
+          erroresJs.push(`${etiqueta404} consola: ${m.text().slice(0, 120)}`)
+        }
+      })
+      pg404.on('response', r => {
+        if (r.status() >= 400 && r.url() !== destino404) respuestasMalas.push(`${r.status()} ${r.url()}`)
+      })
+      pg404.on('requestfailed', r => {
+        const err = r.failure()?.errorText || ''
 
-          if (!/ERR_ABORTED/.test(err)) respuestasMalas.push(`${err} ${r.url().slice(0, 90)}`)
-        })
+        if (!/ERR_ABORTED/.test(err)) respuestasMalas.push(`${err} ${r.url().slice(0, 90)}`)
+      })
 
-        const respuesta404 = await pg404.goto(destino404, { waitUntil: 'domcontentloaded' })
+      const respuesta404 = await pg404.goto(destino404, { waitUntil: 'domcontentloaded' })
 
-        await pg404.waitForTimeout(500)
+      await pg404.waitForTimeout(500)
 
+      if (!(await enModo(pg404, modo, etiqueta404))) {
+        await ctx404.close()
+        continue
+      }
+
+      // Igual que arriba: el estatus, el idioma y la anchura no dependen del
+      // color. Se acreditan en el modo de referencia; el otro viene a por tinta.
+      if (modo.referencia) {
         const estado404 = await pg404.evaluate(() => ({
           lang: document.documentElement.lang,
           title: document.title,
@@ -658,30 +855,47 @@ async function navegador() {
         const volver = await pg404.getByRole('link').getAttribute('href')
 
         if (volver !== `${BASE}/`) problemasIdioma.push(`${etiqueta404}: volver=${JSON.stringify(volver)}`)
-
-        await pg404.evaluate(axeSrc)
-
-        const a11y404 = await pg404.evaluate(async () =>
-          axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } })
-        )
-
-        a11y404.violations.forEach(v =>
-          violaciones.push(
-            `404 @${w} ${variante}: ${v.id} (${v.impact || 'sin impacto'}) (${v.nodes.length})${resumirViolacionAxe(v)}`
-          )
-        )
-        await ctx404.close()
       }
+
+      await pg404.evaluate(axeSrc)
+      pasadasAxe[modo.id] += 1
+
+      const a11y404 = await pg404.evaluate(async () =>
+        axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } })
+      )
+
+      a11y404.violations.forEach(v =>
+        violaciones.push(
+          `404 @${w} ${variante}: ${v.id} (${v.impact || 'sin impacto'}) (${v.nodes.length})${resumirViolacionAxe(v)}`
+        )
+      )
+      await ctx404.close()
     }
   }
 
-  const matriz = `${PAGINAS.length} páginas + capa 2 + 404 × ${ANCHOS_AXE.join('/')} × ${IDIOMAS.join('/')} × ${CONTRASTES.length === 2 ? 'normal+AC' : 'normal'}`
+  // La matriz se IMPRIME entera, modo a modo: quien lee el gate tiene que poder
+  // ver de un vistazo con qué corte se ha medido cada modo, sin abrir el código.
+  const matriz = MODOS_AXE.map(
+    m =>
+      `${m.id} ${m.anchos.join('/')} × ${m.idiomas.join('/')} × ${m.contrastes.length === 2 ? 'normal+AC' : 'normal'}`
+  ).join(' · ')
+
+  const modosSinMedir = MODOS_AXE.filter(m => pasadasAxe[m.id] === 0).map(m => m.id)
+  const recuento = MODOS_AXE.map(m => `${m.id} ${pasadasAxe[m.id]} pasadas`).join(' · ')
 
   marca(
     5,
     `axe + idioma semántico (${matriz})`,
-    violaciones.length === 0 && problemasIdioma.length === 0,
-    [...violaciones, ...problemasIdioma].slice(0, 6).join(' | ') || '0 violaciones · idioma, titulo por seccion, h1 y seleccion de ruta correctos; 404 intacto'
+    violaciones.length === 0 && problemasIdioma.length === 0 && modosSinMedir.length === 0 && problemasModo.length === 0,
+    modosSinMedir.length || problemasModo.length
+      ? [
+          modosSinMedir.length ? `el barrido NO midió ${modosSinMedir.join(' ni ')} (${recuento})` : '',
+          ...problemasModo.slice(0, 3)
+        ]
+          .filter(Boolean)
+          .join(' | ')
+      : [...violaciones, ...problemasIdioma].slice(0, 6).join(' | ') ||
+        `0 violaciones en ${recuento} · idioma, titulo por seccion, h1 y seleccion de ruta correctos; 404 intacto`
   )
   marca(
     6,
