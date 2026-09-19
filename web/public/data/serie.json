@@ -1406,28 +1406,54 @@
     },
     {
       "fecha": "2026-09-18",
-      "ts": 1789695344.787585,
+      "ts": 1789767357.7843351,
       "dias": 7,
       "contexto": {
-        "llamadas": 937,
-        "tokens": 28324667,
-        "tareas_hechas": 23,
-        "llamadas_router": 557
+        "llamadas": 947,
+        "tokens": 29068733,
+        "tareas_hechas": 26,
+        "llamadas_router": 554
       },
       "kpis": {
-        "entrada_por_llamada": 29838.654,
-        "pct_cache": 71.71,
-        "ratio_salida_entrada": 1.309,
-        "pct_local": 2.669,
+        "entrada_por_llamada": 30167.178,
+        "pct_cache": 73.478,
+        "ratio_salida_entrada": 1.752,
+        "pct_local": 0.466,
         "pct_metered": 0.0,
-        "pct_tokens_en_fallo": 0.789,
-        "latencia_p50": 3.5,
-        "tokens_motor_por_tarea": 176038.043,
-        "pct_llamadas_ok": 99.641,
-        "tareas_dia": 3.286,
-        "reintentos_por_tarea": 1.156,
+        "pct_tokens_en_fallo": 0.837,
+        "latencia_p50": 4.22,
+        "tokens_motor_por_tarea": 146820.962,
+        "pct_llamadas_ok": 99.639,
+        "tareas_dia": 3.714,
+        "reintentos_por_tarea": 1.143,
         "pct_propuestas_atendidas": 14.286,
-        "cobertura_medida": 98.933
+        "cobertura_medida": 98.944
+      }
+    },
+    {
+      "fecha": "2026-09-19",
+      "ts": 1789781759.687776,
+      "dias": 7,
+      "contexto": {
+        "llamadas": 812,
+        "tokens": 28248378,
+        "tareas_hechas": 27,
+        "llamadas_router": 419
+      },
+      "kpis": {
+        "entrada_por_llamada": 34278.119,
+        "pct_cache": 75.417,
+        "ratio_salida_entrada": 1.489,
+        "pct_local": 0.098,
+        "pct_metered": 0.0,
+        "pct_tokens_en_fallo": 1.066,
+        "latencia_p50": 3.3,
+        "tokens_motor_por_tarea": 110999.63,
+        "pct_llamadas_ok": 99.523,
+        "tareas_dia": 3.857,
+        "reintentos_por_tarea": 1.143,
+        "pct_propuestas_atendidas": 14.286,
+        "cobertura_medida": 98.768
       }
     }
   ],
