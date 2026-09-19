@@ -19,6 +19,11 @@ const STR = {
   // ------------------------------------------------------------- navegación
   nav_panel: { es: 'Panel', en: 'Home' },
   nav_flota: { es: 'La flota', en: 'The fleet' },
+  nav_hardware: { es: 'Hardware · privado', en: 'Hardware · private' },
+  nav_hardware_ayuda: {
+    es: 'Mac Studio y DGX: requiere Tailscale e iniciar sesión en el panel privado',
+    en: 'Mac Studio and DGX: requires Tailscale and signing in to the private panel'
+  },
   nav_salud: { es: 'Salud', en: 'Health' },
   nav_tokens: { es: 'Tokens', en: 'Tokens' },
   nav_eficiencia: { es: 'Eficiencia', en: 'Efficiency' },

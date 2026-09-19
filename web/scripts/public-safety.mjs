@@ -524,9 +524,15 @@ export const SALIDA_NAVEGABLE_DECLARADA = {
 }
 
 function descontarSalidaDeclarada(source, file) {
-  if (file !== SALIDA_NAVEGABLE_DECLARADA.fichero) return source
+  // MAD solicita este acceso el 19/09/2026: enlace privado, nunca telemetría pública.
+  const declarada = [SALIDA_NAVEGABLE_DECLARADA, {
+    fichero: 'src/components/layout/vertical/VerticalMenu.tsx',
+    destino: 'https://macstudio-de-clon.tail89283c.ts.net/hardware'
+  }].find(salida => salida.fichero === file)
 
-  const destino = SALIDA_NAVEGABLE_DECLARADA.destino.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  if (!declarada) return source
+
+  const destino = declarada.destino.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
   return source.replace(new RegExp(`\\bhref\\s*=\\s*(['"\`])${destino}\\1`, 'g'), 'href=§declarada§')
 }
