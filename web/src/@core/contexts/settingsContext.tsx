@@ -69,15 +69,22 @@ export const SettingsProvider = (props: Props) => {
   }
 
   // Cookies
-  const [settingsCookie, updateSettingsCookie] = useObjectCookie<Settings>(
+  const [cookieLeida, updateSettingsCookie] = useObjectCookie<Settings>(
     themeConfig.settingsCookieName,
     JSON.stringify(props.settingsCookie) !== '{}' ? props.settingsCookie : updatedInitialSettings
   )
 
+  // Lo que diga la cookie manda, pero SOBRE los valores de fábrica, no en lugar
+  // de ellos. Hasta el 19/09/2026 la cookie sustituía al objeto entero, así que
+  // una cookie a la que le faltara un campo —una guardada antes de que ese campo
+  // existiera, o escrita a mano— dejaba `layout` o `skin` en undefined y la web
+  // se caía con «Cannot read properties of undefined (reading 'type')»: pantalla
+  // en blanco, sin más pista. Medido con `{"mode":"dark"}` a pelo. El panel
+  // privado ya fusionaba así; el escaparate no.
+  const settingsCookie = { ...updatedInitialSettings, ...cookieLeida }
+
   // State
-  const [_settingsState, _updateSettingsState] = useState<Settings>(
-    JSON.stringify(settingsCookie) !== '{}' ? settingsCookie : updatedInitialSettings
-  )
+  const [_settingsState, _updateSettingsState] = useState<Settings>(settingsCookie)
 
   const updateSettings = (settings: Partial<Settings>, options?: UpdateSettingsOptions) => {
     const { updateCookie = true } = options || {}

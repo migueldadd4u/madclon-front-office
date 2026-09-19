@@ -1,9 +1,22 @@
 /* Hero del escaparate público. Mismo lenguaje que el inicio privado
    (panel-mad · DashboardInicio.module.css), en la paleta pública #666CFF.
 
-   El fondo es oscuro SIEMPRE, también en tema claro: por eso el bloque
-   redefine aquí las variables de texto de MUI en lugar de usar !important.
-   Así los hijos con color='text.secondary' siguen leyéndose. */
+   19/09/2026 — EL HERO SIGUE AL TEMA. Antes el fondo era oscuro SIEMPRE, también
+   con el tema claro, y por eso redefinía aquí las variables de texto de MUI. Con
+   el claro ya de fábrica (norma de MAD del 15/09) esa isla oscura era lo único
+   que quedaba a contracorriente en la portada. Ahora el claro es la versión base
+   y el bloque oscuro entero vive bajo `html[data-dark]`: quien ponga el modo
+   oscuro lo recupera exactamente como estaba.
+
+   Los tonos claros no son los oscuros aclarados: el texto va sobre el radial MÁS
+   oscuro del degradado (#E3E4FF), que es el peor fondo del bloque, y ahí se
+   midió cada uno el 19/09/2026 — eyebrow 5,65 · fecha y pie 5,52 · título 11,83
+   · «lo que destaca» del título 7,01 · subtítulo 6,56 · botón de al lado 8,49 ·
+   rótulo del botón principal 4,96 sobre su propio morado. AA pide 4,5.
+
+   Y se redefine `text-secondary` también en claro: el del tema (#676B7B) da 4,24
+   sobre ese radial — se queda corto justo por debajo del listón, y la tarjeta del
+   clon lo usa para su oficio y su frase. */
 
 .hero {
   position: relative;
@@ -12,7 +25,52 @@
   border-radius: 26px;
   padding-block: 32px;
   padding-inline: 32px;
-  border: 1px solid #3c3f6b;
+  border: 1px solid #d7d8f2;
+  background:
+    radial-gradient(ellipse at 88% 4%, #e3e4ff 0, transparent 48%),
+    radial-gradient(ellipse at 62% 100%, #ede9ff 0, transparent 50%),
+    #f7f7fe;
+
+  color: #23263f;
+  --mui-palette-text-primary: #23263f;
+  --mui-palette-text-secondary: #4a4e63;
+  --mui-palette-text-disabled: #5a5e77;
+  --mui-palette-divider: #cfd1ee;
+}
+
+.contenido { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 20px; max-inline-size: 850px; }
+
+.eyebrow { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; margin: 0; font-size: 11px; font-weight: 650; letter-spacing: 1.65px; color: #4a4fa8; }
+.punto { display: inline-block; inline-size: 6px; block-size: 6px; background: #666cff; border-radius: 50%; box-shadow: 0 0 12px #666cff55; }
+.fecha { margin-inline-start: 12px; letter-spacing: 0; font-weight: 400; color: #55596f; }
+
+.titulo { margin: 0; font-size: clamp(32px, 3.4vw, 54px); line-height: 1.08; letter-spacing: -2.1px; font-weight: 560; max-inline-size: 20ch; }
+.titulo b { font-weight: inherit; color: #3a3fa0; }
+.subtitulo { margin: 0; color: #4a4e63; font-size: 14px; line-height: 1.6; max-inline-size: 58ch; }
+
+.acciones { display: flex; flex-wrap: wrap; gap: 12px; }
+.primaria, .secundaria { min-block-size: 48px; display: inline-flex; align-items: center; gap: 10px; padding-block: 12px; padding-inline: 20px; border-radius: 9px; font-size: 13px; font-weight: 600; text-decoration: none; transition: filter .18s; }
+.primaria { color: #ffffff; background: #5a5fe8; border: 1px solid #5a5fe8; }
+.secundaria { color: #333680; border: 1px solid #b9bcec; background: #ffffffb3; }
+.primaria:hover, .secundaria:hover { filter: brightness(1.08); }
+.primaria:focus-visible, .secundaria:focus-visible { outline: 3px solid #4f54d9; outline-offset: 3px; }
+
+.pie { margin: 0; font-size: 11px; color: #55596f; }
+
+/* Órbita decorativa — el mismo motivo del inicio privado. */
+.orbita { position: absolute; inset-inline-end: 2%; inset-block-start: 50%; inline-size: 370px; block-size: 370px; transform: translateY(-50%) rotate(-18deg); z-index: 0; opacity: .9; pointer-events: none; }
+.orbita span { position: absolute; inset: 0; border: 1px solid #666cff2e; border-radius: 50%; transform: scaleY(.67); }
+.orbita span:nth-child(2) { transform: rotate(60deg) scaleY(.67); }
+.orbita span:nth-child(3) { transform: rotate(120deg) scaleY(.67); }
+.orbita::before, .orbita::after { content: ''; position: absolute; inline-size: 10px; block-size: 10px; border-radius: 50%; background: #8a90ff; box-shadow: 0 0 30px #8a90ff66; inset-inline-start: 10%; inset-block-start: 24%; }
+.orbita::after { inline-size: 6px; block-size: 6px; inset-block-start: 76%; inset-inline-start: 79%; }
+.orbita b { position: absolute; inset: 0; display: grid; place-items: center; transform: rotate(18deg); font-size: 86px; font-weight: 450; letter-spacing: -10px; color: #d9daf8; text-shadow: 0 0 60px #c9cbf055; }
+
+/* ── El mismo hero, en modo oscuro ──────────────────────────────────────────
+   Tal cual estaba antes del 19/09/2026: quien elija oscuro con el conmutador lo
+   recupera entero, tonos y adornos incluidos. */
+:global(html[data-dark]) .hero {
+  border-color: #3c3f6b;
   background:
     radial-gradient(ellipse at 88% 4%, #3a3e7d 0, transparent 48%),
     radial-gradient(ellipse at 62% 100%, #232a52 0, transparent 50%),
@@ -24,38 +82,25 @@
   --mui-palette-text-disabled: #8d92c4;
   --mui-palette-divider: #3c3f6b;
 
-  /* El chip «imagen generada con IA» es una declaración, no un adorno: en tema
-     claro heredaba un gris (#6d788d) que sobre este fondo no se leía. */
+  /* El chip «imagen generada con IA» es una declaración, no un adorno: con el
+     tema claro heredaba un gris (#6d788d) que sobre este fondo no se leía. */
   --mui-palette-secondary-main: #c3c7ef;
 }
 
-.contenido { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 20px; max-inline-size: 850px; }
-
-.eyebrow { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; margin: 0; font-size: 11px; font-weight: 650; letter-spacing: 1.65px; color: #b9bcff; }
-.punto { display: inline-block; inline-size: 6px; block-size: 6px; background: #9aa0ff; border-radius: 50%; box-shadow: 0 0 12px #9aa0ff66; }
-.fecha { margin-inline-start: 12px; letter-spacing: 0; font-weight: 400; color: #a7abd6; }
-
-.titulo { margin: 0; font-size: clamp(32px, 3.4vw, 54px); line-height: 1.08; letter-spacing: -2.1px; font-weight: 560; max-inline-size: 20ch; }
-.titulo b { font-weight: inherit; color: #bcc0ff; }
-.subtitulo { margin: 0; color: #b4b8e4; font-size: 14px; line-height: 1.6; max-inline-size: 58ch; }
-
-.acciones { display: flex; flex-wrap: wrap; gap: 12px; }
-.primaria, .secundaria { min-block-size: 48px; display: inline-flex; align-items: center; gap: 10px; padding-block: 12px; padding-inline: 20px; border-radius: 9px; font-size: 13px; font-weight: 600; text-decoration: none; transition: filter .18s; }
-.primaria { color: #1b1d38; background: #dcddff; border: 1px solid #dcddff; }
-.secundaria { color: #eceefc; border: 1px solid #6e72a8; background: #ffffff0f; }
-.primaria:hover, .secundaria:hover { filter: brightness(1.08); }
-.primaria:focus-visible, .secundaria:focus-visible { outline: 3px solid #cfd2ff; outline-offset: 3px; }
-
-.pie { margin: 0; font-size: 11px; color: #a7abd6; }
-
-/* Órbita decorativa — el mismo motivo del inicio privado. */
-.orbita { position: absolute; inset-inline-end: 2%; inset-block-start: 50%; inline-size: 370px; block-size: 370px; transform: translateY(-50%) rotate(-18deg); z-index: 0; opacity: .9; pointer-events: none; }
-.orbita span { position: absolute; inset: 0; border: 1px solid #aeb3ff33; border-radius: 50%; transform: scaleY(.67); }
-.orbita span:nth-child(2) { transform: rotate(60deg) scaleY(.67); }
-.orbita span:nth-child(3) { transform: rotate(120deg) scaleY(.67); }
-.orbita::before, .orbita::after { content: ''; position: absolute; inline-size: 10px; block-size: 10px; border-radius: 50%; background: #cfd2ff; box-shadow: 0 0 30px #cfd2ff88; inset-inline-start: 10%; inset-block-start: 24%; }
-.orbita::after { inline-size: 6px; block-size: 6px; inset-block-start: 76%; inset-inline-start: 79%; }
-.orbita b { position: absolute; inset: 0; display: grid; place-items: center; transform: rotate(18deg); font-size: 86px; font-weight: 450; letter-spacing: -10px; color: #dcddff; text-shadow: 0 0 60px #dcddff44; }
+:global(html[data-dark]) .eyebrow { color: #b9bcff; }
+:global(html[data-dark]) .punto { background: #9aa0ff; box-shadow: 0 0 12px #9aa0ff66; }
+:global(html[data-dark]) .fecha { color: #a7abd6; }
+:global(html[data-dark]) .titulo b { color: #bcc0ff; }
+:global(html[data-dark]) .subtitulo { color: #b4b8e4; }
+:global(html[data-dark]) .primaria { color: #1b1d38; background: #dcddff; border-color: #dcddff; }
+:global(html[data-dark]) .secundaria { color: #eceefc; border-color: #6e72a8; background: #ffffff0f; }
+:global(html[data-dark]) .primaria:focus-visible,
+:global(html[data-dark]) .secundaria:focus-visible { outline-color: #cfd2ff; }
+:global(html[data-dark]) .pie { color: #a7abd6; }
+:global(html[data-dark]) .orbita span { border-color: #aeb3ff33; }
+:global(html[data-dark]) .orbita::before,
+:global(html[data-dark]) .orbita::after { background: #cfd2ff; box-shadow: 0 0 30px #cfd2ff88; }
+:global(html[data-dark]) .orbita b { color: #dcddff; text-shadow: 0 0 60px #dcddff44; }
 
 @media (min-width: 1450px) {
   .hero { padding-block: 40px; padding-inline: 46px; }

@@ -3,9 +3,11 @@
 // Bienvenida del escaparate público.
 //
 // Hereda el lenguaje visual del inicio privado (panel-mad · DashboardInicio):
-// fondo oscuro con órbita, un titular grande y apretado, una sola frase y UN
-// gesto principal. Lo que P-01 dejó dicho no cambia — quién es el clon, para
-// qué sirve y qué se puede explorar —; cambia el peso visual de cada cosa.
+// fondo con órbita, un titular grande y apretado, una sola frase y UN gesto
+// principal. Desde el 19/09/2026 el fondo SIGUE AL TEMA — claro con el tema
+// claro, que es el de fábrica, y el bloque oscuro de siempre con el oscuro.
+// Lo que P-01 dejó dicho no cambia — quién es el clon, para qué sirve y qué se
+// puede explorar —; cambia el peso visual de cada cosa.
 //
 // Referencias Mobbin consultadas el 13/09 (Claude web, Uber web): la acción
 // principal es lo único con color sólido y todo lo demás baja de peso.
