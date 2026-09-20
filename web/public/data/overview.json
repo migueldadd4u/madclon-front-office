@@ -1,31 +1,31 @@
 {
   "gtd": {
     "propuestas": null,
-    "bandeja": 338,
+    "bandeja": 342,
     "esperas_vencidas": 11,
     "decisiones": null,
     "acciones_hoy": 32,
     "esperas_listadas": 8
   },
   "personas": {
-    "fichas_curadas": 870,
+    "fichas_curadas": 1354,
     "staged": 0
   },
   "automejora": {
-    "hechas": 318,
+    "hechas": 322,
     "bloqueadas": 70,
-    "aparcadas": 80,
+    "aparcadas": 81,
     "pendientes": 2,
-    "llamadas": 419,
+    "llamadas": 1002,
     "metered": 0,
-    "top": "grok 259, minimax 148, agy_cli 6, local 3"
+    "top": "minimax 631, grok 290, agy_cli 37, zai 34"
   },
   "crons": [
     {
       "nombre": "Briefing COO 08:05",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "18/09 09:07"
+      "ultima": "19/09 09:06"
     },
     {
       "nombre": "Higiene Semanal del Sistema",
@@ -37,7 +37,7 @@
       "nombre": "Triage correos del día",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "18/09 08:55"
+      "ultima": "19/09 08:55"
     },
     {
       "nombre": "Auto-mejora nocturna clon",
@@ -49,19 +49,19 @@
       "nombre": "Resumen diario de Spam",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "18/09 21:30"
+      "ultima": "19/09 21:30"
     },
     {
       "nombre": "Morning briefing",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "18/09 08:00"
+      "ultima": "19/09 08:00"
     },
     {
       "nombre": "Important-mail monitor",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "19/09 03:30"
+      "ultima": "20/09 03:30"
     },
     {
       "nombre": "Weekly review",
@@ -79,7 +79,7 @@
       "nombre": "Repaso ¿Qué necesito?",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "18/09 08:30"
+      "ultima": "19/09 08:30"
     },
     {
       "nombre": "Clon ↔ Jarvis weekly mutual-improvemen",
@@ -91,7 +91,7 @@
       "nombre": "Guardia de tiradas programadas",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "19/09 03:38"
+      "ultima": "20/09 03:38"
     },
     {
       "nombre": "Radar Buzz semanal",
@@ -123,12 +123,12 @@
   ],
   "crons_en_error": 0,
   "tokens_resumen": {
-    "tokens_30d": 112908560,
+    "tokens_30d": 113555353,
     "cobertura_pct": 92,
-    "indice_eficiencia": 110999
+    "indice_eficiencia": 123377
   },
   "salud_global": "🟢 Todo OK",
-  "watchdog_ts": "2026-09-19T00:24:21.414155Z",
+  "watchdog_ts": "2026-09-20T00:39:51.519666Z",
   "historia": {
     "hitos": [
       {
@@ -316,36 +316,36 @@
     "nacimiento": "2026-04-14",
     "ultima_bitacora": "2026-08-15",
     "ultimo_hito": "2026-09-05",
-    "dias_sin_capitulo": 14
+    "dias_sin_capitulo": 15
   },
   "hardware": {
     "version": 1,
     "hosts": [
       {
         "id": "mac",
-        "sampled_at": "2026-09-19T15:40:19Z",
-        "cpu_percent": 20.799999999999997,
+        "sampled_at": "2026-09-20T01:43:13Z",
+        "cpu_percent": null,
         "ram_total_bytes": 103079215104,
-        "ram_available_bytes": 30911152128,
-        "swap_used_bytes": 37751619584,
-        "gpu_percent": 23,
+        "ram_available_bytes": 39582892032,
+        "swap_used_bytes": 29514142843,
+        "gpu_percent": 0,
         "gpu_temperature_c": null,
         "gpu_power_w": null,
         "disk_total_bytes": 994662584320,
-        "disk_available_bytes": 147304026112
+        "disk_available_bytes": 168495280128
       },
       {
         "id": "dgx",
-        "sampled_at": "2026-09-19T15:40:19Z",
+        "sampled_at": "2026-09-20T01:43:13Z",
         "cpu_percent": 0.0,
         "ram_total_bytes": 130661203968,
-        "ram_available_bytes": 124428705792,
+        "ram_available_bytes": 126798737408,
         "swap_used_bytes": 0,
         "gpu_percent": 0.0,
-        "gpu_temperature_c": 41.0,
-        "gpu_power_w": 10.38,
+        "gpu_temperature_c": 34.0,
+        "gpu_power_w": 4.15,
         "disk_total_bytes": 4031871553536,
-        "disk_available_bytes": 3671133741056
+        "disk_available_bytes": 3670886400000
       }
     ]
   }
