@@ -1330,11 +1330,113 @@ async function navegador() {
     if (estado.videosActivos) problemasReducido.push(`${p || 'portada'}: ${estado.videosActivos} vídeo(s) activo(s)`)
   }
 
+  // EL NAV LATERAL NO SE DESLIZA BAJO REDUCE (decisión de MAD del 20/09/2026).
+  //
+  // El recorrido de arriba NO basta para vigilar esto. Mide la página EN REPOSO,
+  // y el deslizamiento del nav sólo existe mientras algo lo dispara: es una
+  // transición de 300 ms sobre `inline-size` que arranca con el redimensionado
+  // (`src/@menu/styles/vertical/StyledVerticalNav.tsx:25`). Esperar a pillarla
+  // de pasada al cargar es exactamente la carrera que costó el FALLO espurio del
+  // 19/09. Así que aquí no se espera: se PROVOCA el disparador y se mira.
+  //
+  // Tres patas, y las tres hacen falta:
+  //   1. el elemento EXISTE. Sin esto la guardia pasaría en vacío el día que la
+  //      plantilla renombre la clase, que es el verde falso más barato que hay.
+  //   2. su `transition-duration` computado bajo reduce es 0. Es la pata
+  //      determinista: acredita que la REGLA se aplica, no que hoy no se haya
+  //      visto moverse.
+  //   3. al CARGAR la página no corre ninguna transición sobre él. Es la pata de
+  //      comportamiento: lo que un humano con `reduce` sufre es el nav
+  //      deslizándose al entrar.
+  //
+  // POR QUÉ LA PATA 3 FRENA LA CPU A PROPÓSITO. La primera versión provocaba el
+  // movimiento redimensionando de 375 a 1440, y salió VERDE sobre un build sin
+  // la regla: medido, el nav ocupa 260 px en los dos anchos, así que el resize no
+  // cambia nada y no había transición que ver. Una pata que no puede fallar no
+  // mide. El disparador de verdad es la hidratación, y ahí manda el reloj de la
+  // máquina; medido sobre el build sin regla, 6 cargas por nivel:
+  //
+  //     CPU ÷1  → deslizamiento cazado en 1 de 6 cargas   ← cara o cruz
+  //     CPU ÷10 → 6 de 6
+  //     CPU ÷20 → 6 de 6
+  //
+  // Así que el frenado por CDP no es un apaño, es el INSTRUMENTO: alargar la
+  // ventana sólo puede hacer el movimiento MÁS visible, nunca inventar quietud,
+  // de modo que no hay forma de que esto fabrique un verde. Sin frenar, esta
+  // pata daría verde cinco de cada seis veces sobre una web que sí se mueve.
+  //
+  // Límite conocido y asumido: vigila el elemento del nav, no sus hijos. Si la
+  // plantilla mudara la transición a un descendiente, la pata 1 seguiría verde;
+  // lo cazaría la pata 2 al quedarse sin regla que acreditar.
+  const SEL_NAV = '.ts-vertical-nav-container'
+
+  await pr.goto(url(''), { waitUntil: 'domcontentloaded' })
+  await pr.waitForTimeout(1600)
+  await esperarDomAsentado(pr)
+  await esperarQuietudDeMovimiento(pr)
+
+  const nav = await pr.evaluate(sel => {
+    const el = document.querySelector(sel)
+
+    if (!el) return { existe: false }
+
+    return { existe: true, duracion: getComputedStyle(el).transitionDuration }
+  }, SEL_NAV)
+
+  if (!nav.existe) {
+    problemasReducido.push(`nav lateral: no existe ${SEL_NAV} — la guardia del deslizamiento no mide nada`)
+  } else {
+    const duraciones = nav.duracion.split(',').map(d => d.trim())
+
+    if (duraciones.some(d => d !== '0s')) {
+      problemasReducido.push(`nav lateral: sigue con transición bajo reduce (transition-duration: ${nav.duracion})`)
+    }
+
+    const cdp = await ctxReducido.newCDPSession(pr)
+
+    await cdp.send('Emulation.setCPUThrottlingRate', { rate: 20 })
+    await pr.goto(url(''), { waitUntil: 'domcontentloaded' })
+
+    const movimientoNav = await pr.evaluate(
+      async sel => {
+        const visto = new Set()
+        const hasta = performance.now() + 4000
+
+        while (performance.now() < hasta && visto.size === 0) {
+          const el = document.querySelector(sel)
+
+          if (el) {
+            for (const a of document.getAnimations()) {
+              if (a.playState !== 'running') continue
+
+              const objetivo = a.effect instanceof KeyframeEffect ? a.effect.target : null
+
+              if (objetivo === el) visto.add(a.transitionProperty || a.animationName || 'movimiento')
+            }
+          }
+
+          await new Promise(listo => setTimeout(listo, 30))
+        }
+
+        return [...visto]
+      },
+      SEL_NAV
+    )
+
+    await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 })
+    await cdp.detach()
+
+    if (movimientoNav.length) {
+      problemasReducido.push(`nav lateral: se desliza al cargar bajo reduce (${movimientoNav.join(', ')})`)
+    }
+  }
+
   marca(
     13,
-    'prefers-reduced-motion + consola/red @375',
+    'prefers-reduced-motion + consola/red @375 + nav sin deslizamiento',
     problemasReducido.length === 0,
-    problemasReducido.slice(0, 6).join(' | ') || 'preferencia aplicada · 0 movimiento · 0 vídeos · 0 errores/red externa'
+    problemasReducido.slice(0, 6).join(' | ') ||
+      'preferencia aplicada · 0 movimiento · 0 vídeos · 0 errores/red externa · nav sin transición ni deslizamiento al cargar'
   )
   await ctxReducido.close()
 

@@ -295,6 +295,28 @@ code {
   }
 }
 
+/* El nav lateral no se desliza para quien ha pedido menos movimiento.
+   Decisión de MAD del 20/09/2026. La plantilla anima el ancho del nav en
+   `src/@menu/styles/vertical/StyledVerticalNav.tsx:25` —`inline-size`,
+   `min-inline-size`, `margin-inline-start` e `inset-inline-start`, 300 ms— y ese
+   desplazamiento corría también bajo `reduce`, por omisión y no por diseño: el
+   resto del trato de `prefers-reduced-motion` de este fichero es opt-in por
+   clase y nunca apagó transiciones. Medido el 19/09 frenando la CPU: es una de
+   las tres familias que seguían vivas al auditar.
+   Se apaga sólo ESTO, no las transiciones en general: un fundido de opacidad es
+   justo lo que la guía de accesibilidad recomienda COMO sustituto del
+   movimiento, así que una regla manta castigaría lo correcto junto con lo
+   dudoso. Va con `!important` porque la plantilla lo declara desde un
+   styled-component de emotion.
+   Lo vigila el check 13 del gate: exige que el elemento EXISTA y que, tras
+   provocar el redimensionado que dispara la transición, no quede ninguna
+   corriendo sobre él. */
+@media (prefers-reduced-motion: reduce) {
+  .ts-vertical-nav-container {
+    transition: none !important;
+  }
+}
+
 /* Modo presentación (kiosk) — oculta el chrome y deja el panel a escena */
 html.fo-kiosk .ts-vertical-nav-root,
 html.fo-kiosk .ts-vertical-layout-header,
