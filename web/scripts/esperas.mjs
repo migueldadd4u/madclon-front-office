@@ -83,6 +83,20 @@
  * @returns {Promise<boolean>} true si el DOM se asentó; false si expiró el plazo.
  *   No es un fallo por sí mismo: quien llama decide, y el juez sigue siendo su
  *   propia medición.
+ *
+ * ⚠ ASIENTA UN PROXY, NO TU MAGNITUD. Cuenta NODOS: que deje de crecer no
+ * garantiza que lo que tú vas a medir se haya estabilizado. El gate del panel se
+ * quemó con esto el 20/09/2026 — su comparación de tinta entre modos daba rojos
+ * que no reproducían (`/nota@834`: «oscuro 8 vs claro 697», con 697 planas en
+ * ocho muestras; `/triaje@375`: «3656 vs 5» a las 11:00 y nada a las 11:33)—.
+ * El DOM ya estaba quieto; la TINTA no. Si vas a comparar una cuenta, asienta
+ * ESA cuenta: muéstrala hasta que repita, y entonces compárala. Un rojo barato
+ * sigue siendo un rojo falso, y el valor entero de un gate es que un rojo
+ * signifique algo.
+ *
+ * El check 5 de este mismo gate cuenta tinta después de llamar aquí y de momento
+ * no ha fallado —sus páginas son más simples—, pero se apoya en el mismo proxy.
+ * Si algún día da una paridad que no reproduce, es esto y no el dato.
  */
 export async function esperarDomAsentado(pg, { ventana = 700, timeout = 30000 } = {}) {
   await pg.evaluate(() => {
