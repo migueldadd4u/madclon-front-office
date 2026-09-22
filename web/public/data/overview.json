@@ -1,7 +1,7 @@
 {
   "gtd": {
     "propuestas": null,
-    "bandeja": 356,
+    "bandeja": 376,
     "esperas_vencidas": 11,
     "decisiones": null,
     "acciones_hoy": 32,
@@ -12,56 +12,56 @@
     "staged": 0
   },
   "automejora": {
-    "hechas": 325,
+    "hechas": 329,
     "bloqueadas": 71,
-    "aparcadas": 81,
-    "pendientes": 2,
-    "llamadas": 1072,
+    "aparcadas": 82,
+    "pendientes": 3,
+    "llamadas": 1024,
     "metered": 0,
-    "top": "minimax 809, grok 178, agy_cli 42, zai 34"
+    "top": "minimax 807, grok 140, agy_cli 36, zai 34"
   },
   "crons": [
     {
       "nombre": "Briefing COO 08:05",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "19/09 09:06"
+      "ultima": "22/09 00:21"
     },
     {
       "nombre": "Higiene Semanal del Sistema",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "13/09 04:00"
+      "ultima": "22/09 00:18"
     },
     {
       "nombre": "Triage correos del día",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "19/09 08:55"
+      "ultima": "22/09 00:18"
     },
     {
       "nombre": "Auto-mejora nocturna clon",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "19/09 03:40"
+      "ultima": "22/09 03:40"
     },
     {
       "nombre": "Resumen diario de Spam",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "20/09 21:30"
+      "ultima": "21/09 21:30"
     },
     {
       "nombre": "Morning briefing",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "20/09 08:00"
+      "ultima": "21/09 08:18"
     },
     {
       "nombre": "Important-mail monitor",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "20/09 22:30"
+      "ultima": "22/09 03:30"
     },
     {
       "nombre": "Weekly review",
@@ -73,13 +73,13 @@
       "nombre": "Topic news digest",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "18/09 18:02"
+      "ultima": "21/09 18:02"
     },
     {
       "nombre": "Repaso ¿Qué necesito?",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "20/09 08:30"
+      "ultima": "21/09 08:31"
     },
     {
       "nombre": "Clon ↔ Jarvis weekly mutual-improvemen",
@@ -91,19 +91,19 @@
       "nombre": "Guardia de tiradas programadas",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "20/09 22:38"
+      "ultima": "22/09 03:38"
     },
     {
       "nombre": "Radar Buzz semanal",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "14/09 09:00"
+      "ultima": "21/09 09:00"
     },
     {
       "nombre": "Scorecard Buzz mensual",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "14/09 09:15"
+      "ultima": "21/09 09:15"
     },
     {
       "nombre": "Decision Buzz 22-11-2026",
@@ -113,16 +113,22 @@
     }
   ],
   "gateways": [
-    "—"
+    "gateway-ceo",
+    "gateway-clon",
+    "gateway-ideas",
+    "gateway-licitador",
+    "gateway-padre",
+    "gateway-patrimonio",
+    "gateway-tecnico"
   ],
   "crons_en_error": 0,
   "tokens_resumen": {
-    "tokens_30d": 113498158,
+    "tokens_30d": 116664677,
     "cobertura_pct": 92,
-    "indice_eficiencia": 114792
+    "indice_eficiencia": 97067
   },
   "salud_global": "🟢 Todo OK",
-  "watchdog_ts": "2026-09-20T18:52:27.247852Z",
+  "watchdog_ts": "2026-09-21T23:35:02.072320Z",
   "historia": {
     "hitos": [
       {
@@ -310,36 +316,36 @@
     "nacimiento": "2026-04-14",
     "ultima_bitacora": "2026-08-15",
     "ultimo_hito": "2026-09-05",
-    "dias_sin_capitulo": 16
+    "dias_sin_capitulo": 17
   },
   "hardware": {
     "version": 1,
     "hosts": [
       {
         "id": "mac",
-        "sampled_at": "2026-09-21T01:43:12Z",
-        "cpu_percent": 18.319999999999993,
+        "sampled_at": "2026-09-22T01:43:14Z",
+        "cpu_percent": null,
         "ram_total_bytes": 103079215104,
-        "ram_available_bytes": 76910460928,
+        "ram_available_bytes": 37197086720,
         "swap_used_bytes": 0,
-        "gpu_percent": 1,
+        "gpu_percent": 77,
         "gpu_temperature_c": null,
         "gpu_power_w": null,
         "disk_total_bytes": 994662584320,
-        "disk_available_bytes": 201251610624
+        "disk_available_bytes": 181299666944
       },
       {
         "id": "dgx",
-        "sampled_at": "2026-09-21T01:43:12Z",
-        "cpu_percent": 0.16611295681062677,
+        "sampled_at": "2026-09-22T01:43:14Z",
+        "cpu_percent": 0.0,
         "ram_total_bytes": 130661203968,
-        "ram_available_bytes": 80694853632,
-        "swap_used_bytes": 440799232,
+        "ram_available_bytes": 81126817792,
+        "swap_used_bytes": 1039310848,
         "gpu_percent": 0.0,
         "gpu_temperature_c": 39.0,
-        "gpu_power_w": 10.38,
+        "gpu_power_w": 10.15,
         "disk_total_bytes": 4031871553536,
-        "disk_available_bytes": 3670780862464
+        "disk_available_bytes": 3669125300224
       }
     ]
   }
