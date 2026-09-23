@@ -13,7 +13,7 @@
 - **Producción**: https://migueldadd4u.github.io/madclon-front-office/
 - **Datos**: los 5 JSON de `web/public/data/` (`manifest`, `overview`, `clones`, `tokens`, `serie`) los regenera el job nocturno vía `exporter/export_panel.py` — **no los edites a mano, no toques el exportador** (zona roja).
 - **Bitácora viva**: `front-office/MEJORAS.md` — apéndice obligatorio por entrega, con el hash REAL leído de `git log` (nunca inventado).
-- **Historial**: `PROMPT-GOAL-WOW.md` … `v4.md` y `PROMPT-ANATOMIA-CLONES.md` — **31 mejoras ya desplegadas**. No repitas ninguna: esta tanda es de *madurez*, no de novedad.
+- **Historial**: `_archivo/2026-09-23/PROMPT-GOAL-WOW.md` … `v4.md` y `PROMPT-ANATOMIA-CLONES.md` — **31 mejoras ya desplegadas**. No repitas ninguna: esta tanda es de *madurez*, no de novedad.
 - **Coordinación multiagente**: lee `MAD-brain/00_SISTEMA/coordinacion/TABLERO.md` al inicio; `claim.sh acquire front-office <agente>` **ANTES de editar**, `release` al terminar cada entrega, y **readquiere si pasan 30 min** (el lock caduca).
 - **Yarn**: `npx yarn@1.22.22`. **Build de verificación**: `BASEPATH=/madclon-front-office npx yarn@1.22.22 build` y sirve `web/out` bajo la subruta (`mkdir -p /tmp/site && ln -sfn …/web/out /tmp/site/madclon-front-office && python3 -m http.server 4173 --directory /tmp/site`). Mata el servidor al terminar.
 - **Playwright**: en `/tmp/pwshot` (`node <script>`); scripts `it11.js`…`it24prod.js` como referencia (capturas, `addInitScript` con `localStorage.setItem('madclon-lang', l)`, teclado real, axe).
