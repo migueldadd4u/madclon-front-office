@@ -18,7 +18,7 @@ import { join } from 'node:path'
 
 import { generar } from './build-historia.mjs'
 import { generar as generarCopia } from './build-copia-publica.mjs'
-import { generar as generarRetos } from './build-copia-retos.mjs'
+import { generar as generarRetos, titulosPublicosHorneados } from './build-copia-retos.mjs'
 
 const COLORES_VALIDOS = ['primary', 'success', 'info', 'warning', 'error', 'secondary']
 const RE_ICONO = /^ri-[a-z0-9-]+$/
@@ -54,6 +54,84 @@ function perfilesDeOrbita(fuente) {
   const cierra = fuente.indexOf('\n]', inicio)
 
   return [...fuente.slice(inicio, cierra).matchAll(/perfil:\s*'([^']+)'/g)].map(m => m[1])
+}
+
+// Lista blanca del bloque `overview.retos` (arco cero-a-cien, fase 7; HU-C12, HU-P07a). La
+// escribe el exportador copiando la porción pública del índice del panel privado; cualquier
+// clave de más es un camino de fuga (13/08: la fuga viajaba en un JSON de DATOS).
+const CLAVES_RETOS_OK = ['estado', 'version', 'generado', 'retos', 'agregado']
+const CLAVES_RETO = ['titulo_publico', 'escala', 'porcentaje', 'hechos', 'total', 'unidad', 'terminado']
+const CLAVES_AGREGADO = ['vivos', 'terminados', 'avanceMedio', 'porEscala', 'diasDelMasParado']
+
+const mismas = (obj, lista) => obj !== null && typeof obj === 'object' && !Array.isArray(obj) &&
+  Object.keys(obj).length === lista.length && lista.every(k => Object.hasOwn(obj, k))
+
+/**
+ * Reglas de HU-P07a sobre `overview.retos`: (1) lista blanca de campos; (2) cero títulos fuera de
+ * los `publico-<n>` horneados de exporter/retos.md; (3) el agregado existe solo con 5 o más y
+ * cuadra con la lista. Pura: la usan este script y su test.
+ * @returns {{ fallos: {regla: string, evidencia: string}[], avisos: string[] }}
+ */
+export function comprobarRetosPublicados(bloque, titulosHorneados) {
+  const fallos = []
+  const avisos = []
+  const falla = (regla, evidencia) => fallos.push({ regla, evidencia })
+
+  if (bloque === undefined) {
+    avisos.push('overview.json sin bloque `retos`: lote de un exportador anterior; la página dice «en revisión»')
+
+    return { fallos, avisos }
+  }
+
+  if (bloque?.estado === 'en revisión') {
+    if (!mismas(bloque, ['estado'])) falla('retos-campo-fuera-de-lista', '«en revisión» no lleva más claves que `estado`')
+
+    return { fallos, avisos }
+  }
+
+  if (bloque?.estado !== 'ok' || !mismas(bloque, CLAVES_RETOS_OK) || !Array.isArray(bloque.retos)) {
+    falla('retos-campo-fuera-de-lista', `overview.retos no es la lista blanca: claves ${JSON.stringify(Object.keys(bloque ?? {}))}`)
+
+    return { fallos, avisos }
+  }
+
+  const { retos, agregado } = bloque
+
+  if (retos.length > 5) falla('retos-mas-de-cinco', `${retos.length} retos: como mucho los 5 más activos (P-4)`)
+
+  retos.forEach((r, i) => {
+    if (!mismas(r, CLAVES_RETO)) {
+      falla('retos-campo-fuera-de-lista', `retos[${i}] lleva ${JSON.stringify(Object.keys(r ?? {}))}`)
+
+      return
+    }
+
+    if (!titulosHorneados.includes(r.titulo_publico)) {
+      falla('retos-titulo-no-declarado',
+        `retos[${i}] publica un título que no es ningún \`publico-<n>\` de exporter/retos.md ` +
+        '(un título privado viajando en el dato, o falta su bloque con la traducción)')
+    }
+  })
+
+  if (retos.length < 5 && agregado !== null) {
+    falla('retos-agregado-no-cuadra', `agregado con ${retos.length} retos: con menos de 5 no hay medias (HU-P02d)`)
+  } else if (retos.length >= 5) {
+    if (!mismas(agregado, CLAVES_AGREGADO)) {
+      falla('retos-agregado-no-cuadra', 'con 5 retos el agregado tiene que existir y ser la lista blanca')
+    } else {
+      const conPct = retos.filter(r => r.porcentaje !== null).map(r => r.porcentaje)
+      const medio = conPct.length ? Math.round(conPct.reduce((s, x) => s + x, 0) / conPct.length) : null
+      const terminados = retos.filter(r => r.terminado).length
+      const porEscala = Object.values(agregado.porEscala ?? {}).reduce((s, x) => s + x, 0)
+
+      if (agregado.avanceMedio !== medio) falla('retos-agregado-no-cuadra', `avance medio ${agregado.avanceMedio} ≠ ${medio} de la lista`)
+      if (agregado.terminados !== terminados) falla('retos-agregado-no-cuadra', `terminados ${agregado.terminados} ≠ ${terminados} de la lista`)
+      if (agregado.vivos + agregado.terminados > retos.length) falla('retos-agregado-no-cuadra', 'vivos + terminados supera la lista')
+      if (porEscala !== retos.length) falla('retos-agregado-no-cuadra', `por altura suma ${porEscala}, la lista tiene ${retos.length}`)
+    }
+  }
+
+  return { fallos, avisos }
 }
 
 export function comprobarContrato(base = process.cwd()) {
@@ -117,7 +195,14 @@ export function comprobarContrato(base = process.cwd()) {
   if (!existsSync(rutaOverview)) {
     falla('overview-ausente', 'public/data/overview.json no existe: ejecuta `make data`')
   } else {
-    const historia = leerJSON(rutaOverview).historia
+    const overviewLote = leerJSON(rutaOverview)
+    const historia = overviewLote.historia
+
+    // ── 2b · los retos publicados cumplen el contrato (HU-P07a) ───────────────
+    const r = comprobarRetosPublicados(overviewLote.retos, titulosPublicosHorneados(generarRetos().bloques))
+
+    r.fallos.forEach(f => falla(f.regla, f.evidencia))
+    r.avisos.forEach(a => avisos.push(a))
 
     if (!historia) {
       falla('historia-ausente', 'overview.json no trae el bloque `historia` (exportador viejo o `make data` sin correr)')
@@ -329,8 +414,9 @@ export function comprobarContrato(base = process.cwd()) {
   //   a) lo horneado coincide con exporter/retos.md y no falta ningún bloque;
   //   b) «lo que el clon no hace» está en la MISMA tarjeta que «cómo propone» —
   //      contado a medias, esto parece vigilancia (decisión de MAD, P-7);
-  //   c) en la fase 0 la página no pinta cifras: no hay retos suficientes para que
-  //      una media signifique algo, y un número inventado es peor que ninguno.
+  //   c) con menos de 5 retos la página no pinta medias: una media de pocos no es una
+  //      tendencia (fase 7: el aviso sigue; las medias solo salen con 5, del dato);
+  //   d) el avance que sí se pinta viene del dato y lleva su procedencia.
   {
     const retos = generarRetos()
 
@@ -363,7 +449,13 @@ export function comprobarContrato(base = process.cwd()) {
 
       if (!pagina.includes('data-sin-cifras')) {
         falla('retos-sin-aviso-de-cifras',
-          'la fase 0 no publica agregados: la página debe llevar el bloque data-sin-cifras que lo dice')
+          'con menos de 5 retos no hay agregados: la página debe llevar el bloque data-sin-cifras que lo dice')
+      }
+
+      // El avance viene del dato (overview.retos) y se pinta con su procedencia; ni una cifra a mano.
+      if (!pagina.includes('data-retos-avance') || !pagina.includes('data-retos-procedencia')) {
+        falla('retos-avance-sin-procedencia',
+          'retos/page.tsx tiene que pintar el avance (data-retos-avance) con su procedencia (data-retos-procedencia)')
       }
     }
 

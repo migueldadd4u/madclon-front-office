@@ -39,7 +39,36 @@ export type Overview = {
 
   /** Historia del clon: capítulos curados + cifras contadas en cada refresco. */
   historia?: Historia
+
+  /** Avance de los retos que se dejan contar (arco cero-a-cien, fase 7). Lo calcula el panel privado. */
+  retos?: RetosPublicos
 }
+
+export type RetoPublico = {
+  titulo_publico: string
+  escala: 'horizonte' | 'frente' | 'reto' | 'empujon'
+  porcentaje: number | null
+  hechos: number
+  total: number
+  unidad: 'pasos' | 'retos' | 'niveles'
+  terminado: boolean
+}
+
+export type RetosPublicos =
+  | { estado: 'en revisión' }
+  | {
+      estado: 'ok'
+      version: number
+      generado: string
+      retos: RetoPublico[]
+      agregado: {
+        vivos: number
+        terminados: number
+        avanceMedio: number | null
+        porEscala: Partial<Record<RetoPublico['escala'], number>>
+        diasDelMasParado: number | null
+      } | null
+    }
 
 /**
  * Un clon de la flota. Aquí NO viajan sus palabras: el rol y la misión los pone

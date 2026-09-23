@@ -218,10 +218,11 @@ function estaticas() {
   )
 
   try {
-    execSync('npm run test:public-safety && python3 -m unittest discover -s ../exporter -p test_hardware_publico.py', { cwd: RAIZ, stdio: 'pipe' })
-    marca('0b', 'contrato y privacidad Hardware: productor + consumidor', true, 'regresiones numéricas y canarios verdes')
+    // Retos (fase 7 de cero-a-cien): el exportador valida y copia la porción pública, nunca calcula.
+    execSync("npm run test:public-safety && python3 -m unittest discover -s ../exporter -p 'test_*publico*.py'", { cwd: RAIZ, stdio: 'pipe' })
+    marca('0b', 'contrato y privacidad Hardware y Retos: productor + consumidor', true, 'regresiones numéricas y canarios verdes')
   } catch {
-    marca('0b', 'contrato y privacidad Hardware: productor + consumidor', false, 'falló una regresión de la proyección pública')
+    marca('0b', 'contrato y privacidad Hardware y Retos: productor + consumidor', false, 'falló una regresión de la proyección pública')
   }
 
   // 1 · build
@@ -627,6 +628,71 @@ async function navegador() {
     }
   }
   marca(17, 'Hardware: portada → detalle anónimo y tolerancia a fallo ajeno', problemasHardware.length === 0, problemasHardware.join(' | ') || 'ES/EN · 390/1440 · CPU/GPU/RAM por host · tokens503 no lo oculta')
+
+  // 18 · /retos cuenta el avance que llega del dato, y solo eso (arco cero-a-cien, fase 7).
+  // Tres lotes sintéticos (títulos inventados, nunca de un reto real): un caso suelto →
+  // «un caso, no una estadística» y sin medias; cinco con agregado → las cifras y ningún aviso de
+  // «sin cifras»; «en revisión» → lo confiesa con role=status y no pinta ni una barra.
+  const problemasRetos = []
+
+  const overviewBase = JSON.parse(readFileSync(join(RAIZ, 'public/data/overview.json'), 'utf8'))
+
+  const sintetico = (n, agregado) => ({
+    estado: 'ok', version: 1, generado: new Date().toISOString(), agregado,
+    retos: Array.from({ length: n }, (_, i) => ({
+      titulo_publico: `Caso sintético ${i + 1}`, escala: ['reto', 'frente', 'empujon', 'reto', 'horizonte'][i],
+      porcentaje: i * 20, hechos: i, total: 5, unidad: 'pasos', terminado: false
+    }))
+  })
+
+  const lotesRetos = [
+    { id: 'uno', retos: sintetico(1, null), barras: 1, caso: 1, cifras: 0, sinCifras: 1, revision: 0 },
+    {
+      id: 'cinco',
+      retos: sintetico(5, { vivos: 5, terminados: 0, avanceMedio: 40, porEscala: { reto: 2, frente: 1, empujon: 1, horizonte: 1 }, diasDelMasParado: 7 }),
+      barras: 5, caso: 0, cifras: 1, sinCifras: 0, revision: 0
+    },
+    { id: 'revision', retos: { estado: 'en revisión' }, barras: 0, caso: 0, cifras: 0, sinCifras: 1, revision: 1 }
+  ]
+
+  for (const lote of lotesRetos) {
+    for (const width of [375, 1440]) {
+      const ctx = await navegadorPw.newContext({ viewport: { width, height: 900 }, serviceWorkers: 'block' })
+
+      vigilarSuperficie(ctx, `retos-${lote.id}@${width}`)
+      await ctx.route('**/data/overview.json', route => route.fulfill({ json: { ...overviewBase, retos: lote.retos } }))
+      const p = await ctx.newPage()
+
+      try {
+        await p.goto(url('retos/'))
+        await p.locator(lote.revision ? '[data-retos-en-revision]' : '[data-retos-avance]').waitFor()
+
+        const medido = await p.evaluate(() => ({
+          barras: document.querySelectorAll('[data-reto-publico] [role="progressbar"]').length,
+          caso: document.querySelectorAll('[data-retos-caso]').length,
+          cifras: document.querySelectorAll('[data-retos-cifras]').length,
+          sinCifras: document.querySelectorAll('[data-sin-cifras]').length,
+          revision: document.querySelectorAll('[data-retos-en-revision][role="status"]').length,
+          procedencias: document.querySelectorAll('[data-retos-procedencia]').length,
+          desborde: document.documentElement.scrollWidth - document.documentElement.clientWidth
+        }))
+
+        for (const k of ['barras', 'caso', 'cifras', 'sinCifras', 'revision']) {
+          if (medido[k] !== lote[k]) problemasRetos.push(`${lote.id}@${width}: ${k}=${medido[k]} (esperado ${lote[k]})`)
+        }
+
+        if (medido.procedencias !== lote.barras) problemasRetos.push(`${lote.id}@${width}: ${medido.procedencias} procedencias para ${lote.barras} barras`)
+        if (medido.desborde > 1) problemasRetos.push(`${lote.id}@${width}: desborde +${medido.desborde}px`)
+      } catch (e) {
+        problemasRetos.push(`${lote.id}@${width}: ${String(e.message).slice(0, 120)}`)
+      }
+
+      await ctx.close()
+    }
+  }
+
+  marca(18, 'Retos: el avance llega del dato (1 caso · 5 con cifras · en revisión)', problemasRetos.length === 0,
+    problemasRetos.join(' | ') || '3 lotes sintéticos × 375/1440 · barras, procedencia y aviso cuadran')
 
   // Una lista plana de combinaciones en vez de tres bucles anidados: cada modo
   // trae SU corte (idiomas, anchos, contrastes), así que la matriz del oscuro no

@@ -94,5 +94,59 @@ export const RETOS_BUILD: Record<string, { es_titulo: string; es_texto: string; 
     "es_texto": "Los primeros retos acaban de abrirse. En cuanto haya suficientes para que una media signifique algo, esta página enseñará cuántos hay vivos, cuántos terminados y cuánto se tarda de verdad en terminar uno. Mientras tanto no hay medias, porque una media de dos cosas no es una tendencia: es un adorno.",
     "en_titulo": "No figures to show yet",
     "en_texto": "The first challenges have only just been opened. As soon as there are enough for an average to mean anything, this page will show how many are alive, how many are finished and how long finishing one really takes. Until then there are no averages, because an average of two things isn't a trend: it's decoration."
+  },
+  "avance": {
+    "es_titulo": "Cómo van los retos que se dejan contar",
+    "es_texto": "Estos son los retos que su dueño ha decidido enseñar, como mucho los cinco que más se han movido en el último mes. El avance no se escribe a mano: sale de los pasos cerrados de cada uno, lo calcula el panel privado y esta web solo lo copia.",
+    "en_titulo": "How the challenges that can be shown are doing",
+    "en_texto": "These are the challenges their owner has chosen to show, at most the five that moved the most in the last month. Progress isn't typed by hand: it comes from each one's closed steps, the private panel works it out and this site just copies it."
+  },
+  "avance-caso": {
+    "es_titulo": "Un caso, no una estadística",
+    "es_texto": "Todavía hay menos de cinco retos que se puedan enseñar, así que aquí no hay medias: cada uno se cuenta por separado, tal como va, también cuando está parado.",
+    "en_titulo": "A case, not a statistic",
+    "en_texto": "There are still fewer than five challenges that can be shown, so there are no averages here: each one is told on its own, as it stands, also when it is stuck."
+  },
+  "avance-en-revision": {
+    "es_titulo": "El avance de los retos está en revisión",
+    "es_texto": "El dato de hoy no ha llegado o tiene más de un día, y un avance viejo contado como si fuera de hoy sería mentira. Vuelve a salir en cuanto el panel privado lo recalcule.",
+    "en_titulo": "Challenge progress is under review",
+    "en_texto": "Today's figure hasn't arrived or is more than a day old, and old progress told as if it were today's would be a lie. It comes back as soon as the private panel works it out again."
+  },
+  "avance-procedencia": {
+    "es_titulo": "De dónde sale",
+    "es_texto": "Pasos cerrados sobre pasos totales, calculado por el panel privado. Dato del",
+    "en_titulo": "Where it comes from",
+    "en_texto": "Closed steps over total steps, worked out by the private panel. Figure from"
+  },
+  "cifra-vivos": {
+    "es_titulo": "Retos vivos",
+    "es_texto": "Abiertos y sin terminar entre los que se cuentan.",
+    "en_titulo": "Live challenges",
+    "en_texto": "Open and unfinished among the ones shown."
+  },
+  "cifra-terminados": {
+    "es_titulo": "Terminados",
+    "es_texto": "Llegaron al cien y se cerraron.",
+    "en_titulo": "Finished",
+    "en_texto": "They reached a hundred and were closed."
+  },
+  "cifra-medio": {
+    "es_titulo": "Avance medio",
+    "es_texto": "La media de los que tienen avance, calculada por el panel privado.",
+    "en_titulo": "Average progress",
+    "en_texto": "The average of those that have progress, worked out by the private panel."
+  },
+  "cifra-parado": {
+    "es_titulo": "Días del más parado",
+    "es_texto": "Los días que lleva sin moverse el que más tiempo lleva quieto.",
+    "en_titulo": "Days of the most stuck",
+    "en_texto": "The days the stillest one has gone without moving."
+  },
+  "publico-1": {
+    "es_titulo": "Que el clon organice la vida en retos",
+    "es_texto": "El propio arco que enseña al clon a trabajar por retos. Su dueño decidió que fuese el primero en contarse, también cuando se atasque.",
+    "en_titulo": "Teaching the clone to work in challenges",
+    "en_texto": "The very arc that teaches the clone to work in challenges. Its owner decided it would be the first to be shown, also when it gets stuck."
   }
 }

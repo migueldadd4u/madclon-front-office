@@ -44,8 +44,21 @@ export const BLOQUES_EXIGIDOS = [
   'no-hace-escribe',
   'no-hace-datos',
   'panel-privado',
-  'sin-cifras'
+  'sin-cifras',
+  'avance',
+  'avance-caso',
+  'avance-en-revision',
+  'avance-procedencia',
+  'cifra-vivos',
+  'cifra-terminados',
+  'cifra-medio',
+  'cifra-parado'
 ]
+
+/** Bloques `publico-<n>`: el título público EXACTO (es_titulo) y su traducción. Es la lista
+ * contra la que `check-contrato` compara los títulos que publica el dato (HU-P03d). */
+export const titulosPublicosHorneados = bloques =>
+  Object.entries(bloques).filter(([clave]) => /^publico-\d+$/.test(clave)).map(([, b]) => b.es_titulo)
 
 export function generar() {
   const { bloques, avisos } = parseBloques(readFileSync(RETOS_MD, 'utf8'), RE_CABECERA, RE_CAMPO, CAMPOS, 'reto')
