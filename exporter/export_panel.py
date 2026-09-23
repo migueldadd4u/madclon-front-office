@@ -10,6 +10,9 @@ Lee (SOLO LECTURA) los paneles vivos del vault:
   - 00_SISTEMA/Monitorizacion/tokens/*.json(l)       (serie KPI + línea base)
   - 00_SISTEMA/handoffs/handoff-*.md y AAAA-MM-DD_handoff_*.md (solo se CUENTAN)
 
+Y del panel privado, sin calcular nada aquí (retos_publicos.py):
+  - `indice-cero-a-cien.mjs --publico`               (avance de los retos marcados públicos)
+
 Y del propio repo (copy público curado, nunca del vault):
   - exporter/historia.md                             (capítulos de /historia)
 
@@ -40,6 +43,8 @@ from pathlib import Path
 
 # Also works when monitors load this file through importlib, outside exporter/.
 collect_public_hardware = runpy.run_path(str(Path(__file__).with_name("hardware_publico.py")))["collect_public_hardware"]
+# El avance de los retos públicos: lo calcula el panel privado, aquí solo se valida y se copia.
+bloque_retos = runpy.run_path(str(Path(__file__).with_name("retos_publicos.py")))["bloque_retos"]
 
 # ---------------------------------------------------------------- avisos del lote
 
@@ -768,6 +773,8 @@ def main() -> int:
                 break
 
     overview["hardware"] = collect_public_hardware()
+    # Retos (arco cero-a-cien, fase 7): la porción pública del índice, o «en revisión».
+    overview["retos"] = bloque_retos(vault, avisos)
 
     ahora = datetime.now(timezone.utc).isoformat(timespec="seconds")
     salidas = {
