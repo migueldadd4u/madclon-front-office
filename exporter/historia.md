@@ -208,3 +208,39 @@ es_texto: El clon deja de ordenar la vida en listas y empieza a ordenarla en ret
 en_titulo: The challenge is born
 en_texto: The clone stops arranging life as lists and starts arranging it as challenges: things you begin in order to finish them, with a plan, steps and progress you can see. When its moment comes, the private panel shows one and sets everything else aside.
 fuente: panel-mad/sdd/retos-v0.01 (SDD del arco «EL RETO» v0.01) + commits c761526 y 2754f94
+
+### 2026-09-03
+icono: ri-parent-line
+color: success
+es_titulo: El clon tiene un hijo
+es_texto: Nace el primer clon derivado: otra persona de la familia estrena el suyo, con su propia casa, su propia memoria y su propio canal. Sale del mismo molde que el Clon de MAD, pero no hereda ni una sola llave.
+en_titulo: The clone has a child
+en_texto: The first derived clone is born: another family member gets their own, with its own home, its own memory and its own channel. It comes from the same mould as MAD's clone, but does not inherit a single key.
+fuente: 2026-09-13_handoff_v6-87-bitacora-2026-08-24-a-2026-09-13.md (BLUF punto 1, ClonMiguel contesta el 03/09 ~21:40)
+
+### 2026-09-06
+icono: ri-flashlight-line
+color: warning
+es_titulo: Se va la luz, y el clon sigue
+es_texto: No fue un simulacro: hubo un corte de luz de verdad y el clon lo aguantó. El apagón real enseñó lo que la prueba en seco no ve: un vigilante que no se enteraba del corte y un apagado ordenado que se atascaba esperando permiso. Las dos cosas quedaron arregladas ese mismo día.
+en_titulo: The power goes out, and the clone carries on
+en_texto: It was not a drill: there was a real power cut and the clone rode it out. The real outage taught what a dry run cannot: a watchdog that did not notice the cut and an orderly shutdown that got stuck waiting for permission. Both were fixed that same day.
+fuente: 2026-09-13_handoff_v6-87-bitacora-2026-08-24-a-2026-09-13.md §4.6 (commits 5954ef53, cbbe5fc4, 0ff51f51, 38af8378)
+
+### 2026-09-13
+icono: ri-search-eye-line
+color: error
+es_titulo: El clon se pilla en una mentira
+es_texto: El clon descubre que su propia memoria daba por hecho algo que nunca había pasado, y que llevaba tiempo repitiéndolo. Se corrige en la fuente y la lección queda escrita: lo que el clon recuerda también hay que comprobarlo.
+en_titulo: The clone catches itself in a lie
+en_texto: The clone discovers that its own memory took for granted something that never happened, and had been repeating it for a while. It is corrected at the source and the lesson is written down: what the clone remembers must be checked too.
+fuente: 2026-09-13_handoff_v6-87-bitacora-2026-08-24-a-2026-09-13.md (BLUF punto 2, commits a43044c3 y 59ffcf20)
+
+### 2026-09-20
+icono: ri-ruler-line
+color: info
+es_titulo: Medir al que mide
+es_texto: Tres agentes trabajan a la vez y cada uno revisa el trabajo del otro. Salen a la luz comprobaciones que daban verde midiendo algo distinto de lo que decían medir, y ninguna la cazó quien la había escrito: las cazó el vecino. Lo que funcionó no fue coordinarse, fue medirse entre ellos.
+en_titulo: Measuring the measurer
+en_texto: Three agents work at once and each one reviews the others' work. Checks come to light that came back green while measuring something other than what they claimed to measure, and none was caught by whoever wrote it: the neighbour caught them. What worked was not coordinating, it was measuring each other.
+fuente: 2026-09-20_handoff_v6-88-bitacora-2026-09-14-a-2026-09-20.md (BLUF punto 1) + 2026-09-20_handoff_verificacion-cruzada-tres-agentes-y-el-contrato-que-falta.md

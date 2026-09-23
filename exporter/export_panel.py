@@ -8,7 +8,7 @@ Lee (SOLO LECTURA) los paneles vivos del vault:
   - 00_SISTEMA/Vistas-Principales/PANEL-TOKENS.md    (contador, KPIs, modelos)
   - 00_SISTEMA/cuadros-de-mando/SISTEMA-COMPLETO.md  (clones + integraciones)
   - 00_SISTEMA/Monitorizacion/tokens/*.json(l)       (serie KPI + línea base)
-  - 00_SISTEMA/handoffs/handoff-*.md                 (solo se CUENTAN: nº y fechas)
+  - 00_SISTEMA/handoffs/handoff-*.md y AAAA-MM-DD_handoff_*.md (solo se CUENTAN)
 
 Y del propio repo (copy público curado, nunca del vault):
   - exporter/historia.md                             (capítulos de /historia)
@@ -502,6 +502,21 @@ def parse_hitos(md: str, avisos: list) -> list:
     return sorted(hitos, key=lambda h: h["fecha"])
 
 
+BITACORA_VIEJA = re.compile(r"^handoff-.*?(20\d{2})(\d{2})(\d{2})\.md$")
+BITACORA_NUEVA = re.compile(r"^(20\d{2})-(\d{2})-(\d{2})_handoff_.+\.md$")
+
+
+def fecha_bitacora(nombre: str):
+    """Fecha ISO de una bitácora por su nombre, en cualquiera de los dos formatos."""
+    m = BITACORA_NUEVA.match(nombre) or BITACORA_VIEJA.match(nombre)
+    return "-".join(m.groups()) if m else None
+
+
+def bitacoras_en(dir_handoffs: Path) -> list:
+    """Las bitácoras del directorio de handoffs: las que llevan fecha en el nombre."""
+    return [f for f in dir_handoffs.glob("*.md") if fecha_bitacora(f.name)]
+
+
 def parse_historia(fichero_hitos: Path, dir_handoffs: Path, hoy: date, avisos: list) -> dict:
     """Bloque `historia` de overview.json: capítulos curados + cifras contadas.
 
@@ -512,15 +527,18 @@ def parse_historia(fichero_hitos: Path, dir_handoffs: Path, hoy: date, avisos: l
     if not fichero_hitos.exists():
         avisos.append(f"⚠️ fuente no encontrada: {fichero_hitos.name} (la historia se queda sin capítulos nuevos)")
 
-    fechas = sorted(re.findall(r"20\d{6}", " ".join(p.name for p in dir_handoffs.glob("handoff-*.md"))))
-    bitacoras = len(list(dir_handoffs.glob("handoff-*.md")))
-    iso = lambda s: f"{s[0:4]}-{s[4:6]}-{s[6:8]}"
+    # Dos nombres conviven: el viejo `handoff-vX_Y-slug-AAAAMMDD.md` y, desde el
+    # estándar de nombres del 16/08, `AAAA-MM-DD_handoff_slug.md`. Contar sólo el
+    # viejo dejó el contador en 186 y la última bitácora en el 15/08 durante
+    # cinco semanas, sin un solo aviso.
+    fechas = sorted(fecha_bitacora(f.name) for f in bitacoras_en(dir_handoffs))
+    bitacoras = len(fechas)
 
     historia = {
         "hitos": hitos,
         "bitacoras": bitacoras or None,
-        "nacimiento": iso(fechas[0]) if fechas else None,
-        "ultima_bitacora": iso(fechas[-1]) if fechas else None,
+        "nacimiento": fechas[0] if fechas else None,
+        "ultima_bitacora": fechas[-1] if fechas else None,
         "ultimo_hito": hitos[-1]["fecha"] if hitos else None,
         "dias_sin_capitulo": None,
     }
