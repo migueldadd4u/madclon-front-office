@@ -22,6 +22,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import shutil
 import subprocess
 import tempfile
 from datetime import datetime, timezone
@@ -122,6 +123,18 @@ def generador(panel_dir: Path) -> Path | None:
         return None
 
 
+def node_bin() -> str:
+    """El `node` que corre el generador. El refresco nocturno va por launchd, con un PATH
+    sin Homebrew ni ~/.local/bin: con un `node` a secas el generador no arrancaba y el
+    escaparate salía «en revisión» cada noche (24/09/2026)."""
+    candidatos = [os.environ.get("NODE_BIN"), shutil.which("node"),
+                  "/opt/homebrew/bin/node", str(Path.home() / ".local/bin/node"), "/usr/local/bin/node"]
+    for c in candidatos:
+        if c and Path(c).is_file() and os.access(c, os.X_OK):
+            return c
+    return "node"
+
+
 def bloque_retos(vault: Path, avisos, ahora: datetime | None = None, panel_dir: Path | None = None,
                  ejecutar=subprocess.run) -> dict:
     """El bloque `overview.retos`: `{estado: 'ok', ...porción}` o `{estado: 'en revisión'}`."""
@@ -136,7 +149,7 @@ def bloque_retos(vault: Path, avisos, ahora: datetime | None = None, panel_dir: 
         destino = Path(tmp) / "porcion.json"
         entorno = {**os.environ, "PANEL_VAULT": str(vault), "PANEL_WORKSPACE": str(vault.parent)}
         try:
-            r = ejecutar(["node", "--experimental-strip-types", str(script), "--publico", str(destino)],
+            r = ejecutar([node_bin(), "--experimental-strip-types", str(script), "--publico", str(destino)],
                          cwd=str(script.parent.parent), env=entorno, capture_output=True, text=True, timeout=180)
             if r.returncode != 0:
                 avisos.nota(f"retos en revisión: el generador salió con {r.returncode}")

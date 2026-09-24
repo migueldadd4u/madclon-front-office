@@ -127,3 +127,26 @@ class RetosPublicosTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class NodeBinTest(unittest.TestCase):
+    """Bajo launchd el PATH no trae node: el generador tiene que encontrarlo igual."""
+
+    def test_encuentra_node_con_path_minimo(self):
+        import os
+        antes = os.environ.get("PATH")
+        os.environ["PATH"] = "/usr/bin:/bin"
+        try:
+            node = rp["node_bin"]()
+        finally:
+            os.environ["PATH"] = antes or ""
+        self.assertNotEqual(node, "node", "con PATH mínimo debe resolver una ruta absoluta")
+        self.assertTrue(Path(node).is_file())
+
+    def test_node_bin_manda(self):
+        import os
+        os.environ["NODE_BIN"] = "/bin/sh"
+        try:
+            self.assertEqual(rp["node_bin"](), "/bin/sh")
+        finally:
+            del os.environ["NODE_BIN"]
