@@ -359,33 +359,65 @@
     "hosts": [
       {
         "id": "mac",
-        "sampled_at": "2026-09-24T16:38:44Z",
+        "sampled_at": "2026-09-24T16:43:22Z",
         "cpu_percent": null,
         "ram_total_bytes": 103079215104,
-        "ram_available_bytes": 31271272448,
+        "ram_available_bytes": 30996332544,
         "swap_used_bytes": 2097351229,
-        "gpu_percent": 23,
+        "gpu_percent": 25,
         "gpu_temperature_c": null,
         "gpu_power_w": null,
         "disk_total_bytes": 994662584320,
-        "disk_available_bytes": 202170167296
+        "disk_available_bytes": 202085371904
       },
       {
         "id": "dgx",
-        "sampled_at": "2026-09-24T16:38:44Z",
-        "cpu_percent": 0.16638935108153063,
+        "sampled_at": "2026-09-24T16:43:22Z",
+        "cpu_percent": 0.0,
         "ram_total_bytes": 130661203968,
-        "ram_available_bytes": 81103892480,
+        "ram_available_bytes": 81088286720,
         "swap_used_bytes": 1039261696,
         "gpu_percent": 0.0,
         "gpu_temperature_c": 40.0,
-        "gpu_power_w": 10.4,
+        "gpu_power_w": 10.32,
         "disk_total_bytes": 4031871553536,
-        "disk_available_bytes": 3669585956864
+        "disk_available_bytes": 3669585944576
       }
     ]
   },
   "retos": {
-    "estado": "en revisión"
+    "estado": "ok",
+    "version": 1,
+    "generado": "2026-09-24T16:43:23.005Z",
+    "retos": [
+      {
+        "titulo_publico": "Que el clon organice la vida en retos",
+        "escala": "reto",
+        "porcentaje": 0,
+        "hechos": 0,
+        "total": 2,
+        "unidad": "pasos",
+        "terminado": false
+      },
+      {
+        "titulo_publico": "Comprobar que las cifras de los retos son ciertas",
+        "escala": "empujon",
+        "porcentaje": 0,
+        "hechos": 0,
+        "total": 2,
+        "unidad": "pasos",
+        "terminado": false
+      },
+      {
+        "titulo_publico": "Ordenar el clon para poder darlo por terminado",
+        "escala": "reto",
+        "porcentaje": 0,
+        "hechos": 0,
+        "total": 9,
+        "unidad": "pasos",
+        "terminado": false
+      }
+    ],
+    "agregado": null
   }
 }
