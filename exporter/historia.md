@@ -7,6 +7,13 @@ exportador lo lee en cada refresco (`make data`) y lo publica dentro de
 **Para añadir un capítulo**: copia un bloque, cámbialo y ya está. Sale publicado
 en el refresco nocturno siguiente, sin tocar React ni desplegar a mano.
 
+**Capítulo semanal automático** (desde el 24/09/2026, orden de MAD): cada domingo,
+al cerrar la bitácora semanal, `cc` lee el handoff de la semana y añade aquí 0-2
+capítulos (`services/automejora/orchestrator/historia_capitulo_semanal.sh`, que
+llama `bitacora_semanal.sh`). Antes de un capítulo a mano en domingo, mira si ya
+hay uno de esa semana. MAD recibe un Telegram y lo veta con `git revert` antes del
+refresco de las 03:43. Log: `scratch/bitacora/historia.log`.
+
 Reglas del contenido (es una web PÚBLICA):
 
 - Nada de personas identificables, clientes, importes, rutas ni nombres internos.
