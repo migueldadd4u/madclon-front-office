@@ -1,7 +1,7 @@
 {
   "gtd": {
     "propuestas": null,
-    "bandeja": 407,
+    "bandeja": 413,
     "esperas_vencidas": 11,
     "decisiones": null,
     "acciones_hoy": 32,
@@ -16,16 +16,16 @@
     "bloqueadas": 73,
     "aparcadas": 84,
     "pendientes": 6,
-    "llamadas": 1150,
+    "llamadas": 1165,
     "metered": 0,
-    "top": "minimax 821, grok 233, agy_cli 41, zai 38"
+    "top": "minimax 824, grok 237, agy_cli 44, zai 40"
   },
   "crons": [
     {
       "nombre": "Briefing COO 08:05",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "23/09 09:08"
+      "ultima": "24/09 09:08"
     },
     {
       "nombre": "Higiene Semanal del Sistema",
@@ -37,7 +37,7 @@
       "nombre": "Triage correos del día",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "23/09 08:55"
+      "ultima": "24/09 08:55"
     },
     {
       "nombre": "Auto-mejora nocturna clon",
@@ -55,13 +55,13 @@
       "nombre": "Morning briefing",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "23/09 08:00"
+      "ultima": "24/09 08:00"
     },
     {
       "nombre": "Important-mail monitor",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "24/09 03:30"
+      "ultima": "24/09 18:30"
     },
     {
       "nombre": "Weekly review",
@@ -73,13 +73,13 @@
       "nombre": "Topic news digest",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "23/09 18:02"
+      "ultima": "24/09 18:00"
     },
     {
       "nombre": "Repaso ¿Qué necesito?",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "23/09 08:30"
+      "ultima": "24/09 08:31"
     },
     {
       "nombre": "Clon ↔ Jarvis weekly mutual-improvemen",
@@ -91,7 +91,7 @@
       "nombre": "Guardia de tiradas programadas",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "24/09 03:38"
+      "ultima": "24/09 18:38"
     },
     {
       "nombre": "Radar Buzz semanal",
@@ -123,12 +123,12 @@
   ],
   "crons_en_error": 0,
   "tokens_resumen": {
-    "tokens_30d": 124677554,
+    "tokens_30d": 125651714,
     "cobertura_pct": 92,
-    "indice_eficiencia": 102039
+    "indice_eficiencia": 118088
   },
   "salud_global": "🟢 Todo OK",
-  "watchdog_ts": "2026-09-24T00:04:41.456126Z",
+  "watchdog_ts": "2026-09-24T16:13:33.802343Z",
   "historia": {
     "hitos": [
       {
@@ -359,30 +359,33 @@
     "hosts": [
       {
         "id": "mac",
-        "sampled_at": "2026-09-24T01:43:14Z",
+        "sampled_at": "2026-09-24T16:38:44Z",
         "cpu_percent": null,
         "ram_total_bytes": 103079215104,
-        "ram_available_bytes": 31235375104,
-        "swap_used_bytes": 1339817984,
-        "gpu_percent": 69,
+        "ram_available_bytes": 31271272448,
+        "swap_used_bytes": 2097351229,
+        "gpu_percent": 23,
         "gpu_temperature_c": null,
         "gpu_power_w": null,
         "disk_total_bytes": 994662584320,
-        "disk_available_bytes": 204353327104
+        "disk_available_bytes": 202170167296
       },
       {
         "id": "dgx",
-        "sampled_at": "2026-09-24T01:43:14Z",
+        "sampled_at": "2026-09-24T16:38:44Z",
         "cpu_percent": 0.16638935108153063,
         "ram_total_bytes": 130661203968,
-        "ram_available_bytes": 25695453184,
-        "swap_used_bytes": 1039269888,
+        "ram_available_bytes": 81103892480,
+        "swap_used_bytes": 1039261696,
         "gpu_percent": 0.0,
-        "gpu_temperature_c": 41.0,
-        "gpu_power_w": 10.29,
+        "gpu_temperature_c": 40.0,
+        "gpu_power_w": 10.4,
         "disk_total_bytes": 4031871553536,
-        "disk_available_bytes": 3669588606976
+        "disk_available_bytes": 3669585956864
       }
     ]
+  },
+  "retos": {
+    "estado": "en revisión"
   }
 }
