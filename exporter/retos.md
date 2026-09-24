@@ -165,3 +165,15 @@ es_titulo: Que el clon organice la vida en retos
 es_texto: El propio arco que enseña al clon a trabajar por retos. Su dueño decidió que fuese el primero en contarse, también cuando se atasque.
 en_titulo: Teaching the clone to work in challenges
 en_texto: The very arc that teaches the clone to work in challenges. Its owner decided it would be the first to be shown, also when it gets stuck.
+
+### publico-2
+es_titulo: Comprobar que las cifras de los retos son ciertas
+es_texto: Antes de enseñar un porcentaje hay que poder recalcularlo a mano. Este reto revisa que cada número que pinta el panel salga de pasos reales y no de lo que alguien escribió.
+en_titulo: Checking that the challenge figures are true
+en_texto: Before showing a percentage you have to be able to work it out by hand. This challenge checks that every number the panel shows comes from real steps, not from what someone wrote.
+
+### publico-3
+es_titulo: Ordenar el clon para poder darlo por terminado
+es_texto: El clon funciona, y por eso da miedo tocarlo. Este reto es la versión que sí tiene final: cada funcionalidad documentada, un registro del que partir y un clon capaz de contar qué ha hecho.
+en_titulo: Tidying up the clone so it can be called done
+en_texto: The clone works, and that is exactly why touching it is scary. This challenge is the version that does have an ending: every feature documented, a register to start from, and a clone able to say what it has done.
