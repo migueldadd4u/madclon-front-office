@@ -1,7 +1,7 @@
 {
   "gtd": {
     "propuestas": null,
-    "bandeja": 413,
+    "bandeja": 435,
     "esperas_vencidas": 11,
     "decisiones": null,
     "acciones_hoy": 32,
@@ -12,13 +12,13 @@
     "staged": 0
   },
   "automejora": {
-    "hechas": 335,
-    "bloqueadas": 73,
-    "aparcadas": 84,
-    "pendientes": 6,
-    "llamadas": 1165,
+    "hechas": 339,
+    "bloqueadas": 75,
+    "aparcadas": 85,
+    "pendientes": 2,
+    "llamadas": 1232,
     "metered": 0,
-    "top": "minimax 824, grok 237, agy_cli 44, zai 40"
+    "top": "minimax 827, grok 293, agy_cli 44, zai 40"
   },
   "crons": [
     {
@@ -43,13 +43,13 @@
       "nombre": "Auto-mejora nocturna clon",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "24/09 03:40"
+      "ultima": "25/09 03:40"
     },
     {
       "nombre": "Resumen diario de Spam",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "23/09 21:30"
+      "ultima": "24/09 21:30"
     },
     {
       "nombre": "Morning briefing",
@@ -61,7 +61,7 @@
       "nombre": "Important-mail monitor",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "24/09 18:30"
+      "ultima": "25/09 03:30"
     },
     {
       "nombre": "Weekly review",
@@ -91,7 +91,7 @@
       "nombre": "Guardia de tiradas programadas",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "24/09 18:38"
+      "ultima": "25/09 03:38"
     },
     {
       "nombre": "Radar Buzz semanal",
@@ -123,12 +123,12 @@
   ],
   "crons_en_error": 0,
   "tokens_resumen": {
-    "tokens_30d": 125651714,
+    "tokens_30d": 125831160,
     "cobertura_pct": 92,
-    "indice_eficiencia": 118088
+    "indice_eficiencia": 128877
   },
   "salud_global": "🟢 Todo OK",
-  "watchdog_ts": "2026-09-24T16:13:33.802343Z",
+  "watchdog_ts": "2026-09-25T00:20:42.586672Z",
   "historia": {
     "hitos": [
       {
@@ -348,47 +348,47 @@
         "en_texto": "Three agents work at once and each one reviews the others' work. Checks come to light that came back green while measuring something other than what they claimed to measure, and none was caught by whoever wrote it: the neighbour caught them. What worked was not coordinating, it was measuring each other."
       }
     ],
-    "bitacoras": 213,
+    "bitacoras": 215,
     "nacimiento": "2026-04-14",
     "ultima_bitacora": "2026-09-24",
     "ultimo_hito": "2026-09-20",
-    "dias_sin_capitulo": 4
+    "dias_sin_capitulo": 5
   },
   "hardware": {
     "version": 1,
     "hosts": [
       {
         "id": "mac",
-        "sampled_at": "2026-09-24T16:43:22Z",
+        "sampled_at": "2026-09-25T01:43:14Z",
         "cpu_percent": null,
         "ram_total_bytes": 103079215104,
-        "ram_available_bytes": 30996332544,
-        "swap_used_bytes": 2097351229,
-        "gpu_percent": 25,
+        "ram_available_bytes": 41887940608,
+        "swap_used_bytes": 2055408189,
+        "gpu_percent": 0,
         "gpu_temperature_c": null,
         "gpu_power_w": null,
         "disk_total_bytes": 994662584320,
-        "disk_available_bytes": 202085371904
+        "disk_available_bytes": 196331032576
       },
       {
         "id": "dgx",
-        "sampled_at": "2026-09-24T16:43:22Z",
-        "cpu_percent": 0.0,
+        "sampled_at": "2026-09-25T01:43:14Z",
+        "cpu_percent": 0.16638935108153063,
         "ram_total_bytes": 130661203968,
-        "ram_available_bytes": 81088286720,
-        "swap_used_bytes": 1039261696,
+        "ram_available_bytes": 81103831040,
+        "swap_used_bytes": 1039253504,
         "gpu_percent": 0.0,
-        "gpu_temperature_c": 40.0,
-        "gpu_power_w": 10.32,
+        "gpu_temperature_c": 39.0,
+        "gpu_power_w": 10.35,
         "disk_total_bytes": 4031871553536,
-        "disk_available_bytes": 3669585944576
+        "disk_available_bytes": 3669584375808
       }
     ]
   },
   "retos": {
     "estado": "ok",
     "version": 1,
-    "generado": "2026-09-24T16:43:23.005Z",
+    "generado": "2026-09-25T01:43:15.287Z",
     "retos": [
       {
         "titulo_publico": "Que el clon organice la vida en retos",
