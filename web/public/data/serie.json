@@ -1588,28 +1588,54 @@
     },
     {
       "fecha": "2026-09-25",
-      "ts": 1790299122.663286,
+      "ts": 1790372934.816493,
       "dias": 7,
       "contexto": {
-        "llamadas": 1554,
-        "tokens": 23022435,
-        "tareas_hechas": 27,
-        "llamadas_router": 1229
+        "llamadas": 1426,
+        "tokens": 21892081,
+        "tareas_hechas": 24,
+        "llamadas_router": 1105
       },
       "kpis": {
-        "entrada_por_llamada": 14149.317,
-        "pct_cache": 63.162,
-        "ratio_salida_entrada": 4.704,
-        "pct_local": 0.778,
+        "entrada_por_llamada": 14740.405,
+        "pct_cache": 66.111,
+        "ratio_salida_entrada": 4.15,
+        "pct_local": 0.818,
         "pct_metered": 0.0,
-        "pct_tokens_en_fallo": 15.932,
-        "latencia_p50": 3.03,
-        "tokens_motor_por_tarea": 128877.166,
-        "pct_llamadas_ok": 96.013,
-        "tareas_dia": 3.857,
-        "reintentos_por_tarea": 1.143,
+        "pct_tokens_en_fallo": 17.869,
+        "latencia_p50": 2.83,
+        "tokens_motor_por_tarea": 123814.937,
+        "pct_llamadas_ok": 95.385,
+        "tareas_dia": 3.429,
+        "reintentos_por_tarea": 1.156,
         "pct_propuestas_atendidas": 13.636,
-        "cobertura_medida": 94.466
+        "cobertura_medida": 93.829
+      }
+    },
+    {
+      "fecha": "2026-09-26",
+      "ts": 1790385536.99053,
+      "dias": 7,
+      "contexto": {
+        "llamadas": 1427,
+        "tokens": 21899752,
+        "tareas_hechas": 26,
+        "llamadas_router": 1106
+      },
+      "kpis": {
+        "entrada_por_llamada": 14735.232,
+        "pct_cache": 66.088,
+        "ratio_salida_entrada": 4.15,
+        "pct_local": 0.818,
+        "pct_metered": 0.0,
+        "pct_tokens_en_fallo": 17.845,
+        "latencia_p50": 2.83,
+        "tokens_motor_por_tarea": 114585.749,
+        "pct_llamadas_ok": 95.389,
+        "tareas_dia": 3.714,
+        "reintentos_por_tarea": 1.156,
+        "pct_propuestas_atendidas": 13.636,
+        "cobertura_medida": 93.833
       }
     }
   ],
