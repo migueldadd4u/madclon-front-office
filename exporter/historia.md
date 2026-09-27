@@ -251,3 +251,21 @@ es_texto: Tres agentes trabajan a la vez y cada uno revisa el trabajo del otro. 
 en_titulo: Measuring the measurer
 en_texto: Three agents work at once and each one reviews the others' work. Checks come to light that came back green while measuring something other than what they claimed to measure, and none was caught by whoever wrote it: the neighbour caught them. What worked was not coordinating, it was measuring each other.
 fuente: 2026-09-20_handoff_v6-88-bitacora-2026-09-14-a-2026-09-20.md (BLUF punto 1) + 2026-09-20_handoff_verificacion-cruzada-tres-agentes-y-el-contrato-que-falta.md
+
+### 2026-09-27
+icono: ri-git-merge-line
+color: warning
+es_titulo: La memoria se parte, y se vuelve a unir
+es_texto: El robot que sincroniza la memoria privada del clon se paraba sin avisar en cuanto un agente reservaba un fichero, fuera cual fuera. Durante días, la copia de casa y la de fuera siguieron caminos distintos, y cada una creía ser la memoria entera. No lo vio el robot: lo cazó otro agente. Se unieron sin perder nada, y el robot aprendió a apartar solo lo reservado y seguir. La lección: la sincronización se vigila comparando las copias, no mirando si el robot corrió.
+en_titulo: The memory splits, and comes back together
+en_texto: The robot that syncs the clone's private memory would stop without a word whenever an agent reserved any file at all. For days, the home copy and the outside copy went separate ways, and each believed it was the whole memory. The robot did not notice: another agent caught it. They were joined back without losing anything, and the robot learned to set aside only what is reserved and carry on. The lesson: syncing is watched by comparing the copies, not by checking whether the robot ran.
+fuente: 2026-09-27_handoff_v6-89-bitacora-2026-09-21-a-2026-09-27.md §4.2 (commits c225bc6e y 99313f47)
+
+### 2026-09-27
+icono: ri-user-unfollow-line
+color: error
+es_titulo: El clon confunde a su dueño con otro
+es_texto: Al poner nombre a contactos de los que solo sabía el teléfono y una conversación, el clon propuso a MAD como la otra persona: en cada chat, el nombre que más se repite es el del dueño. Se deshizo y quedó una guardia. La regla vale para cualquier clon: el dueño nunca es candidato a ser un tercero.
+en_titulo: The clone mistakes its owner for someone else
+en_texto: While naming contacts it only knew by phone number and a conversation, the clone proposed MAD as the other person: in every chat, the name that appears most is the owner's. It was undone and a guard was put in place. The rule holds for any clone: the owner is never a candidate to be someone else.
+fuente: 2026-09-27_handoff_v6-89-bitacora-2026-09-21-a-2026-09-27.md §4.5 (commit 33a8b07f)
