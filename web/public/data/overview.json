@@ -1,31 +1,31 @@
 {
   "gtd": {
     "propuestas": null,
-    "bandeja": 518,
+    "bandeja": 534,
     "esperas_vencidas": 5,
     "decisiones": null,
-    "acciones_hoy": 15,
+    "acciones_hoy": 12,
     "esperas_listadas": 5
   },
   "personas": {
-    "fichas_curadas": 1710,
+    "fichas_curadas": 1713,
     "staged": 0
   },
   "automejora": {
-    "hechas": 367,
+    "hechas": 373,
     "bloqueadas": 76,
     "aparcadas": 89,
-    "pendientes": 27,
-    "llamadas": 1495,
+    "pendientes": 34,
+    "llamadas": 1787,
     "metered": 0,
-    "top": "grok 852, minimax 528, local 34, agy_cli 26"
+    "top": "grok 1019, minimax 644, local 30, agy_cli 29"
   },
   "crons": [
     {
       "nombre": "Briefing COO 08:05",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "30/09 09:07"
+      "ultima": "01/10 09:06"
     },
     {
       "nombre": "Higiene Semanal del Sistema",
@@ -37,31 +37,31 @@
       "nombre": "Triage correos del día",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "30/09 08:58"
+      "ultima": "01/10 08:58"
     },
     {
       "nombre": "Auto-mejora nocturna clon",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "01/10 03:40"
+      "ultima": "02/10 03:40"
     },
     {
       "nombre": "Resumen diario de Spam",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "30/09 21:30"
+      "ultima": "01/10 21:30"
     },
     {
       "nombre": "Morning briefing",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "30/09 08:00"
+      "ultima": "01/10 08:00"
     },
     {
       "nombre": "Important-mail monitor",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "01/10 03:30"
+      "ultima": "02/10 03:30"
     },
     {
       "nombre": "Weekly review",
@@ -73,13 +73,13 @@
       "nombre": "Topic news digest",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "30/09 18:00"
+      "ultima": "01/10 18:00"
     },
     {
       "nombre": "Repaso ¿Qué necesito?",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "30/09 08:30"
+      "ultima": "01/10 08:30"
     },
     {
       "nombre": "Clon ↔ Jarvis weekly mutual-improvemen",
@@ -91,7 +91,7 @@
       "nombre": "Guardia de tiradas programadas",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "01/10 03:38"
+      "ultima": "02/10 03:38"
     },
     {
       "nombre": "Radar Buzz semanal",
@@ -115,13 +115,13 @@
       "nombre": "Proactividad nocturna",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "30/09 13:30"
+      "ultima": "01/10 09:30"
     },
     {
       "nombre": "Proactividad recogida",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "30/09 13:32"
+      "ultima": "01/10 10:45"
     }
   ],
   "gateways": [
@@ -135,12 +135,12 @@
   ],
   "crons_en_error": 0,
   "tokens_resumen": {
-    "tokens_30d": 142561492,
+    "tokens_30d": 127211121,
     "cobertura_pct": 92,
-    "indice_eficiencia": 183039
+    "indice_eficiencia": 188327
   },
   "salud_global": "🟢 Todo OK",
-  "watchdog_ts": "2026-10-01T00:42:18.205918Z",
+  "watchdog_ts": "2026-10-01T23:03:56.373915Z",
   "historia": {
     "hitos": [
       {
@@ -378,47 +378,47 @@
         "en_texto": "While naming contacts it only knew by phone number and a conversation, the clone proposed MAD as the other person: in every chat, the name that appears most is the owner's. It was undone and a guard was put in place. The rule holds for any clone: the owner is never a candidate to be someone else."
       }
     ],
-    "bitacoras": 216,
+    "bitacoras": 219,
     "nacimiento": "2026-04-14",
-    "ultima_bitacora": "2026-09-27",
+    "ultima_bitacora": "2026-10-02",
     "ultimo_hito": "2026-09-27",
-    "dias_sin_capitulo": 4
+    "dias_sin_capitulo": 5
   },
   "hardware": {
     "version": 1,
     "hosts": [
       {
         "id": "mac",
-        "sampled_at": "2026-10-01T01:43:49Z",
-        "cpu_percent": null,
+        "sampled_at": "2026-10-02T01:43:11Z",
+        "cpu_percent": 29.799999999999997,
         "ram_total_bytes": 103079215104,
-        "ram_available_bytes": 25233162240,
-        "swap_used_bytes": 19983887237,
+        "ram_available_bytes": 40082161664,
+        "swap_used_bytes": 2160067,
         "gpu_percent": 0,
         "gpu_temperature_c": null,
         "gpu_power_w": null,
         "disk_total_bytes": 994662584320,
-        "disk_available_bytes": 16505184256
+        "disk_available_bytes": 133562998784
       },
       {
         "id": "dgx",
-        "sampled_at": "2026-10-01T01:43:49Z",
+        "sampled_at": "2026-10-02T01:43:11Z",
         "cpu_percent": 0.0,
         "ram_total_bytes": 130661203968,
-        "ram_available_bytes": 68334063616,
-        "swap_used_bytes": 1618886656,
+        "ram_available_bytes": 15197614080,
+        "swap_used_bytes": 3626119168,
         "gpu_percent": 0.0,
-        "gpu_temperature_c": 41.0,
-        "gpu_power_w": 10.45,
+        "gpu_temperature_c": 42.0,
+        "gpu_power_w": 10.82,
         "disk_total_bytes": 4031871553536,
-        "disk_available_bytes": 3666293571584
+        "disk_available_bytes": 3666970624000
       }
     ]
   },
   "retos": {
     "estado": "ok",
     "version": 1,
-    "generado": "2026-10-01T01:43:52.928Z",
+    "generado": "2026-10-02T01:43:12.143Z",
     "retos": [
       {
         "titulo_publico": "Que el clon organice la vida en retos",
