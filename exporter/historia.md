@@ -269,3 +269,21 @@ es_texto: Al poner nombre a contactos de los que solo sabía el teléfono y una 
 en_titulo: The clone mistakes its owner for someone else
 en_texto: While naming contacts it only knew by phone number and a conversation, the clone proposed MAD as the other person: in every chat, the name that appears most is the owner's. It was undone and a guard was put in place. The rule holds for any clone: the owner is never a candidate to be someone else.
 fuente: 2026-09-27_handoff_v6-89-bitacora-2026-09-21-a-2026-09-27.md §4.5 (commit 33a8b07f)
+
+### 2026-10-01
+icono: ri-file-damage-line
+color: error
+es_titulo: Un carácter de más deja ciega una pantalla
+es_texto: Algunos ficheros de la memoria privada los lee una máquina estricta: ante cualquier cosa fuera de formato, rechaza el fichero entero y no avisa. Esta semana pasó varias veces. Un salto de línea que faltaba al final dejó el resumen nocturno de los mensajes sin generarse noches seguidas. Una cabecera incompleta y una nota pegada donde no tocaba vaciaron secciones del panel privado. Ninguna la vio quien escribió: las cazaron las comprobaciones de otro agente. La lección quedó en regla: si el lector rechaza en silencio, la comprobación va en la mano del que escribe, antes de guardar.
+en_titulo: One stray character blinds a screen
+en_texto: Some files in the private memory are read by a strict machine: anything out of format and it rejects the whole file without a word. This week it happened several times. A missing line break at the end left the nightly summary of messages ungenerated for nights in a row. An incomplete heading and a note pasted where it did not belong emptied sections of the private panel. None was spotted by whoever wrote it: another agent's checks caught them. The lesson became a rule: if the reader rejects in silence, the check belongs in the writer's hand, before saving.
+fuente: 2026-10-04_handoff_v6-90-bitacora-2026-09-28-a-2026-10-04.md §4.2 (commits 4f4d517d, ddf5ef80, 29015bb3, 7bbc0174, cce21ae5)
+
+### 2026-10-01
+icono: ri-door-lock-line
+color: primary
+es_titulo: Nace la puerta de producción, y lo primero que suspende es lo propio
+es_texto: Desde hoy nada sale del clon hacia fuera sin pasar ante un tribunal de jueces adversariales. No puntúan gusto ni limpieza: puntúan si el resultado sirve a quien lo recibe. La nota que cuenta es la más baja, no la media. Lo primero que examinó fue su propia instalación, y la suspendió. Lo segundo, un documento que estaba a punto de firmarse: tampoco pasó, y el fallo no estaba en el código, sino en lo que el texto no decía. Cada suspenso deja escrita una guardia para que no se repita.
+en_titulo: The production gate is born, and the first thing it fails is its own
+en_texto: From today nothing leaves the clone for the outside without facing a panel of adversarial judges. They do not score taste or tidiness: they score whether the result serves the person receiving it. The grade that counts is the lowest, not the average. The first thing it examined was its own installation, and it failed it. The second, a document about to be signed: it did not pass either, and the flaw was not in the code but in what the text left unsaid. Every fail leaves a written guard so it does not happen again.
+fuente: 2026-10-04_handoff_v6-90-bitacora-2026-09-28-a-2026-10-04.md §4.1 (commits 57b7bc5e, fdba939c, 7d7d28f2)
