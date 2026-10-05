@@ -1,7 +1,7 @@
 {
   "gtd": {
     "propuestas": null,
-    "bandeja": 572,
+    "bandeja": 584,
     "esperas_vencidas": 5,
     "decisiones": null,
     "acciones_hoy": 12,
@@ -12,62 +12,62 @@
     "staged": 0
   },
   "automejora": {
-    "hechas": 381,
+    "hechas": 387,
     "bloqueadas": 78,
     "aparcadas": 90,
-    "pendientes": 51,
-    "llamadas": 1935,
+    "pendientes": 58,
+    "llamadas": 1748,
     "metered": 0,
-    "top": "grok 1079, minimax 713, agy_cli 42, local 32"
+    "top": "grok 900, minimax 708, agy_cli 38, local 30"
   },
   "crons": [
     {
       "nombre": "Briefing COO 08:05",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "03/10 09:25"
+      "ultima": "04/10 09:30"
     },
     {
       "nombre": "Higiene Semanal del Sistema",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "27/09 04:00"
+      "ultima": "04/10 04:00"
     },
     {
       "nombre": "Triage correos del día",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "03/10 08:55"
+      "ultima": "04/10 08:55"
     },
     {
       "nombre": "Auto-mejora nocturna clon",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "04/10 03:40"
+      "ultima": "05/10 03:40"
     },
     {
       "nombre": "Resumen diario de Spam",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "03/10 21:30"
+      "ultima": "04/10 21:30"
     },
     {
       "nombre": "Morning briefing",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "03/10 08:00"
+      "ultima": "04/10 08:00"
     },
     {
       "nombre": "Important-mail monitor",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "04/10 03:30"
+      "ultima": "05/10 03:30"
     },
     {
       "nombre": "Weekly review",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "27/09 18:00"
+      "ultima": "04/10 18:00"
     },
     {
       "nombre": "Topic news digest",
@@ -79,19 +79,19 @@
       "nombre": "Repaso ¿Qué necesito?",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "03/10 08:31"
+      "ultima": "04/10 08:31"
     },
     {
       "nombre": "Clon ↔ Jarvis weekly mutual-improvemen",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "27/09 19:15"
+      "ultima": "04/10 19:15"
     },
     {
       "nombre": "Guardia de tiradas programadas",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "04/10 03:38"
+      "ultima": "05/10 03:38"
     },
     {
       "nombre": "Radar Buzz semanal",
@@ -115,13 +115,13 @@
       "nombre": "Proactividad nocturna",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "03/10 09:31"
+      "ultima": "04/10 09:31"
     },
     {
       "nombre": "Proactividad recogida",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "03/10 10:45"
+      "ultima": "04/10 10:45"
     }
   ],
   "gateways": [
@@ -135,12 +135,12 @@
   ],
   "crons_en_error": 0,
   "tokens_resumen": {
-    "tokens_30d": 119519010,
+    "tokens_30d": 109040721,
     "cobertura_pct": 92,
-    "indice_eficiencia": 206495
+    "indice_eficiencia": 173173
   },
-  "salud_global": "🟢 Todo OK",
-  "watchdog_ts": "2026-10-03T23:51:56.320848Z",
+  "salud_global": "🔴 Hay incidencias activas",
+  "watchdog_ts": "2026-10-05T00:15:51.694779Z",
   "historia": {
     "hitos": [
       {
@@ -376,49 +376,67 @@
         "es_texto": "Al poner nombre a contactos de los que solo sabía el teléfono y una conversación, el clon propuso a MAD como la otra persona: en cada chat, el nombre que más se repite es el del dueño. Se deshizo y quedó una guardia. La regla vale para cualquier clon: el dueño nunca es candidato a ser un tercero.",
         "en_titulo": "The clone mistakes its owner for someone else",
         "en_texto": "While naming contacts it only knew by phone number and a conversation, the clone proposed MAD as the other person: in every chat, the name that appears most is the owner's. It was undone and a guard was put in place. The rule holds for any clone: the owner is never a candidate to be someone else."
+      },
+      {
+        "fecha": "2026-10-01",
+        "icono": "ri-file-damage-line",
+        "color": "error",
+        "es_titulo": "Un carácter de más deja ciega una pantalla",
+        "es_texto": "Algunos ficheros de la memoria privada los lee una máquina estricta: ante cualquier cosa fuera de formato, rechaza el fichero entero y no avisa. Esta semana pasó varias veces. Un salto de línea que faltaba al final dejó el resumen nocturno de los mensajes sin generarse noches seguidas. Una cabecera incompleta y una nota pegada donde no tocaba vaciaron secciones del panel privado. Ninguna la vio quien escribió: las cazaron las comprobaciones de otro agente. La lección quedó en regla: si el lector rechaza en silencio, la comprobación va en la mano del que escribe, antes de guardar.",
+        "en_titulo": "One stray character blinds a screen",
+        "en_texto": "Some files in the private memory are read by a strict machine: anything out of format and it rejects the whole file without a word. This week it happened several times. A missing line break at the end left the nightly summary of messages ungenerated for nights in a row. An incomplete heading and a note pasted where it did not belong emptied sections of the private panel. None was spotted by whoever wrote it: another agent's checks caught them. The lesson became a rule: if the reader rejects in silence, the check belongs in the writer's hand, before saving."
+      },
+      {
+        "fecha": "2026-10-01",
+        "icono": "ri-door-lock-line",
+        "color": "primary",
+        "es_titulo": "Nace la puerta de producción, y lo primero que suspende es lo propio",
+        "es_texto": "Desde hoy nada sale del clon hacia fuera sin pasar ante un tribunal de jueces adversariales. No puntúan gusto ni limpieza: puntúan si el resultado sirve a quien lo recibe. La nota que cuenta es la más baja, no la media. Lo primero que examinó fue su propia instalación, y la suspendió. Lo segundo, un documento que estaba a punto de firmarse: tampoco pasó, y el fallo no estaba en el código, sino en lo que el texto no decía. Cada suspenso deja escrita una guardia para que no se repita.",
+        "en_titulo": "The production gate is born, and the first thing it fails is its own",
+        "en_texto": "From today nothing leaves the clone for the outside without facing a panel of adversarial judges. They do not score taste or tidiness: they score whether the result serves the person receiving it. The grade that counts is the lowest, not the average. The first thing it examined was its own installation, and it failed it. The second, a document about to be signed: it did not pass either, and the flaw was not in the code but in what the text left unsaid. Every fail leaves a written guard so it does not happen again."
       }
     ],
-    "bitacoras": 219,
+    "bitacoras": 220,
     "nacimiento": "2026-04-14",
-    "ultima_bitacora": "2026-10-02",
-    "ultimo_hito": "2026-09-27",
-    "dias_sin_capitulo": 7
+    "ultima_bitacora": "2026-10-04",
+    "ultimo_hito": "2026-10-01",
+    "dias_sin_capitulo": 4
   },
   "hardware": {
     "version": 1,
     "hosts": [
       {
         "id": "mac",
-        "sampled_at": "2026-10-04T01:43:15Z",
+        "sampled_at": "2026-10-05T01:43:16Z",
         "cpu_percent": null,
         "ram_total_bytes": 103079215104,
-        "ram_available_bytes": 39522631680,
-        "swap_used_bytes": 10453977661,
-        "gpu_percent": 0,
+        "ram_available_bytes": 36979982336,
+        "swap_used_bytes": 4559470592,
+        "gpu_percent": 34,
         "gpu_temperature_c": null,
         "gpu_power_w": null,
         "disk_total_bytes": 994662584320,
-        "disk_available_bytes": 123356622848
+        "disk_available_bytes": 105910218752
       },
       {
         "id": "dgx",
-        "sampled_at": "2026-10-04T01:43:15Z",
-        "cpu_percent": 0.33333333333332993,
+        "sampled_at": "2026-10-05T01:43:16Z",
+        "cpu_percent": 0.16666666666667052,
         "ram_total_bytes": 130661203968,
-        "ram_available_bytes": 65692610560,
-        "swap_used_bytes": 6573649920,
+        "ram_available_bytes": 67693973504,
+        "swap_used_bytes": 8418996224,
         "gpu_percent": 0.0,
         "gpu_temperature_c": 41.0,
-        "gpu_power_w": 10.51,
+        "gpu_power_w": 10.56,
         "disk_total_bytes": 4031871553536,
-        "disk_available_bytes": 3638932881408
+        "disk_available_bytes": 3638909399040
       }
     ]
   },
   "retos": {
     "estado": "ok",
     "version": 1,
-    "generado": "2026-10-04T01:43:16.281Z",
+    "generado": "2026-10-05T01:43:17.675Z",
     "retos": [
       {
         "titulo_publico": "Que el clon organice la vida en retos",
