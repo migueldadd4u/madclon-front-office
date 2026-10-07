@@ -80,21 +80,21 @@
   "integraciones": [
     {
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-10-05T23:38:48.030453Z",
+      "ultimo_ok": "2026-10-07T00:02:49.829532Z",
       "ultimo_fallo": "2026-09-16T08:53:17.725671Z",
       "detalle": "lectura / autenticación OK",
       "clave": "2a5e3926"
     },
     {
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-10-05T23:38:48.030453Z",
+      "ultimo_ok": "2026-10-07T00:02:49.829532Z",
       "ultimo_fallo": null,
       "detalle": "lectura / autenticación OK",
       "clave": "2c435866"
     },
     {
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-10-05T23:38:48.030453Z",
+      "ultimo_ok": "2026-10-07T00:02:49.829532Z",
       "ultimo_fallo": "2026-09-23T06:53:36.839682Z",
       "detalle": "lectura / autenticación OK",
       "clave": "132b93b4"
@@ -102,20 +102,20 @@
     {
       "estado": "🔴 FALLA",
       "ultimo_ok": "2026-10-04T21:12:52.259737Z",
-      "ultimo_fallo": "2026-10-05T23:38:48.030453Z",
+      "ultimo_fallo": "2026-10-07T00:02:49.829532Z",
       "detalle": "error: b'[AUTHENTICATIONFAILED] Authentication Failed'",
       "clave": "aefcdbb3"
     },
     {
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-10-05T23:38:48.030453Z",
+      "ultimo_ok": "2026-10-07T00:02:49.829532Z",
       "ultimo_fallo": "2026-08-18T12:16:28.636436Z",
       "detalle": "listado / acceso OK",
       "clave": "6b996a58"
     },
     {
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-10-05T23:38:48.030453Z",
+      "ultimo_ok": "2026-10-07T00:02:49.829532Z",
       "ultimo_fallo": null,
       "detalle": "listado / acceso OK",
       "clave": "4f1bcdaf"
@@ -123,11 +123,11 @@
     {
       "estado": "🔴 FALLA",
       "ultimo_ok": "2026-10-04T21:12:52.259737Z",
-      "ultimo_fallo": "2026-10-05T23:38:48.030453Z",
+      "ultimo_fallo": "2026-10-07T00:02:49.829532Z",
       "detalle": "ics_exists=True",
       "clave": "c75c1d4b"
     }
   ],
   "salud_global": "🔴 Hay incidencias activas",
-  "watchdog_ts": "2026-10-05T23:38:48.031942Z"
+  "watchdog_ts": "2026-10-07T00:02:49.830996Z"
 }
