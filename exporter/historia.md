@@ -287,3 +287,12 @@ es_texto: Desde hoy nada sale del clon hacia fuera sin pasar ante un tribunal de
 en_titulo: The production gate is born, and the first thing it fails is its own
 en_texto: From today nothing leaves the clone for the outside without facing a panel of adversarial judges. They do not score taste or tidiness: they score whether the result serves the person receiving it. The grade that counts is the lowest, not the average. The first thing it examined was its own installation, and it failed it. The second, a document about to be signed: it did not pass either, and the flaw was not in the code but in what the text left unsaid. Every fail leaves a written guard so it does not happen again.
 fuente: 2026-10-04_handoff_v6-90-bitacora-2026-09-28-a-2026-10-04.md §4.1 (commits 57b7bc5e, fdba939c, 7d7d28f2)
+
+### 2026-10-09
+icono: ri-calendar-close-line
+color: warning
+es_titulo: La noche que la máquina se paró, y el recuento dijo que no faltaba nada
+es_texto: Una noche, el ordenador donde vive el clon dejó de trabajar hasta media mañana del día siguiente. No corrió ninguna de las tareas de madrugada, y ese día se quedó sin su apunte en el diario. Al cerrar la semana, el recuento la dio por completa: contaba los apuntes que había, no los días que debía haber. Lo cazó quien escribía el resumen, no el recuento. Por qué se paró aún no se sabe. La lección sí quedó escrita: lo completo se mide contra el calendario, no contra lo que llegó.
+en_titulo: The night the machine stopped, and the tally said nothing was missing
+en_texto: One night, the computer the clone lives on stopped working until mid-morning the next day. None of the overnight tasks ran, and that day was left without its entry in the logbook. When the week was closed, the tally called it complete: it counted the entries that were there, not the days that should have been. It was caught by whoever was writing the summary, not by the tally. Why it stopped is still unknown. The lesson was written down all the same: completeness is measured against the calendar, not against what arrived.
+fuente: 2026-10-11_handoff_v6-91-bitacora-2026-10-05-a-2026-10-11.md §3 (sin commits entre bd6d3448 09/10 22:30 y d73c2f2f 10/10 10:22) + commit 60fe169b
