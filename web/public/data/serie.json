@@ -1952,28 +1952,80 @@
     },
     {
       "fecha": "2026-10-09",
-      "ts": 1791509259.064817,
+      "ts": 1791579472.644352,
       "dias": 7,
       "contexto": {
         "llamadas": 835,
-        "tokens": 22076180,
+        "tokens": 22591632,
         "tareas_hechas": 38,
-        "llamadas_router": 623
+        "llamadas_router": 621
       },
       "kpis": {
-        "entrada_por_llamada": 25294.037,
-        "pct_cache": 50.105,
-        "ratio_salida_entrada": 4.525,
-        "pct_local": 9.051,
+        "entrada_por_llamada": 25849.733,
+        "pct_cache": 50.068,
+        "ratio_salida_entrada": 4.666,
+        "pct_local": 9.042,
         "pct_metered": 0.0,
-        "pct_tokens_en_fallo": 46.097,
-        "latencia_p50": 13.44,
-        "tokens_motor_por_tarea": 215811.352,
-        "pct_llamadas_ok": 61.958,
+        "pct_tokens_en_fallo": 47.369,
+        "latencia_p50": 19.02,
+        "tokens_motor_por_tarea": 221473.675,
+        "pct_llamadas_ok": 59.42,
         "tareas_dia": 5.429,
         "reintentos_por_tarea": 1.026,
         "pct_propuestas_atendidas": 12.0,
-        "cobertura_medida": 65.269
+        "cobertura_medida": 63.473
+      }
+    },
+    {
+      "fecha": "2026-10-10",
+      "ts": 1791668903.666374,
+      "dias": 7,
+      "contexto": {
+        "llamadas": 735,
+        "tokens": 21646494,
+        "tareas_hechas": 33,
+        "llamadas_router": 527
+      },
+      "kpis": {
+        "entrada_por_llamada": 28191.161,
+        "pct_cache": 50.552,
+        "ratio_salida_entrada": 4.469,
+        "pct_local": 9.293,
+        "pct_metered": 0.0,
+        "pct_tokens_en_fallo": 48.983,
+        "latencia_p50": 47.72,
+        "tokens_motor_por_tarea": 241715.46,
+        "pct_llamadas_ok": 53.7,
+        "tareas_dia": 4.714,
+        "reintentos_por_tarea": 1.0,
+        "pct_propuestas_atendidas": 12.0,
+        "cobertura_medida": 61.769
+      }
+    },
+    {
+      "fecha": "2026-10-11",
+      "ts": 1791681505.850374,
+      "dias": 7,
+      "contexto": {
+        "llamadas": 732,
+        "tokens": 21607615,
+        "tareas_hechas": 36,
+        "llamadas_router": 524
+      },
+      "kpis": {
+        "entrada_por_llamada": 28267.581,
+        "pct_cache": 50.622,
+        "ratio_salida_entrada": 4.426,
+        "pct_local": 9.31,
+        "pct_metered": 0.0,
+        "pct_tokens_en_fallo": 49.163,
+        "latencia_p50": 48.03,
+        "tokens_motor_por_tarea": 220492.533,
+        "pct_llamadas_ok": 53.435,
+        "tareas_dia": 5.143,
+        "reintentos_por_tarea": 1.0,
+        "pct_propuestas_atendidas": 11.538,
+        "cobertura_medida": 61.885
       }
     }
   ],
