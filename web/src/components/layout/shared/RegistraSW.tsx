@@ -4,7 +4,8 @@
 import { useEffect } from 'react'
 
 // Registra el service worker (PWA mínimo): estáticos offline, páginas con
-// red primero y JSON de /data con caché de un día. Silencioso por diseño:
+// red primero y JSON de /data también con red primero (plazo de 3 s; sin red,
+// lo guardado — ver public/sw.js, v8). Silencioso por diseño:
 // si el navegador no soporta SW o el registro falla, la web funciona igual.
 const RegistraSW = () => {
   useEffect(() => {

@@ -1,7 +1,8 @@
 // MAD Clon — service worker mínimo (PWA de verdad)
 // Estáticos con hash: caché primero (offline total una vez vistos).
 // Páginas HTML: red primero (fresco); sin red, la última versión vista.
-// JSON de /data: caché de UN DÍA — fresco se sirve al instante; viejo o sin red, lo guardado.
+// JSON de /data: RED PRIMERO con plazo de 3 s; sin red, o si tarda y lo guardado es de
+//     menos de un día, lo guardado (desde la v8; hasta la v7, caché de un día sin revalidar).
 // v2: los JSON se clonan antes de sellarlos en caché (arreglo del ERR_FAILED en frío)
 // v3 (13/08/2026): cambia la FORMA de clones.json — los buzones y agendas pasan a
 //     identificarse por `clave` y las palabras de la flota se fueron al build. Un
@@ -28,11 +29,27 @@
 //     siga así, ARREGLAR LA PUBLICACIÓN NO TERMINA HASTA SUBIR ESTA VERSIÓN, que es
 //     lo único que desaloja el lote muerto en el navegador de todo el mundo a la vez.
 // v6 (19/09/2026): overview incorpora hardware; desalojar lotes sin indicadores.
-const VERSION = 'v7' // v7 (24/09/2026): overview gana `retos` (forma nueva, /retos lo pinta): desalojar lotes sin él.
+// v7 (24/09/2026): overview gana `retos` (forma nueva, /retos lo pinta): desalojar lotes sin él.
+// v8 (15/10/2026): los JSON de /data pasan de «primero caché, sin revalidar» a RED PRIMERO
+//     con plazo (PLAZO_RED_MS). Quien volvía a la web veía los datos de ayer hasta 24 h,
+//     y cada parada del refresco se pagaba dos veces (v4, v5). Ahora cada visita pide el
+//     lote a la red y guarda en caché toda respuesta buena, llegue a tiempo o tarde.
+//     El modo avión se mantiene: sin red, lo guardado aunque sea viejo. Si la red tarda
+//     más del plazo, lo guardado solo si es de menos de un día (DIA_MS); si es más viejo,
+//     se espera a la red. Un 5xx también cae a lo guardado; un 4xx no (el fichero ya no
+//     está, y eso se respeta). Arreglar una parada de publicación ya no exige subir VERSION;
+//     cambiar la FORMA de un JSON sí (regla de la v3), porque con red lenta u offline la
+//     página nueva podría recibir un lote guardado de la forma vieja.
+const VERSION = 'v8'
 const ESTATICA = `madclon-estatica-${VERSION}`
 const PAGINAS = `madclon-paginas-${VERSION}`
 const DATOS = `madclon-datos-${VERSION}`
 const DIA_MS = 24 * 60 * 60 * 1000
+
+// Por debajo del FETCH_TIMEOUT_MS de la página (5 s, src/lib/data.ts): si la red tarda, la
+// página tiene que recibir lo guardado antes de rendirse ella. Lo vigila scripts/sw-datos.test.mjs.
+const PLAZO_RED_MS = 3000
+const TARDE = Symbol('tarde')
 
 // Subruta real del despliegue (p. ej. /madclon-front-office), derivada del scope
 const BASE = new URL(self.registration.scope).pathname.replace(/\/$/, '')
@@ -99,36 +116,63 @@ self.addEventListener('fetch', e => {
 
   if (url.origin !== self.location.origin) return
 
-  // JSON con caché de un día
+  // JSON del día: red primero con plazo; sin red o si tarda, lo guardado
   if (esDatos(url.pathname)) {
+    // Cada respuesta buena se guarda, llegue antes o después del plazo: si tarda, la página
+    // ya se llevó lo guardado y esta copia es la de la próxima visita.
+    let guardado = Promise.resolve()
+
+    const red = fetch(req).then(res => {
+      if (res.ok) {
+        const cabeceras = new Headers(res.headers)
+
+        cabeceras.set('sw-fecha', String(Date.now()))
+
+        // Ojo: hay que clonar ANTES de construir la copia sellada. Pasar `res.body`
+        // directamente deja la respuesta original sin cuerpo y la página recibe un
+        // ERR_FAILED en el primer arranque (era la causa del reintento a los 1,5 s).
+        const copia = res.clone()
+
+        guardado = DATOS_P.then(cache => cache.put(req, new Response(copia.body, { status: copia.status, statusText: copia.statusText, headers: cabeceras })))
+      }
+
+      return res
+    })
+
+    // Que el SW siga vivo hasta guardar la respuesta aunque la página ya tenga la suya.
+    e.waitUntil(red.then(() => guardado, () => {}).catch(() => {}))
+
     e.respondWith(
       (async () => {
         const cache = await DATOS_P
-        const guardada = await cache.match(req)
-        const fecha = guardada && Number(guardada.headers.get('sw-fecha'))
 
-        if (guardada && fecha && Date.now() - fecha < DIA_MS) return guardada
+        // Un 5xx es el servidor fallando: lo guardado, si lo hay. Un 4xx se respeta.
+        const deLaRed = async res => (res.status >= 500 && (await cache.match(req))) || res
+        let plazo
+
+        const tarde = new Promise(resolve => {
+          plazo = setTimeout(() => resolve(TARDE), PLAZO_RED_MS)
+        })
 
         try {
-          const res = await fetch(req)
+          const res = await Promise.race([red, tarde])
 
-          if (res.ok) {
-            const cabeceras = new Headers(res.headers)
+          if (res !== TARDE) return await deLaRed(res)
 
-            cabeceras.set('sw-fecha', String(Date.now()))
+          // La red tarda: lo guardado si es de menos de un día; si no, se sigue esperando a la red.
+          const guardada = await cache.match(req)
+          const fecha = guardada && Number(guardada.headers.get('sw-fecha'))
 
-            // Ojo: hay que clonar ANTES de construir la copia sellada. Pasar `res.body`
-            // directamente deja la respuesta original sin cuerpo y la página recibe un
-            // ERR_FAILED en el primer arranque (era la causa del reintento a los 1,5 s).
-            const copia = res.clone()
+          if (guardada && fecha && Date.now() - fecha < DIA_MS) return guardada
 
-            cache.put(req, new Response(copia.body, { status: copia.status, statusText: copia.statusText, headers: cabeceras }))
-          }
-
-          return res
+          return await deLaRed(await red)
         } catch (err) {
-          if (guardada) return guardada // sin red: sirve lo guardado aunque esté viejo
+          const guardada = await cache.match(req)
+
+          if (guardada) return guardada // sin red (modo avión): sirve lo guardado aunque esté viejo
           throw err
+        } finally {
+          clearTimeout(plazo)
         }
       })()
     )
