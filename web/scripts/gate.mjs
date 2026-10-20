@@ -287,10 +287,18 @@ function estaticas() {
 
   marca(2, 'tsc + eslint + stylelint (sin regresión)', ok2, detalle.join(' · '))
 
-  // 3 · cifras a mano
+  // 3 · cifras a mano; el guion sintético no abre una exención para métricas.
+  let regresionesHardcode = true
+
+  try {
+    sh('node --test scripts/check-hardcode.test.mjs')
+  } catch {
+    regresionesHardcode = false
+  }
+
   const h = comprobarHardcode(RAIZ)
 
-  marca(3, 'check-hardcode (eje 7)', h.fallos.length === 0, `${h.fallos.length} fallos · ${h.deudas.length} deudas`)
+  marca(3, 'check-hardcode (eje 7)', h.fallos.length === 0 && regresionesHardcode, `${h.fallos.length} fallos · ${h.deudas.length} deudas · regresiones ${regresionesHardcode ? 'PASS' : 'FAIL'}`)
 
   // 4 · identidad y tecnicismos
   const c = comprobarCopy(RAIZ)
