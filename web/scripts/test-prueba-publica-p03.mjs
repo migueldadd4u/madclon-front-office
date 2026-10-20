@@ -197,18 +197,26 @@ async function continuidadTeclado(page) {
 
 async function editorial(page, idioma) {
   const demo = page.locator('section[aria-labelledby="demostracion"]')
-  const texto = await demo.innerText()
 
   assert.match(await demo.locator('[data-demo-sintetica]').innerText(), idioma === 'es' ? /Demostración sintética[\s\S]*inventados[\s\S]*No son un correo real ni un resultado de cliente/ : /Synthetic demonstration[\s\S]*invented[\s\S]*not a real email or a client result/)
-  assert.equal(await demo.locator('time').getAttribute('datetime'), '2026-10-18')
-  assert.match(await demo.locator('time').innerText(), idioma === 'es' ? /18 de octubre de 2026.*fuente: mensaje de ejemplo de esta página/ : /18 October 2026.*source: the sample message on this page/)
-  assert.equal(await demo.locator('#mensaje-sintetico').innerText(), idioma === 'es' ? 'Tenemos una propuesta para revisar. Reúne los antecedentes e indica qué información falta antes de decidir.' : 'We have a proposal to review. Gather the background and identify what information is missing before deciding.')
+  assert.equal(await demo.locator('time').getAttribute('datetime'), '2026-10-20')
+  assert.match(await demo.locator('time').innerText(), idioma === 'es' ? /20 de octubre de 2026.*fuentes: correo, nota y agenda ficticios/ : /20 October 2026.*sources: the fictional email, note and calendar/)
+  assert.equal(await demo.locator('[data-demo-etapa]').count(), 4, 'el caso tiene entrada, trabajo, entrega y decisión humana')
+  assert.equal(await demo.locator('[data-demo-fuentes] dt').count(), 3, 'se pueden leer las tres fuentes usadas')
+  assert.match(await demo.locator('#mensaje-sintetico').innerText(), /10:00/)
+  const fuentes = await demo.locator('[data-demo-fuentes]').innerText()
 
-  const fragmentos = idioma === 'es'
-    ? ['Una entrada ordenada', 'Origen', 'Mensaje sintético de esta página', 'Petición', 'Siguiente paso propuesto', 'Una propuesta para revisar', 'Solo el mensaje de ejemplo.', 'No se ha adjuntado la propuesta ni sus antecedentes. No hay base para recomendar su aprobación.', 'Revisión humana pendiente', 'No se ha enviado ninguna petición.']
-    : ['An organized entry', 'Origin', 'Synthetic message on this page', 'Request', 'Proposed next step', 'A proposal to review', 'Only the sample message.', 'Neither the proposal nor its background is attached. There is no basis to recommend approval.', 'Human review pending', 'No request has been sent.']
+  assert.match(fuentes, /10:00[\s\S]*11:00[\s\S]*11:30[\s\S]*12:00/, 'agenda y conflicto visibles')
+  assert.match(fuentes, idioma === 'es' ? /no ha autorizado el acceso a su buzón/ : /has not yet been authorised/, 'no se inventa acceso a otro buzón')
+  const borrador = await demo.locator('[data-demo-borrador]').innerText()
 
-  for (const fragmento of fragmentos) assert.ok(texto.includes(fragmento), `demo conserva ${fragmento}`)
+  assert.match(borrador, /11:30[\s\S]*30/, 'la respuesta propone la franja libre de la fuente')
+  assert.match(borrador, idioma === 'es' ? /tres ejemplos sin datos personales/ : /three examples without personal data/)
+  const humano = await demo.locator('[data-demo-etapa="4"]').innerText()
+
+  assert.match(humano, idioma === 'es' ? /envías tú la respuesta revisada/ : /send the reviewed reply yourself/, 'la persona decide y envía')
+  assert.match(await demo.locator('[data-demo-estado-final]').innerText(), idioma === 'es' ? /reunión pendiente de confirmación/ : /meeting awaiting confirmation/, 'proponer hora no equivale a confirmar reunión')
+  assert.equal(await demo.locator('form').count(), 0, 'el relato no ejecuta una acción de negocio')
   const limites = await page.locator('#limite-0-contenido').innerText()
 
   assert.match(limites, idioma === 'es' ? /no acredita precisión[\s\S]*ahorro ni resultados comerciales[\s\S]*trabajo en curso no es un éxito de cliente/ : /does not establish AI accuracy[\s\S]*savings or commercial results[\s\S]*work in progress is not a client success/)
