@@ -1,6 +1,3 @@
-// MUI Imports
-import Button from '@mui/material/Button'
-
 // Type Imports
 import type { ChildrenType } from '@core/types'
 
@@ -17,6 +14,7 @@ import Navbar from '@components/layout/vertical/Navbar'
 import VerticalFooter from '@components/layout/vertical/Footer'
 import HorizontalFooter from '@components/layout/horizontal/Footer'
 import ScrollToTop from '@core/components/scroll-to-top'
+import SubirAlInicio from '@/components/layout/shared/SubirAlInicio'
 
 // Util Imports
 import { getMode, getSystemMode } from '@core/utils/serverHelpers'
@@ -47,9 +45,7 @@ const Layout = async (props: ChildrenType) => {
         }
       />
       <ScrollToTop className='mui-fixed'>
-        <Button variant='contained' className='is-10 bs-10 rounded-full p-0 min-is-0 flex items-center justify-center'>
-          <i className='ri-arrow-up-line' />
-        </Button>
+        <SubirAlInicio />
       </ScrollToTop>
     </Providers>
   )

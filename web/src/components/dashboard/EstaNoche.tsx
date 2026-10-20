@@ -56,7 +56,7 @@ const EstaNoche = ({ data }: { data: PanelData }) => {
         <div className='flex flex-wrap items-center justify-between gap-2'>
           <div className='flex items-center gap-2'>
             <i className='ri-moon-clear-line text-2xl text-primary' aria-hidden='true' />
-            <Typography variant='h6'>{t('noche_titulo')}</Typography>
+            <Typography component='h2' variant='h6'>{t('noche_titulo')}</Typography>
           </div>
           <Typography variant='caption' color='text.secondary'>
             {reemplaza(t('noche_caption'), { fecha })}

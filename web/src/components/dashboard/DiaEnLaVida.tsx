@@ -30,9 +30,9 @@ type Props = { crons: Cron[] }
 /**
  * «Un día en la vida del clon» — franja de 24 h con un punto por rutina real,
  * en la hora en que corrió por última vez, y una línea «ahora» que se mueve.
- * Solo usa los datos ya públicos de overview.json. Accesible: cada punto es
- * un botón con tooltip también por teclado; la franja entera tiene resumen
- * textual para lectores de pantalla.
+ * Solo usa los datos ya públicos de overview.json. Los puntos conservan el
+ * tooltip visual y no simulan acciones. La lista complementaria de rutinas y
+ * horarios se abre con teclado; conserva nombres y últimas ejecuciones exactas.
  */
 const DiaEnLaVida = ({ crons }: Props) => {
   const { t } = useLang()
@@ -110,7 +110,7 @@ const DiaEnLaVida = ({ crons }: Props) => {
     <Card>
       <CardContent className='flex flex-col gap-3'>
         <div className='flex flex-wrap items-baseline justify-between gap-2'>
-          <Typography variant='h6'>{t('dia_titulo')}</Typography>
+          <Typography component='h2' variant='h6'>{t('dia_titulo')}</Typography>
           <Typography variant='caption' color='text.secondary'>{t('dia_caption')}</Typography>
         </div>
         <Box sx={{ position: 'relative' }}>
@@ -118,7 +118,8 @@ const DiaEnLaVida = ({ crons }: Props) => {
             ref={pistaRef}
             onScroll={alDesplazar}
             className='fo-pista'
-            sx={{ overflowX: 'auto', pb: 1 }}
+            tabIndex={0}
+            sx={{ overflowX: 'auto', pb: 1, '&:focus-visible': { outline: '2px solid', outlineColor: 'primary.main', outlineOffset: 2, borderRadius: 1 } }}
             role='group'
             aria-label={`${t('dia_titulo')}: ${resumen}`}
           >
@@ -151,8 +152,8 @@ const DiaEnLaVida = ({ crons }: Props) => {
                 arrow
               >
                 <Box
-                  component='button'
-                  type='button'
+                  component='span'
+                  role='img'
                   aria-label={`${p.nombre}, ${String(Math.floor(p.hora)).padStart(2, '0')}:${String(Math.round((p.hora % 1) * 60)).padStart(2, '0')}`}
                   sx={{
                     position: 'absolute',
@@ -187,8 +188,8 @@ const DiaEnLaVida = ({ crons }: Props) => {
                   cursor: 'default'
                 }}
                 aria-label={t('dia_ahora')}
-                component='button'
-                type='button'
+                component='span'
+                role='img'
               />
             </Tooltip>
             </Box>
@@ -242,6 +243,31 @@ const DiaEnLaVida = ({ crons }: Props) => {
             </Typography>
           )}
         </div>
+        <Box
+          component='details'
+          data-rutinas-accesibles
+          sx={{
+            '& > summary': {
+              minHeight: 44,
+              cursor: 'pointer',
+              alignContent: 'center',
+              borderRadius: 1,
+              px: 1,
+              '&:focus-visible': { outline: '2px solid', outlineColor: 'primary.main', outlineOffset: 2 }
+            }
+          }}
+        >
+          <Box component='summary'>{t('dia_lista')}</Box>
+          <Box component='ul' sx={{ m: 0, pl: 5 }}>
+            {crons.map(cron => (
+              <Box component='li' key={cron.nombre} sx={{ py: 1 }}>
+                <Typography component='span' fontWeight={600}>{cron.nombre}</Typography>
+                {' · '}
+                <Typography component='span' color='text.secondary'>{cron.ultima || '—'}</Typography>
+              </Box>
+            ))}
+          </Box>
+        </Box>
       </CardContent>
     </Card>
   )

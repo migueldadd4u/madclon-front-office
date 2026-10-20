@@ -10,12 +10,16 @@ import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import Chip from '@mui/material/Chip'
 import Box from '@mui/material/Box'
+import Accordion from '@mui/material/Accordion'
+import AccordionSummary from '@mui/material/AccordionSummary'
+import AccordionDetails from '@mui/material/AccordionDetails'
 import { BarChart, Bar, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
 // Component Imports
 import DataGate from '@/components/dashboard/DataGate'
 import StatCard from '@/components/dashboard/StatCard'
 import HeroClon from '@/components/dashboard/HeroClon'
+import EscaparateClon from '@/components/dashboard/EscaparateClon'
 import HardwareOverview from '@/components/dashboard/HardwareOverview'
 import ClonOpina from '@/components/dashboard/ClonOpina'
 import EstaNoche from '@/components/dashboard/EstaNoche'
@@ -66,58 +70,15 @@ function fraseEstado(data: PanelData, lang: Lang, t: (k: StrKey) => string): str
   return partes.join(', ') + '.'
 }
 
-const PASOS = [
-  {
-    icon: 'ri-inbox-line',
-    es: {
-      titulo: 'Captura',
-      texto: 'Todo lo que llega — correos, WhatsApp, notas, citas — entra en una bandeja única. Nada se pierde: cada cosa queda clasificada o esperando su turno.'
-    },
-    en: {
-      titulo: 'Capture',
-      texto: 'Everything that arrives — mail, WhatsApp, notes, appointments — goes into a single inbox. Nothing is lost: everything gets sorted or waits its turn.'
-    }
-  },
-  {
-    icon: 'ri-brain-line',
-    es: {
-      titulo: 'Piensa',
-      texto: 'Un consejo de varios modelos de IA (GPT, Grok, Kimi, GLM…) contrasta opiniones antes de proponer nada. Las decisiones importantes siempre las toma el humano.'
-    },
-    en: {
-      titulo: 'Think',
-      texto: 'A council of several AI models (GPT, Grok, Kimi, GLM…) compares opinions before proposing anything. The important decisions are always made by the human.'
-    }
-  },
-  {
-    icon: 'ri-hand-heart-line',
-    es: {
-      titulo: 'Actúa',
-      texto: 'Prepara borradores, persigue respuestas que se deben, monta dossieres y deja las propuestas listas para que MAD solo tenga que decir sí o no.'
-    },
-    en: {
-      titulo: 'Act',
-      texto: 'It prepares drafts, chases owed replies, builds dossiers and leaves proposals ready so MAD only has to say yes or no.'
-    }
-  },
-  {
-    icon: 'ri-line-chart-line',
-    es: {
-      titulo: 'Se mide',
-      texto: 'Cada noche se audita a sí mismo: cuánto gasta, cuánto falla, si hoy es mejor que ayer. Los números de este panel son esa autoauditoría, en directo.'
-    },
-    en: {
-      titulo: 'Measure',
-      texto: 'Every night it audits itself: how much it spends, how often it fails, whether today is better than yesterday. The numbers on this dashboard are that self-audit, live.'
-    }
-  }
-]
-
 const InicioPage = () => {
   const { lang, t } = useLang()
   const [diaSel, setDiaSel] = useState<number | null>(null)
 
   return (
+    <div className='flex flex-col gap-8'>
+      <HeroClon />
+      <EscaparateClon />
+      <section aria-label={t('home_sistema')}>
     <DataGate necesita={['overview', 'tokens', 'clones', 'manifest', 'serie']} fallback={partial => <HardwareOverview hardware={partial.overview?.hardware} />}>
       {data => {
         const { overview, tokens, clones, manifest } = data
@@ -140,11 +101,15 @@ const InicioPage = () => {
         const pctDia = (v: number) => (mediaTokens > 0 ? Math.round((v / mediaTokens) * 100) : null)
 
         return (
+          <>
+            <DatoRancio generado={manifest.generado} />
+            <Accordion slotProps={{ transition: { unmountOnExit: true } }}>
+              <AccordionSummary id='sistema-por-dentro' aria-controls='sistema-contenido' expandIcon={<i className='ri-arrow-down-s-line' aria-hidden='true' />} sx={{ minBlockSize: 56 }}>
+                <Typography component='span' fontWeight={600}>{t('home_sistema')}</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Typography color='text.secondary' sx={{ mb: 4 }}>{t('home_sistema_sub')} {lang === 'en' ? 'Data generated on' : 'Datos generados el'} {fmtFecha(manifest.generado)}.</Typography>
           <Grid container spacing={6}>
-            {/* Si el refresco nocturno no ha corrido, la web lo confiesa (eje 7) */}
-            <Grid size={12} className='empty:hidden'>
-              <DatoRancio generado={manifest.generado} />
-            </Grid>
 
             {/* Cabecera de informe — solo aparece en papel */}
             <Grid size={12} className='fo-print-only'>
@@ -161,9 +126,6 @@ const InicioPage = () => {
 
             {/* Identidad, utilidad y siguiente gesto antes del detalle del sistema. */}
             <Grid size={12}>
-              <HeroClon
-                frescura={`${lang === 'en' ? 'data generated on' : 'datos generados el'} ${fmtFecha(manifest.generado)}`}
-              />
               <Box sx={{ mt: 3, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 3 }}>
                 <Box component='details' sx={{ flex: '1 1 240px', minInlineSize: 0 }}>
                   <Box component='summary' sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 2, minBlockSize: 48, cursor: 'pointer', '&:focus-visible': { outline: '2px solid', outlineColor: 'primary.main', outlineOffset: 3, borderRadius: 1 } }}>
@@ -188,16 +150,6 @@ const InicioPage = () => {
 
             <Grid size={12}>
               <HardwareOverview hardware={overview.hardware} />
-            </Grid>
-
-            {/* El clon opina */}
-            <Grid size={12}>
-              <ClonOpina data={data} />
-            </Grid>
-
-            {/* El clon te cuenta su noche */}
-            <Grid size={12}>
-              <EstaNoche data={data} />
             </Grid>
 
             {/* Cifras de cabecera — count-up animado al cargar */}
@@ -244,28 +196,19 @@ const InicioPage = () => {
               />
             </Grid>
 
-            {/* Qué es */}
+          </Grid>
+              </AccordionDetails>
+            </Accordion>
+            <Grid container spacing={6} data-actividad-publica>
+            {/* El clon opina */}
             <Grid size={12}>
-              <Typography id='como-funciona' tabIndex={-1} component='h2' variant='h5' className='mbe-1' sx={{ scrollMarginBlockStart: 100 }}>
-                {t('home_quees_titulo').replace('{n}', String(PASOS.length))}
-              </Typography>
-              <Typography color='text.secondary'>{t('home_quees_sub')}</Typography>
-              <Typography color='text.secondary' sx={{ mt: 2, maxInlineSize: '75ch' }}>{t('home_intro')}</Typography>
+              <ClonOpina data={data} />
             </Grid>
-            {PASOS.map((p, i) => (
-              <Grid key={p.icon} size={{ xs: 12, sm: 6, lg: 3 }}>
-                <Card className='bs-full fo-card-hover'>
-                  <CardContent className='flex flex-col gap-2'>
-                    <div className='flex items-center justify-between'>
-                      <i className={`${p.icon} text-3xl text-primary`} />
-                      <Typography variant='caption' color='text.secondary' className='font-mono'>0{i + 1}</Typography>
-                    </div>
-                    <Typography variant='h6'>{p[lang].titulo}</Typography>
-                    <Typography variant='body2' color='text.secondary'>{p[lang].texto}</Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
+
+            {/* El clon te cuenta su noche */}
+            <Grid size={12}>
+              <EstaNoche data={data} />
+            </Grid>
 
             {/* Un día en la vida del clon */}
             <Grid size={12}>
@@ -277,7 +220,7 @@ const InicioPage = () => {
               <Card>
                 <CardContent className='flex flex-col gap-2'>
                   <div className='flex flex-wrap items-baseline justify-between gap-2'>
-                    <Typography variant='h6'>{t('home_pulso_titulo')}</Typography>
+                    <Typography component='h2' variant='h6'>{t('home_pulso_titulo')}</Typography>
                     <Typography variant='caption' color='text.secondary'>
                       {t('home_pulso_caption')}
                     </Typography>
@@ -415,10 +358,13 @@ const InicioPage = () => {
                 </CardContent>
               </Card>
             </Grid>
-          </Grid>
+            </Grid>
+          </>
         )
       }}
     </DataGate>
+      </section>
+    </div>
   )
 }
 

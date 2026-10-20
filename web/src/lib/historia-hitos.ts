@@ -177,6 +177,15 @@ export const HITOS_BUILD: Hito[] = [
     "en_texto": "This timeline stops being hand-written inside the site: chapters and figures now come from the nightly refresh, and if a chapter runs late the page says so itself."
   },
   {
+    "fecha": "2026-09-03",
+    "icono": "ri-parent-line",
+    "color": "success",
+    "es_titulo": "El clon tiene un hijo",
+    "es_texto": "Nace el primer clon derivado: otra persona de la familia estrena el suyo, con su propia casa, su propia memoria y su propio canal. Sale del mismo molde que el Clon de MAD, pero no hereda ni una sola llave.",
+    "en_titulo": "The clone has a child",
+    "en_texto": "The first derived clone is born: another family member gets their own, with its own home, its own memory and its own channel. It comes from the same mould as MAD's clone, but does not inherit a single key."
+  },
+  {
     "fecha": "2026-09-05",
     "icono": "ri-focus-3-line",
     "color": "primary",
@@ -184,5 +193,77 @@ export const HITOS_BUILD: Hito[] = [
     "es_texto": "El clon deja de ordenar la vida en listas y empieza a ordenarla en retos: cosas que se empiezan para terminarlas, con su plan, sus pasos y un avance que se ve. Cuando le llega su momento, el panel privado enseña uno solo y aparta todo lo demás.",
     "en_titulo": "The challenge is born",
     "en_texto": "The clone stops arranging life as lists and starts arranging it as challenges: things you begin in order to finish them, with a plan, steps and progress you can see. When its moment comes, the private panel shows one and sets everything else aside."
+  },
+  {
+    "fecha": "2026-09-06",
+    "icono": "ri-flashlight-line",
+    "color": "warning",
+    "es_titulo": "Se va la luz, y el clon sigue",
+    "es_texto": "No fue un simulacro: hubo un corte de luz de verdad y el clon lo aguantó. El apagón real enseñó lo que la prueba en seco no ve: un vigilante que no se enteraba del corte y un apagado ordenado que se atascaba esperando permiso. Las dos cosas quedaron arregladas ese mismo día.",
+    "en_titulo": "The power goes out, and the clone carries on",
+    "en_texto": "It was not a drill: there was a real power cut and the clone rode it out. The real outage taught what a dry run cannot: a watchdog that did not notice the cut and an orderly shutdown that got stuck waiting for permission. Both were fixed that same day."
+  },
+  {
+    "fecha": "2026-09-13",
+    "icono": "ri-search-eye-line",
+    "color": "error",
+    "es_titulo": "El clon se pilla en una mentira",
+    "es_texto": "El clon descubre que su propia memoria daba por hecho algo que nunca había pasado, y que llevaba tiempo repitiéndolo. Se corrige en la fuente y la lección queda escrita: lo que el clon recuerda también hay que comprobarlo.",
+    "en_titulo": "The clone catches itself in a lie",
+    "en_texto": "The clone discovers that its own memory took for granted something that never happened, and had been repeating it for a while. It is corrected at the source and the lesson is written down: what the clone remembers must be checked too."
+  },
+  {
+    "fecha": "2026-09-20",
+    "icono": "ri-ruler-line",
+    "color": "info",
+    "es_titulo": "Medir al que mide",
+    "es_texto": "Tres agentes trabajan a la vez y cada uno revisa el trabajo del otro. Salen a la luz comprobaciones que daban verde midiendo algo distinto de lo que decían medir, y ninguna la cazó quien la había escrito: las cazó el vecino. Lo que funcionó no fue coordinarse, fue medirse entre ellos.",
+    "en_titulo": "Measuring the measurer",
+    "en_texto": "Three agents work at once and each one reviews the others' work. Checks come to light that came back green while measuring something other than what they claimed to measure, and none was caught by whoever wrote it: the neighbour caught them. What worked was not coordinating, it was measuring each other."
+  },
+  {
+    "fecha": "2026-09-27",
+    "icono": "ri-git-merge-line",
+    "color": "warning",
+    "es_titulo": "La memoria se parte, y se vuelve a unir",
+    "es_texto": "El robot que sincroniza la memoria privada del clon se paraba sin avisar en cuanto un agente reservaba un fichero, fuera cual fuera. Durante días, la copia de casa y la de fuera siguieron caminos distintos, y cada una creía ser la memoria entera. No lo vio el robot: lo cazó otro agente. Se unieron sin perder nada, y el robot aprendió a apartar solo lo reservado y seguir. La lección: la sincronización se vigila comparando las copias, no mirando si el robot corrió.",
+    "en_titulo": "The memory splits, and comes back together",
+    "en_texto": "The robot that syncs the clone's private memory would stop without a word whenever an agent reserved any file at all. For days, the home copy and the outside copy went separate ways, and each believed it was the whole memory. The robot did not notice: another agent caught it. They were joined back without losing anything, and the robot learned to set aside only what is reserved and carry on. The lesson: syncing is watched by comparing the copies, not by checking whether the robot ran."
+  },
+  {
+    "fecha": "2026-09-27",
+    "icono": "ri-user-unfollow-line",
+    "color": "error",
+    "es_titulo": "El clon confunde a su dueño con otro",
+    "es_texto": "Al poner nombre a contactos de los que solo sabía el teléfono y una conversación, el clon propuso a MAD como la otra persona: en cada chat, el nombre que más se repite es el del dueño. Se deshizo y quedó una guardia. La regla vale para cualquier clon: el dueño nunca es candidato a ser un tercero.",
+    "en_titulo": "The clone mistakes its owner for someone else",
+    "en_texto": "While naming contacts it only knew by phone number and a conversation, the clone proposed MAD as the other person: in every chat, the name that appears most is the owner's. It was undone and a guard was put in place. The rule holds for any clone: the owner is never a candidate to be someone else."
+  },
+  {
+    "fecha": "2026-10-01",
+    "icono": "ri-file-damage-line",
+    "color": "error",
+    "es_titulo": "Un carácter de más deja ciega una pantalla",
+    "es_texto": "Algunos ficheros de la memoria privada los lee una máquina estricta: ante cualquier cosa fuera de formato, rechaza el fichero entero y no avisa. Esta semana pasó varias veces. Un salto de línea que faltaba al final dejó el resumen nocturno de los mensajes sin generarse noches seguidas. Una cabecera incompleta y una nota pegada donde no tocaba vaciaron secciones del panel privado. Ninguna la vio quien escribió: las cazaron las comprobaciones de otro agente. La lección quedó en regla: si el lector rechaza en silencio, la comprobación va en la mano del que escribe, antes de guardar.",
+    "en_titulo": "One stray character blinds a screen",
+    "en_texto": "Some files in the private memory are read by a strict machine: anything out of format and it rejects the whole file without a word. This week it happened several times. A missing line break at the end left the nightly summary of messages ungenerated for nights in a row. An incomplete heading and a note pasted where it did not belong emptied sections of the private panel. None was spotted by whoever wrote it: another agent's checks caught them. The lesson became a rule: if the reader rejects in silence, the check belongs in the writer's hand, before saving."
+  },
+  {
+    "fecha": "2026-10-01",
+    "icono": "ri-door-lock-line",
+    "color": "primary",
+    "es_titulo": "Nace la puerta de producción, y lo primero que suspende es lo propio",
+    "es_texto": "Desde hoy nada sale del clon hacia fuera sin pasar ante un tribunal de jueces adversariales. No puntúan gusto ni limpieza: puntúan si el resultado sirve a quien lo recibe. La nota que cuenta es la más baja, no la media. Lo primero que examinó fue su propia instalación, y la suspendió. Lo segundo, un documento que estaba a punto de firmarse: tampoco pasó, y el fallo no estaba en el código, sino en lo que el texto no decía. Cada suspenso deja escrita una guardia para que no se repita.",
+    "en_titulo": "The production gate is born, and the first thing it fails is its own",
+    "en_texto": "From today nothing leaves the clone for the outside without facing a panel of adversarial judges. They do not score taste or tidiness: they score whether the result serves the person receiving it. The grade that counts is the lowest, not the average. The first thing it examined was its own installation, and it failed it. The second, a document about to be signed: it did not pass either, and the flaw was not in the code but in what the text left unsaid. Every fail leaves a written guard so it does not happen again."
+  },
+  {
+    "fecha": "2026-10-09",
+    "icono": "ri-calendar-close-line",
+    "color": "warning",
+    "es_titulo": "La noche que la máquina se paró, y el recuento dijo que no faltaba nada",
+    "es_texto": "Una noche, el ordenador donde vive el clon dejó de trabajar hasta media mañana del día siguiente. No corrió ninguna de las tareas de madrugada, y ese día se quedó sin su apunte en el diario. Al cerrar la semana, el recuento la dio por completa: contaba los apuntes que había, no los días que debía haber. Lo cazó quien escribía el resumen, no el recuento. Por qué se paró aún no se sabe. La lección sí quedó escrita: lo completo se mide contra el calendario, no contra lo que llegó.",
+    "en_titulo": "The night the machine stopped, and the tally said nothing was missing",
+    "en_texto": "One night, the computer the clone lives on stopped working until mid-morning the next day. None of the overnight tasks ran, and that day was left without its entry in the logbook. When the week was closed, the tally called it complete: it counted the entries that were there, not the days that should have been. It was caught by whoever was writing the summary, not by the tally. Why it stopped is still unknown. The lesson was written down all the same: completeness is measured against the calendar, not against what arrived."
   }
 ]

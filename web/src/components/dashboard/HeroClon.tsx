@@ -21,8 +21,9 @@ import { useLang } from '@/lib/i18n'
 import styles from './HeroClon.module.css'
 
 type Props = {
+
   /** Fecha de generación del lote, ya formateada y con su etiqueta. */
-  frescura: string
+  frescura?: string
 }
 
 const HeroClon = ({ frescura }: Props) => {
@@ -40,7 +41,7 @@ const HeroClon = ({ frescura }: Props) => {
       <div className={styles.contenido}>
         <p className={styles.eyebrow}>
           <span className={styles.punto} aria-hidden='true' />
-          <span className={styles.fecha}>{frescura}</span>
+          <span className={styles.fecha}>{frescura ?? t('home_eyebrow')}</span>
         </p>
 
         <TarjetaDelClon compacta />
@@ -54,12 +55,14 @@ const HeroClon = ({ frescura }: Props) => {
             {t('home_explorar')}
             <i className='ri-arrow-right-line' aria-hidden='true' />
           </Link>
-          <a href='#como-funciona' className={styles.secundaria}>
+          <Link href='#demostracion' className={styles.secundaria}>
             {t('home_como')}
-          </a>
+          </Link>
         </div>
 
-        <p className={styles.pie}>{t('home_caption_datos')}</p>
+        <p className={styles.pie}>
+          <Link href='#limites-privacidad' className={styles.privacidad}>{t('home_privacidad_limites')}</Link>
+        </p>
       </div>
     </header>
   )

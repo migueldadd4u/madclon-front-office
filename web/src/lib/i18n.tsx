@@ -17,7 +17,13 @@ const STR = {
   },
 
   // ------------------------------------------------------------- navegación
-  nav_panel: { es: 'Panel', en: 'Home' },
+  nav_sistema: { es: 'El sistema por dentro', en: 'Inside the system' },
+  modo_cambiar: { es: 'Cambiar apariencia: {modo}', en: 'Change appearance: {modo}' },
+  modo_titulo: { es: 'Apariencia', en: 'Appearance' },
+  modo_claro: { es: 'Claro', en: 'Light' },
+  modo_oscuro: { es: 'Oscuro', en: 'Dark' },
+  modo_sistema: { es: 'Sistema', en: 'System' },
+  nav_panel: { es: 'Inicio', en: 'Home' },
   nav_flota: { es: 'La flota', en: 'The fleet' },
   nav_hardware: { es: 'Hardware', en: 'Hardware' },
   nav_salud: { es: 'Salud', en: 'Health' },
@@ -50,7 +56,10 @@ const STR = {
     en: 'Enter the private panel of the Clon de MAD — it will ask you to identify yourself'
   },
   menu_abrir: { es: 'Abrir o cerrar el menú', en: 'Open or close the menu' },
-  kiosk_entrar: { es: 'Modo presentación: oculta menús y muestra solo el panel', en: 'Presentation mode: hides menus and shows only the dashboard' },
+  kiosk_entrar: {
+    es: 'Modo presentación: oculta menús y muestra solo el panel',
+    en: 'Presentation mode: hides menus and shows only the dashboard'
+  },
   kiosk_salir: { es: 'Salir (Esc)', en: 'Exit (Esc)' },
 
   // atajos de teclado (g + letra para navegar, ? para la ayuda)
@@ -63,13 +72,23 @@ const STR = {
   atajos_ayuda_fila: { es: 'mostrar u ocultar esta ayuda', en: 'show or hide this help' },
 
   // ------------------------------------------------------------- portada
-  home_titulo: { es: 'La sala de control del Clon de MAD', en: 'The MAD Clone control room' },
-  home_resumen: {
-    es: 'Organiza lo que llega, prepara decisiones y deja su trabajo a la vista. Explora qué hace y cómo funciona.',
-    en: 'It organizes what comes in, prepares decisions and makes its work visible. Explore what it does and how it works.'
+  home_titulo: {
+    es: 'De información dispersa a un siguiente paso claro',
+    en: 'From scattered information to a clear next step'
   },
-  home_explorar: { es: 'Explorar los retos', en: 'Explore the challenges' },
-  home_como: { es: 'Cómo funciona', en: 'How it works' },
+  home_eyebrow: { es: 'El Clon de MAD · explora una colaboración', en: 'The MAD Clone · explore a collaboration' },
+  home_resumen: {
+    es: 'Organiza entradas, prepara decisiones con contexto y sigue los trabajos. Mira qué entrega el clon y qué sigue decidiendo una persona.',
+    en: 'Organize incoming information, prepare decisions with context and follow work. See what the clone delivers and what a person still decides.'
+  },
+  home_explorar: { es: 'Ver un caso', en: 'See a case' },
+  home_como: { es: 'Ver una demostración', en: 'See a demonstration' },
+  home_privacidad_limites: { es: 'Privacidad y límites', en: 'Privacy and limits' },
+  home_sistema: { es: 'Ver el sistema por dentro', en: 'See inside the system' },
+  home_sistema_sub: {
+    es: 'Métricas del lote publicado, con su fecha. El volumen de tokens no mide ahorro ni retorno económico.',
+    en: 'Metrics from the published data, with their date. Token volume does not measure savings or financial return.'
+  },
   home_estado: { es: 'Estado del sistema', en: 'System status' },
   home_intro: {
     es: 'Un equipo de inteligencia artificial que trabaja mientras Miguel Ángel Domínguez (MAD) vive su vida: lee el correo, clasifica lo importante, prepara decisiones, vigila el patrimonio y se mejora a sí mismo cada noche. Esta web es su cuadro de mandos — los mismos números que ve él, explicados para personas.',
@@ -93,8 +112,8 @@ const STR = {
     en: 'These figures are from {fecha}: the nightly refresh has not run for {horas} h. We say so instead of showing you an old number with a fresh face.'
   },
   home_caption_datos: {
-    es: 'solo cifras agregadas, sin información personal',
-    en: 'aggregated figures only, no personal information'
+    es: 'ejemplos sintéticos y retos autorizados; sin datos privados',
+    en: 'synthetic examples and authorized challenges; no private data'
   },
   home_stat_tokens: { es: 'trabajo de IA en 30 días', en: 'AI work in 30 days' },
   home_stat_clones: { es: 'clones con oficio propio', en: 'clones with their own craft' },
@@ -259,6 +278,7 @@ const STR = {
   retenido_fecha: { es: 'Comprobación de seguridad: {fecha}', en: 'Safety check: {fecha}' },
 
   // un día en la vida del clon
+  dia_lista: { es: 'Ver rutinas y horarios', en: 'View routines and times' },
   dia_titulo: { es: 'Un día en la vida del clon', en: 'A day in the life of the clone' },
   dia_caption: {
     es: 'cada punto es una rutina real, a la hora en que corrió por última vez',
@@ -303,7 +323,10 @@ const STR = {
 
   // coste en euros (estimado)
   eur_titulo: { es: '¿Y todo eso, en euros?', en: 'And all that, in euros?' },
-  eur_valor: { es: 'valor de mercado estimado del trabajo de 30 días', en: 'estimated market value of 30 days of work' },
+  eur_valor: {
+    es: 'valor de mercado estimado del trabajo de 30 días',
+    en: 'estimated market value of 30 days of work'
+  },
   eur_nota: {
     es: 'Estimación orientativa: ~3 € por millón de tokens, un precio medio típico de API. No es un gasto real.',
     en: 'Ballpark estimate: ~€3 per million tokens, a typical average API price. It is not a real expense.'
@@ -315,7 +338,10 @@ const STR = {
 
   // frase de estado (plantillas)
   frase_tranquilo: { es: 'Hoy el sistema respira tranquilo', en: 'Today the system breathes easy' },
-  frase_bien: { es: 'Hoy el sistema va bien, con un deber pendiente', en: 'Today the system is doing well, with one pending chore' },
+  frase_bien: {
+    es: 'Hoy el sistema va bien, con un deber pendiente',
+    en: 'Today the system is doing well, with one pending chore'
+  },
   frase_atencion: { es: 'Hoy el sistema pide atención', en: 'Today the system asks for attention' },
   frase_rutinas_de: { es: 'de', en: 'of' },
   frase_rutinas_fin: { es: 'rutinas al día', en: 'routines on track' },
@@ -369,7 +395,10 @@ const STR = {
   capa_volver_pista: { es: 'o pulsa Esc, o el gesto de atrás', en: 'or press Esc, or the back gesture' },
   capa_anterior: { es: 'Clon anterior', en: 'Previous clone' },
   capa_siguiente: { es: 'Clon siguiente', en: 'Next clone' },
-  capa_lateral_pista: { es: 'muévete entre clones sin volver atrás (← →)', en: 'move between clones without going back (← →)' },
+  capa_lateral_pista: {
+    es: 'muévete entre clones sin volver atrás (← →)',
+    en: 'move between clones without going back (← →)'
+  },
   capa_posicion: { es: '{i} de {total}', en: '{i} of {total}' },
   capa_anuncio: {
     es: 'Estás en {nombre}, {pos} de la flota. Sigues dentro de la capa 2.',
@@ -573,7 +602,10 @@ const STR = {
     es: 'Cada día a las 03:00 se añade un punto — vuelve en una semana y verás la curva.',
     en: 'A point is added every day at 03:00 — come back in a week and you will see the curve.'
   },
-  ef_intervenciones: { es: 'Intervenciones: ¿sirvió lo que cambiamos?', en: 'Interventions: did what we changed work?' },
+  ef_intervenciones: {
+    es: 'Intervenciones: ¿sirvió lo que cambiamos?',
+    en: 'Interventions: did what we changed work?'
+  },
   ef_intervenciones_sub: {
     es: 'cada mejora aplicada se anota y se juzga sola comparando su KPI antes y después',
     en: 'every applied improvement is logged and judged by comparing its KPI before and after'

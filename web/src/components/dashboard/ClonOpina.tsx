@@ -136,7 +136,7 @@ const ClonOpina = ({ data }: { data: PanelData }) => {
           <MadClonLogo width={38} height={38} />
         </div>
         <div className='flex flex-col gap-1'>
-          <Typography variant='subtitle1' fontWeight={700}>
+          <Typography component='h2' variant='subtitle1' fontWeight={700}>
             {t('opina_titulo')}
           </Typography>
           <Typography fontWeight={500} className='italic'>

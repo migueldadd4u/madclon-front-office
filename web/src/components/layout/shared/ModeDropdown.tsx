@@ -1,121 +1,74 @@
 'use client'
 
-// React Imports
 import { useRef, useState } from 'react'
 
-// MUI Imports
 import Tooltip from '@mui/material/Tooltip'
 import IconButton from '@mui/material/IconButton'
-import Popper from '@mui/material/Popper'
-import Fade from '@mui/material/Fade'
-import Paper from '@mui/material/Paper'
-import ClickAwayListener from '@mui/material/ClickAwayListener'
-import MenuList from '@mui/material/MenuList'
+import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 
-// Type Imports
 import type { Mode } from '@core/types'
-
-// Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
+import { useLang } from '@/lib/i18n'
 
 const ModeDropdown = () => {
-  // States
   const [open, setOpen] = useState(false)
   const [tooltipOpen, setTooltipOpen] = useState(false)
-
-  // Refs
   const anchorRef = useRef<HTMLButtonElement>(null)
-
-  // Hooks
   const { settings, updateSettings } = useSettings()
+  const { t } = useLang()
+
+  const modos = [
+    { valor: 'light' as const, nombre: t('modo_claro'), icono: 'ri-sun-line' },
+    { valor: 'dark' as const, nombre: t('modo_oscuro'), icono: 'ri-moon-clear-line' },
+    { valor: 'system' as const, nombre: t('modo_sistema'), icono: 'ri-computer-line' }
+  ]
+
+  const actual = modos.find(modo => modo.valor === settings.mode) ?? modos[0]
+  const nombreControl = t('modo_cambiar').replace('{modo}', actual.nombre)
 
   const handleClose = () => {
     setOpen(false)
     setTooltipOpen(false)
   }
 
-  const handleToggle = () => {
-    setOpen(prevOpen => !prevOpen)
-  }
-
   const handleModeSwitch = (mode: Mode) => {
     handleClose()
-
-    if (settings.mode !== mode) {
-      updateSettings({ mode: mode })
-    }
-  }
-
-  const getModeIcon = () => {
-    if (settings.mode === 'system') {
-      return 'ri-macbook-line'
-    } else if (settings.mode === 'dark') {
-      return 'ri-moon-clear-line'
-    } else {
-      return 'ri-sun-line'
-    }
+    if (settings.mode !== mode) updateSettings({ mode })
   }
 
   return (
     <>
-      <Tooltip
-        title={settings.mode + ' Mode'}
-        onOpen={() => setTooltipOpen(true)}
-        onClose={() => setTooltipOpen(false)}
-        open={open ? false : tooltipOpen ? true : false}
-        PopperProps={{ className: 'capitalize' }}
-      >
-        <IconButton ref={anchorRef} onClick={handleToggle} className='text-textPrimary'>
-          <i className={getModeIcon()} />
+      <Tooltip title={nombreControl} open={!open && tooltipOpen} onOpen={() => setTooltipOpen(true)} onClose={() => setTooltipOpen(false)}>
+        <IconButton
+          ref={anchorRef}
+          id='selector-apariencia'
+          aria-label={nombreControl}
+          aria-haspopup='menu'
+          aria-expanded={open}
+          aria-controls={open ? 'menu-apariencia' : undefined}
+          onClick={() => setOpen(prev => !prev)}
+          className='text-textPrimary'
+          disableFocusRipple
+          sx={{ '&:focus-visible, &.Mui-focusVisible': { outline: '2px solid', outlineColor: 'primary.main', outlineOffset: 2 } }}
+        >
+          <i className={actual.icono} aria-hidden='true' />
         </IconButton>
       </Tooltip>
-      <Popper
-        open={open}
-        transition
-        disablePortal
-        placement='bottom-start'
+      <Menu
+        id='menu-apariencia'
         anchorEl={anchorRef.current}
-        className='min-is-[160px] !mbs-4 z-[1]'
+        open={open}
+        onClose={handleClose}
+        slotProps={{ list: { 'aria-label': t('modo_titulo') } }}
       >
-        {({ TransitionProps, placement }) => (
-          <Fade
-            {...TransitionProps}
-            style={{ transformOrigin: placement === 'bottom-start' ? 'left top' : 'right top' }}
-          >
-            <Paper className={settings.skin === 'bordered' ? 'border shadow-none' : 'shadow-lg'}>
-              <ClickAwayListener onClickAway={handleClose}>
-                <MenuList onKeyDown={handleClose}>
-                  <MenuItem
-                    className='gap-3 pli-4'
-                    onClick={() => handleModeSwitch('light')}
-                    selected={settings.mode === 'light'}
-                  >
-                    <i className='ri-sun-line' />
-                    Light
-                  </MenuItem>
-                  <MenuItem
-                    className='gap-3 pli-4'
-                    onClick={() => handleModeSwitch('dark')}
-                    selected={settings.mode === 'dark'}
-                  >
-                    <i className='ri-moon-clear-line' />
-                    Dark
-                  </MenuItem>
-                  <MenuItem
-                    className='gap-3 pli-4'
-                    onClick={() => handleModeSwitch('system')}
-                    selected={settings.mode === 'system'}
-                  >
-                    <i className='ri-computer-line' />
-                    System
-                  </MenuItem>
-                </MenuList>
-              </ClickAwayListener>
-            </Paper>
-          </Fade>
-        )}
-      </Popper>
+        {modos.map(modo => (
+          <MenuItem key={modo.valor} className='gap-3 pli-4' onClick={() => handleModeSwitch(modo.valor)} selected={settings.mode === modo.valor}>
+            <i className={modo.icono} aria-hidden='true' />
+            {modo.nombre}
+          </MenuItem>
+        ))}
+      </Menu>
     </>
   )
 }

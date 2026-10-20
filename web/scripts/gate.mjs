@@ -16,10 +16,12 @@
 // panel privado. /tmp/pwshot queda solo como compatibilidad: macOS puede podarlo
 // dejando directorios a medias. PW_HOME sigue siendo la prioridad explícita.
 
-import { execSync } from 'node:child_process'
+import { execSync, execFile } from 'node:child_process'
+import { promisify } from 'node:util'
 import { createServer } from 'node:http'
+import { createHash, randomBytes } from 'node:crypto'
 import { createRequire } from 'node:module'
-import { readFileSync, existsSync, statSync } from 'node:fs'
+import { readFileSync, readdirSync, existsSync, lstatSync, statSync } from 'node:fs'
 import { join, extname, resolve } from 'node:path'
 
 import { comprobarContrato } from './check-contrato.mjs'
@@ -136,8 +138,8 @@ const SECCIONES = {
 }
 
 const TITULOS_PORTADA = {
-  es: 'La sala de control del Clon de MAD',
-  en: 'The MAD Clone control room'
+  es: 'De información dispersa a un siguiente paso claro',
+  en: 'From scattered information to a clear next step'
 }
 
 // El titular del informativo del 404 (views/NotFound.tsx): es el h1 de la página.
@@ -157,14 +159,7 @@ const DEUDAS = {}
 // Objetivos táctiles por debajo de 44 px aceptados hoy, con motivo. Cada entrada es
 // una excepción real y comentada, no una alfombra bajo la que barrer.
 const TACTIL_BLANCA = [
-  { sel: '.MuiPaginationItem-root', motivo: 'paginación de la plantilla Materialize, sin uso en el panel' },
-  {
-    sel: '.fo-pista',
-    motivo:
-      'puntos de la franja «un día en la vida»: su tamaño ES el dato (cada punto marca una hora exacta en 24 h). ' +
-      'Agrandarlos a 44 px los solaparía y destruiría la línea de tiempo. La franja entera es enfocable y se ' +
-      'recorre con las flechas, y hay resumen textual: la información es accesible sin acertar el punto.'
-  }
+  { sel: '.MuiPaginationItem-root', motivo: 'paginación de la plantilla Materialize, sin uso en el panel' }
 ]
 
 const log = (...a) => console.log(...a)
@@ -359,7 +354,38 @@ const MIME = {
 function servir() {
   const raizOut = join(RAIZ, 'out')
 
+  if (lstatSync(raizOut).isSymbolicLink()) throw new Error('out no admite symlinks en la atestación P03')
+  const filas = []
+  const hash = contenido => createHash('sha256').update(contenido).digest('hex')
+  const recorrer = (directorio, prefijo = '') => {
+    const entradas = readdirSync(directorio, { withFileTypes: true }).sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0)
+
+    for (const entrada of entradas) {
+      const ruta = join(directorio, entrada.name)
+      const relativa = prefijo + entrada.name
+
+      if (entrada.isSymbolicLink()) throw new Error('out no admite symlinks en la atestación P03')
+      if (entrada.isDirectory()) recorrer(ruta, `${relativa}/`)
+      else if (entrada.isFile()) filas.push(`${relativa}\0${hash(readFileSync(ruta))}\n`)
+      else throw new Error('out contiene un objeto no regular')
+    }
+  }
+
+  recorrer(raizOut)
+  const atestacionP03 = { version: 1, nonce: randomBytes(32).toString('hex'), origin: new URL(`http://127.0.0.1:${PUERTO}`).origin, base: `${BASE}/`, out_sha256: hash(filas.join('')) }
+
   const srv = createServer((req, res) => {
+    if (req.url.split('?')[0] === `${BASE}/__p03_gate_attestation`) {
+      if (req.method !== 'GET' || req.url !== `${BASE}/__p03_gate_attestation`) {
+        res.writeHead(405).end()
+
+        return
+      }
+      // Nonce propio del closure: la petición no lo contiene ni se refleja.
+      res.writeHead(200, { 'content-type': 'application/json', 'cache-control': 'no-store' }).end(JSON.stringify(atestacionP03))
+
+      return
+    }
     let ruta = decodeURIComponent(req.url.split('?')[0])
 
     if (!ruta.startsWith(BASE)) {
@@ -389,7 +415,29 @@ function servir() {
     res.end(readFileSync(f))
   })
 
-  return new Promise(ok => srv.listen(PUERTO, '127.0.0.1', () => ok(srv)))
+  return new Promise((ok, fallo) => {
+    srv.once('error', fallo)
+    srv.listen(PUERTO, '127.0.0.1', () => ok({ srv, atestacionP03 }))
+  })
+}
+
+async function smokeAtestacionP03() {
+  const { srv, atestacionP03 } = await servir()
+
+  try {
+    const salida = await promisify(execFile)(process.execPath, ['scripts/test-prueba-publica-p03.mjs', '--solo-atestacion'], {
+      cwd: RAIZ,
+      env: { ...process.env, PROTOTYPE_URL: `http://127.0.0.1:${PUERTO}${BASE}/`, P03_GATE_NONCE: atestacionP03.nonce, P03_GATE_OUT_SHA256: atestacionP03.out_sha256 },
+      timeout: 20000
+    })
+
+    log(salida.stdout)
+    marca('p03-smoke', 'SMOKE atestación del listener propio; no gate completo', true, '9 negativos standalone + 8 integrados; sin Chromium')
+  } catch {
+    marca('p03-smoke', 'SMOKE atestación del listener propio; no gate completo', false, 'No se acreditó el listener; detalle saneado sin cuerpo ni nonce')
+  } finally {
+    await new Promise(ok => srv.close(ok))
+  }
 }
 
 // Un modo que no llega a aplicarse no es un fallo de accesibilidad: es el gate
@@ -477,7 +525,7 @@ async function navegador() {
     return
   }
 
-  const srv = await servir()
+  const { srv, atestacionP03 } = await servir()
   const url = p => `http://127.0.0.1:${PUERTO}${BASE}/${p}`
   const navegadorPw = await chromium.launch()
   const violaciones = []
@@ -546,7 +594,7 @@ async function navegador() {
         if (!caja || caja.x < 0 || caja.x + caja.width > width || caja.y < 0 || caja.y + caja.height > height || caja.height < 44) {
           problemasBienvenida.push(`${lang}@${width}: acción principal fuera de pantalla o menor de 44px`)
         }
-        const como = inicio.locator('[data-bienvenida] a[href="#como-funciona"]')
+        const como = inicio.locator('[data-bienvenida] a[href$="#demostracion"]')
         const cajaComo = await como.boundingBox()
 
         if (!cajaComo || cajaComo.x < 0 || cajaComo.x + cajaComo.width > width || cajaComo.y < 0 || cajaComo.y + cajaComo.height > height || cajaComo.height < 44) {
@@ -562,16 +610,19 @@ async function navegador() {
           if (!foco) problemasBienvenida.push(`${lang}@${width}: acción sin foco visible al tabular`)
         }
         await como.press('Enter')
-        const destino = inicio.locator('h2#como-funciona')
+        await inicio.waitForURL('**/#demostracion')
+        await inicio.waitForFunction(() => document.activeElement?.id === 'demostracion')
+        const destino = inicio.locator('h2#demostracion')
         const focoDestino = await destino.evaluate(el => el === document.activeElement)
         await inicio.waitForTimeout(500)
         const cajaDestino = await destino.boundingBox()
 
-        if (!(await destino.isVisible()) || !focoDestino || !cajaDestino || cajaDestino.y < 80 || cajaDestino.y + cajaDestino.height > height || !inicio.url().endsWith('#como-funciona')) {
+        if (!(await destino.isVisible()) || !focoDestino || !cajaDestino || cajaDestino.y < 80 || cajaDestino.y + cajaDestino.height > height || !inicio.url().endsWith('#demostracion')) {
           problemasBienvenida.push(`${lang}@${width}: explicación sin navegación o foco`)
         }
         await inicio.goto(url(''))
-        const resumen = inicio.locator('details > summary')
+        await inicio.getByRole('button', { name: lang === 'es' ? 'Ver el sistema por dentro' : 'See inside the system', exact: true }).click()
+        const resumen = inicio.locator('#sistema-contenido details > summary')
         await resumen.focus()
         await resumen.press('Enter')
         if (!(await inicio.locator('details[open]').count())) problemasBienvenida.push(`${lang}@${width}: estado no abre con teclado`)
@@ -587,6 +638,37 @@ async function navegador() {
     }
   }
   marca(16, 'bienvenida: siguiente gesto, explicación y estado con teclado', problemasBienvenida.length === 0, problemasBienvenida.join(' | ') || 'ES/EN · 390×844 y 1440×900')
+
+  // P02: la conservación de los cuatro bloques y los controles es una puerta
+  // adicional. Usa el MISMO export servido; cualquier fallo tumba el gate.
+  let errorPortadaP02 = ''
+
+  try {
+    await promisify(execFile)(process.execPath, ['scripts/test-portada-p02.mjs'], {
+      cwd: RAIZ,
+      env: { ...process.env, PROTOTYPE_URL: url('') },
+      stdio: 'pipe',
+      timeout: 240000
+    })
+  } catch (error) {
+    errorPortadaP02 = String(error.stderr || error.message).slice(-2500)
+  }
+  marca(22, 'P02: cuatro bloques al final, datos honestos y controles con teclado', !errorPortadaP02, errorPortadaP02 || 'ES/EN · 390/1440 · claro/oscuro/alto contraste · pulso/modo/menú')
+
+  // P03: mismo export; standalone9354/55 o listener propio acreditado del gate.
+  let errorPruebaP03 = ''
+
+  try {
+    await promisify(execFile)(process.execPath, ['scripts/test-prueba-publica-p03.mjs'], {
+      cwd: RAIZ,
+      env: { ...process.env, PROTOTYPE_URL: url(''), PROTOTYPE_EVIDENCE: process.env.P03_GATE_EVIDENCE, P03_GATE_NONCE: atestacionP03.nonce, P03_GATE_OUT_SHA256: atestacionP03.out_sha256 },
+      stdio: 'pipe',
+      timeout: 300000
+    })
+  } catch (error) {
+    errorPruebaP03 = `${error.stdout || ''}\n${error.stderr || error.message}`.slice(-3500)
+  }
+  marca(23, 'P03: demo sintética, dos gestos a límites y caché real aislada', !errorPruebaP03, errorPruebaP03 || 'ES/EN · 390/1440 · teclado/historial · procedencia y SW con destino acotado')
 
   const problemasHardware = []
 
@@ -606,6 +688,7 @@ async function navegador() {
       const p = await ctx.newPage()
       try {
         await p.goto(url(''))
+        await p.getByRole('button', { name: lang === 'es' ? 'Ver el sistema por dentro' : 'See inside the system', exact: true }).click()
         const section = p.locator('section[aria-labelledby="hardware-home-title"]')
         await section.getByRole('progressbar').first().waitFor()
         if (await section.getByRole('progressbar').count() !== 6) problemasHardware.push(`indicadores@${width}/${lang}`)
@@ -1702,14 +1785,21 @@ async function navegador() {
 }
 
 // ── main ────────────────────────────────────────────────────────────────────────
-log(`GATE · front office${rapido ? ' (modo rápido: matriz reducida)' : ''}`)
-if (!process.argv.includes('--solo-navegador')) estaticas()
-if (!process.argv.includes('--sin-navegador')) await navegador()
+const smokeP03 = process.argv.includes('--p03-smoke-atestacion')
+
+if (smokeP03) {
+  log('SMOKE P03 · diagnóstico sin build ni Chromium; NO es gate completo')
+  await smokeAtestacionP03()
+} else {
+  log(`GATE · front office${rapido ? ' (modo rápido: matriz reducida)' : ''}`)
+  if (!process.argv.includes('--solo-navegador')) estaticas()
+  if (!process.argv.includes('--sin-navegador')) await navegador()
+}
 
 const fallos = resultados.filter(r => r.estado === 'FALLO')
 const deudas = resultados.filter(r => r.estado === 'DEUDA')
 
-log(`\nRESULTADO · ${resultados.filter(r => r.estado === 'OK').length} OK · ${deudas.length} DEUDA · ${fallos.length} FALLO`)
+log(`\nRESULTADO${smokeP03 ? ' SMOKE (NO gate completo)' : ''} · ${resultados.filter(r => r.estado === 'OK').length} OK · ${deudas.length} DEUDA · ${fallos.length} FALLO`)
 if (rapido) log('⚠ modo rápido: NO sirve para publicar, solo para el bucle de bugfixing.')
 deudas.forEach(d => log(`  DEUDA ${d.n} · ${DEUDAS[d.n]}`))
 process.exit(fallos.length === 0 ? 0 : 1)

@@ -56,6 +56,8 @@
 .primaria:focus-visible, .secundaria:focus-visible { outline: 3px solid #4f54d9; outline-offset: 3px; }
 
 .pie { margin: 0; font-size: 11px; color: #55596f; }
+.privacidad { display: inline-flex; align-items: center; min-block-size: 44px; font-size: 13px; text-decoration: underline; text-underline-offset: 3px; }
+.privacidad:focus-visible { outline: 3px solid currentColor; outline-offset: 3px; border-radius: 2px; }
 
 /* Órbita decorativa — el mismo motivo del inicio privado. */
 .orbita { position: absolute; inset-inline-end: 2%; inset-block-start: 50%; inline-size: 370px; block-size: 370px; transform: translateY(-50%) rotate(-18deg); z-index: 0; opacity: .9; pointer-events: none; }
