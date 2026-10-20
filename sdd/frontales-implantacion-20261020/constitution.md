@@ -12,4 +12,4 @@ agente: cdx-frontales-publico-20261020
 - Fuente de la mejora: candidato f1911dc820c0a242b4c3a03a527f72c6c7adda46. Solo delta web/src y web/scripts, sin datos 18/19Oct.
 - Jueces solo por petición expresa de MAD: este corte usa comprobaciones propias, sin jueces ni notas.
 - No publicar, push ni merge; entregar commits y parche revisables a root.
-- Instalación propia congelada con pnpm install --frozen-lockfile --ignore-scripts; nunca node_modules compartido. Recursos propios con identidad y limpieza finally.
+- Instalación propia congelada con yarn install --frozen-lockfile --ignore-scripts; nunca node_modules compartido. Recursos propios con identidad y limpieza finally.

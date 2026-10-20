@@ -15,3 +15,5 @@ agente: cdx-frontales-publico-20261020
 - El gate P03 acepta listener integrado autenticado del gate y por ello puede usar puerto 9362 sin rebajar la guardia de destino.
 
 - Corrección antes de instalar: el público no tiene package-lock.json; npm ci falló sin crear node_modules. Se preserva ese rojo. Usa pnpm-lock.yaml version9 congelado mediante pnpm10.33.0; ningún lockfile/dependencia cambia. Iconos se ejecutan explícitamente con node --import tsx para evitar IPC auxiliar.
+
+- pnpm congelado detectó que su lock heredado no incluye recharts ya declarado. No se actualizó ni se usó --no-frozen-lockfile. Yarn.lock sí contiene recharts; es el gestor congelado usado por P03. Se utiliza Yarn1.22.22 copiado físicamente a evidencia propia, sin rc global y con caché temporal propia. Dos fallos de instalación previos preservados, sin producto/build/browser ejecutados.
