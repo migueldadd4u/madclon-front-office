@@ -287,7 +287,50 @@ async function cacheReal() {
 
     assert.equal(caliente.hash, hashEsperado)
     assert.equal(guardada.hash, hashEsperado)
-    assert.equal(caliente.sello, guardada.sello, 'caché reciente se sirve con sello SW')
+    assert.equal(caliente.sello, null, 'online v8 devuelve la respuesta original de red, incluso con copia reciente')
+    await page.waitForFunction(async ({ u, desde }) => {
+      const nombre = (await caches.keys()).find(n => n.startsWith('madclon-datos-'))
+      const r = nombre && await (await caches.open(nombre)).match(u)
+
+      return !!r && Number(r.headers.get('sw-fecha')) >= desde
+    }, { u: dato, desde: caliente.antes })
+
+    // Fixture válida anterior, sellada AHORA: v7 la ocultaba hasta 24 h.
+    // El servidor sigue sirviendo el manifest actual; no se cambia ningún JSON.
+    const manifestAnterior = JSON.parse(readFileSync('out/data/manifest.json', 'utf8'))
+
+    manifestAnterior.generado = new Date(new Date(manifestAnterior.generado).getTime() - 86400000).toISOString()
+    const cuerpoAnterior = JSON.stringify(manifestAnterior)
+    const hashAnterior = hash(cuerpoAnterior)
+
+    assert.notEqual(hashAnterior, hashEsperado, 'el lote anterior difiere del actual')
+    const semillaReciente = await page.evaluate(async ({ u, cuerpo }) => {
+      const nombre = (await caches.keys()).find(n => n.startsWith('madclon-datos-'))
+      const sello = String(Date.now())
+
+      await (await caches.open(nombre)).put(u, new Response(cuerpo, { headers: { 'content-type': 'application/json', 'sw-fecha': sello } }))
+
+      return { cache: nombre, sello }
+    }, { u: dato, cuerpo: cuerpoAnterior })
+
+    assert.equal((await copia()).hash, hashAnterior, 'la caché contiene de verdad el lote anterior reciente')
+    const redReciente = await leer()
+
+    assert.equal(redReciente.status, 200)
+    assert.equal(redReciente.hash, hashEsperado, 'la red actual sustituye al lote anterior aunque la copia sea reciente')
+    assert.equal(redReciente.sello, null, 'el lote nuevo online llega directamente de red')
+    await page.waitForFunction(async ({ u, esperado, desde }) => {
+      const nombre = (await caches.keys()).find(n => n.startsWith('madclon-datos-'))
+      const r = nombre && await (await caches.open(nombre)).match(u)
+
+      if (!r || Number(r.headers.get('sw-fecha')) < desde) return false
+      const bytes = await crypto.subtle.digest('SHA-256', await r.arrayBuffer())
+
+      return [...new Uint8Array(bytes)].map(b => b.toString(16).padStart(2, '0')).join('') === esperado
+    }, { u: dato, esperado: hashEsperado, desde: redReciente.antes })
+    const renovadaReciente = await copia()
+
+    assert.equal(renovadaReciente.hash, hashEsperado, 'también queda guardado el lote nuevo para modo avión')
 
     const envejecer = async () => {
       const sello = String(Date.now() - 25 * 60 * 60 * 1000)
@@ -337,7 +380,7 @@ async function cacheReal() {
     await page.reload({ waitUntil: 'domcontentloaded' })
     await page.locator('[data-demo-sintetica]').waitFor({ state: 'visible' })
     assert.equal(await page.locator('h1').count(), 1, 'portada precacheada sigue legible offline')
-    resultados.push({ swReal: 'PASS', identidad, manifestHash: hashEsperado, cache: guardada.cache, reciente: caliente.sello, fixture25hOnline: viejoOnline, ventanaRenovacion: { desde: red.antes, hasta: renovada.inspeccion }, renovada: renovada.sello, fixture25hOffline: viejoOffline, offline: 'copia vieja conservada; no frescura real', paginaOffline: 'demo visible' })
+    resultados.push({ swReal: 'PASS', identidad, manifestHash: hashEsperado, cache: guardada.cache, reciente: caliente.sello, copiaRecienteAnterior: { hashAnterior, semillaReciente, redReciente, renovadaReciente }, fixture25hOnline: viejoOnline, ventanaRenovacion: { desde: red.antes, hasta: renovada.inspeccion }, renovada: renovada.sello, fixture25hOffline: viejoOffline, offline: 'copia vieja conservada; no frescura real', paginaOffline: 'demo visible' })
   } finally { await ctx.close() }
 }
 
