@@ -51,12 +51,12 @@ const HeroClon = ({ frescura }: Props) => {
         <p className={styles.subtitulo}>{t('home_resumen')}</p>
 
         <div className={styles.acciones}>
-          <Link href='/retos/' className={styles.primaria} data-bienvenida-explorar>
-            {t('home_explorar')}
+          <Link href='#demostracion' className={styles.primaria}>
+            {t('home_como')}
             <i className='ri-arrow-right-line' aria-hidden='true' />
           </Link>
-          <Link href='#demostracion' className={styles.secundaria}>
-            {t('home_como')}
+          <Link href='/retos/' className={styles.secundaria} data-bienvenida-explorar>
+            {t('home_explorar')}
           </Link>
         </div>
 

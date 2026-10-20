@@ -18,9 +18,9 @@ export const RETOS_BUILD: Record<string, { es_titulo: string; es_texto: string; 
     "en_texto": "It lasts years and never closes: \"keep the house in order\", \"don't let work eat everything\". It has no progress of its own; it shows the progress of the challenges hanging from it."
   },
   "altura-frente": {
-    "es_titulo": "Frente",
+    "es_titulo": "Batalla",
     "es_texto": "Meses. Es la campaña que sirve a un horizonte y que sí se puede dar por terminada. También agrega el avance de lo que tiene debajo.",
-    "en_titulo": "Front",
+    "en_titulo": "Battle",
     "en_texto": "Months. The campaign that serves a horizon and that can actually be finished. It also aggregates the progress of what sits below it."
   },
   "altura-reto": {

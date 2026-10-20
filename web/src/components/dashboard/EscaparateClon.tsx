@@ -120,10 +120,10 @@ const COPY = {
           'Un canal, un tipo de entrada y un resultado concreto. Después, material autorizado y un criterio para que una persona compruebe si la salida es útil. La revisión, los permisos y el alcance se acuerdan antes de conectar datos; aquí no se ofrece un precio ni un plazo de respuesta.'
       }
     ],
-    siguiente: 'Primero, mira un caso',
+    siguiente: 'Explora los retos públicos',
     siguienteTexto:
       'Retos permite ver trabajos autorizados y qué falta para cerrarlos. Para explorar una colaboración, identifica un proceso parecido y el resultado que necesitarías comprobar.',
-    cta: 'Ver un caso',
+    cta: 'Ver retos públicos',
     faq: 'Más preguntas sobre el clon'
   },
   en: {
@@ -216,10 +216,10 @@ const COPY = {
           'One channel, one type of entry and one concrete output. Then, authorized material and criteria for a person to check whether the output is useful. Review, permissions and scope are agreed before connecting data; this page offers no price or response deadline.'
       }
     ],
-    siguiente: 'First, look at a case',
+    siguiente: 'Explore public challenges',
     siguienteTexto:
       'Challenges lets you see authorized work and what remains to close it. To explore a collaboration, identify a similar process and the output you would need to check.',
-    cta: 'See a case',
+    cta: 'View public challenges',
     faq: 'More questions about the clone'
   }
 } as const

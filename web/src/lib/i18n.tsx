@@ -81,8 +81,8 @@ const STR = {
     es: 'Organiza entradas, prepara decisiones con contexto y sigue los trabajos. Mira qué entrega el clon y qué sigue decidiendo una persona.',
     en: 'Organize incoming information, prepare decisions with context and follow work. See what the clone delivers and what a person still decides.'
   },
-  home_explorar: { es: 'Ver un caso', en: 'See a case' },
-  home_como: { es: 'Ver una demostración', en: 'See a demonstration' },
+  home_explorar: { es: 'Ver retos públicos', en: 'View public challenges' },
+  home_como: { es: 'Ver un ejemplo', en: 'See an example' },
   home_privacidad_limites: { es: 'Privacidad y límites', en: 'Privacy and limits' },
   home_sistema: { es: 'Ver el sistema por dentro', en: 'See inside the system' },
   home_sistema_sub: {

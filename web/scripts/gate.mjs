@@ -592,7 +592,7 @@ async function navegador() {
         const caja = await explorar.boundingBox()
 
         if (!caja || caja.x < 0 || caja.x + caja.width > width || caja.y < 0 || caja.y + caja.height > height || caja.height < 44) {
-          problemasBienvenida.push(`${lang}@${width}: acción principal fuera de pantalla o menor de 44px`)
+          problemasBienvenida.push(`${lang}@${width}: acceso a retos fuera de pantalla o menor de 44px`)
         }
         const como = inicio.locator('[data-bienvenida] a[href$="#demostracion"]')
         const cajaComo = await como.boundingBox()
@@ -601,7 +601,7 @@ async function navegador() {
           problemasBienvenida.push(`${lang}@${width}: explicación fuera de pantalla o menor de 44px`)
         }
         await inicio.locator('h1').evaluate(el => { el.setAttribute('tabindex', '-1'); el.focus() })
-        for (const accion of [explorar, como]) {
+        for (const accion of [como, explorar]) {
           await inicio.keyboard.press('Tab')
           const foco = await accion.evaluate(el => {
             const estilo = getComputedStyle(el)
