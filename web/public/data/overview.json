@@ -1,31 +1,31 @@
 {
   "gtd": {
     "propuestas": null,
-    "bandeja": 976,
+    "bandeja": 989,
     "esperas_vencidas": 3,
     "decisiones": null,
     "acciones_hoy": 13,
     "esperas_listadas": 3
   },
   "personas": {
-    "fichas_curadas": 1750,
+    "fichas_curadas": 1752,
     "staged": 0
   },
   "automejora": {
-    "hechas": 510,
+    "hechas": 515,
     "bloqueadas": 80,
     "aparcadas": 103,
-    "pendientes": 298,
-    "llamadas": 611,
+    "pendientes": 312,
+    "llamadas": 562,
     "metered": 0,
-    "top": "minimax 295, grok 213, agy_cli 29, local 22"
+    "top": "minimax 288, grok 171, agy_cli 28, local 21"
   },
   "crons": [
     {
       "nombre": "Briefing COO 08:05",
       "ambito": "global",
       "estado": "delivery_failed",
-      "ultima": "27/10 09:06"
+      "ultima": "28/10 09:06"
     },
     {
       "nombre": "Higiene Semanal del Sistema",
@@ -37,31 +37,31 @@
       "nombre": "Triage correos del día",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "27/10 08:56"
+      "ultima": "28/10 08:55"
     },
     {
       "nombre": "Auto-mejora nocturna clon",
       "ambito": "global",
       "estado": "ok",
-      "ultima": "28/10 03:40"
+      "ultima": "29/10 03:40"
     },
     {
       "nombre": "Resumen diario de Spam",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "27/10 21:30"
+      "ultima": "28/10 21:30"
     },
     {
       "nombre": "Morning briefing",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "27/10 08:00"
+      "ultima": "28/10 08:00"
     },
     {
       "nombre": "Important-mail monitor",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "28/10 03:30"
+      "ultima": "29/10 03:30"
     },
     {
       "nombre": "Weekly review",
@@ -73,13 +73,13 @@
       "nombre": "Topic news digest",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "27/10 18:00"
+      "ultima": "28/10 18:01"
     },
     {
       "nombre": "Repaso ¿Qué necesito?",
       "ambito": "clon",
       "estado": "error",
-      "ultima": "27/10 08:31"
+      "ultima": "28/10 08:31"
     },
     {
       "nombre": "Clon ↔ Jarvis weekly mutual-improvemen",
@@ -91,7 +91,7 @@
       "nombre": "Guardia de tiradas programadas",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "28/10 03:38"
+      "ultima": "29/10 03:38"
     },
     {
       "nombre": "Radar Buzz semanal",
@@ -115,19 +115,19 @@
       "nombre": "Proactividad nocturna",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "27/10 09:30"
+      "ultima": "28/10 09:30"
     },
     {
       "nombre": "Proactividad recogida",
       "ambito": "clon",
       "estado": "ok",
-      "ultima": "27/10 10:45"
+      "ultima": "28/10 10:45"
     },
     {
       "nombre": "Instinct GitHub",
       "ambito": "clon",
       "estado": "error",
-      "ultima": "28/10 03:40"
+      "ultima": "29/10 03:40"
     }
   ],
   "gateways": [
@@ -141,12 +141,12 @@
   ],
   "crons_en_error": 2,
   "tokens_resumen": {
-    "tokens_30d": 121288811,
+    "tokens_30d": 127972432,
     "cobertura_pct": 91,
-    "indice_eficiencia": 116023
+    "indice_eficiencia": 112865
   },
   "salud_global": "🔴 Hay incidencias activas",
-  "watchdog_ts": "2026-10-28T01:26:52.985509Z",
+  "watchdog_ts": "2026-10-29T00:49:53.079902Z",
   "historia": {
     "hitos": [
       {
@@ -433,43 +433,43 @@
     "nacimiento": "2026-04-14",
     "ultima_bitacora": "2026-10-25",
     "ultimo_hito": "2026-10-15",
-    "dias_sin_capitulo": 13
+    "dias_sin_capitulo": 14
   },
   "hardware": {
     "version": 1,
     "hosts": [
       {
         "id": "mac",
-        "sampled_at": "2026-10-28T02:43:14Z",
+        "sampled_at": "2026-10-29T02:43:14Z",
         "cpu_percent": null,
         "ram_total_bytes": 103079215104,
-        "ram_available_bytes": 30802083840,
-        "swap_used_bytes": 7471890432,
-        "gpu_percent": 1,
+        "ram_available_bytes": 18934448128,
+        "swap_used_bytes": 6277100995,
+        "gpu_percent": 0,
         "gpu_temperature_c": null,
         "gpu_power_w": null,
         "disk_total_bytes": 994662584320,
-        "disk_available_bytes": 72098635776
+        "disk_available_bytes": 61029351424
       },
       {
         "id": "dgx",
-        "sampled_at": "2026-10-28T02:43:14Z",
-        "cpu_percent": 0.33333333333332993,
+        "sampled_at": "2026-10-29T02:43:14Z",
+        "cpu_percent": 0.16666666666667052,
         "ram_total_bytes": 130660978688,
-        "ram_available_bytes": 65025245184,
-        "swap_used_bytes": 73543680,
+        "ram_available_bytes": 65126862848,
+        "swap_used_bytes": 74035200,
         "gpu_percent": 0.0,
         "gpu_temperature_c": 39.0,
-        "gpu_power_w": 10.49,
+        "gpu_power_w": 10.29,
         "disk_total_bytes": 4031871553536,
-        "disk_available_bytes": 3604122193920
+        "disk_available_bytes": 3604139356160
       }
     ]
   },
   "retos": {
     "estado": "ok",
     "version": 1,
-    "generado": "2026-10-28T02:43:15.625Z",
+    "generado": "2026-10-29T02:43:15.356Z",
     "retos": [
       {
         "titulo_publico": "Ordenar el clon para poder darlo por terminado",
