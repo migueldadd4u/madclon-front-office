@@ -80,54 +80,54 @@
   "integraciones": [
     {
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-10-30T01:29:03.978875Z",
+      "ultimo_ok": "2026-10-31T01:53:04.187946Z",
       "ultimo_fallo": "2026-10-26T10:48:43.477969Z",
       "detalle": "lectura / autenticación OK",
       "clave": "2a5e3926"
     },
     {
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-10-30T01:29:03.978875Z",
+      "ultimo_ok": "2026-10-31T01:53:04.187946Z",
       "ultimo_fallo": null,
       "detalle": "lectura / autenticación OK",
       "clave": "2c435866"
     },
     {
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-10-30T01:29:03.978875Z",
+      "ultimo_ok": "2026-10-31T01:53:04.187946Z",
       "ultimo_fallo": "2026-10-21T22:01:16.619825Z",
       "detalle": "lectura / autenticación OK",
       "clave": "132b93b4"
     },
     {
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-10-30T01:29:03.978875Z",
+      "ultimo_ok": "2026-10-31T01:53:04.187946Z",
       "ultimo_fallo": "2026-10-20T20:27:02.180945Z",
       "detalle": "lectura / autenticación OK",
       "clave": "aefcdbb3"
     },
     {
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-10-30T01:29:03.978875Z",
+      "ultimo_ok": "2026-10-31T01:53:04.187946Z",
       "ultimo_fallo": "2026-10-29T09:13:05.074939Z",
       "detalle": "listado / acceso OK",
       "clave": "6b996a58"
     },
     {
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-10-30T01:29:03.978875Z",
+      "ultimo_ok": "2026-10-31T01:53:04.187946Z",
       "ultimo_fallo": "2026-10-20T21:24:35.967602Z",
       "detalle": "listado / acceso OK",
       "clave": "4f1bcdaf"
     },
     {
       "estado": "🟢 OK",
-      "ultimo_ok": "2026-10-30T01:29:03.978875Z",
+      "ultimo_ok": "2026-10-31T01:53:04.187946Z",
       "ultimo_fallo": "2026-10-20T20:27:02.180945Z",
       "detalle": "listado / acceso OK",
       "clave": "c75c1d4b"
     }
   ],
   "salud_global": "🟢 Todo OK",
-  "watchdog_ts": "2026-10-30T01:29:03.980420Z"
+  "watchdog_ts": "2026-10-31T01:53:04.189284Z"
 }

@@ -2498,28 +2498,54 @@
     },
     {
       "fecha": "2026-10-30",
-      "ts": 1793328099.2424152,
+      "ts": 1793400114.234356,
       "dias": 7,
       "contexto": {
-        "llamadas": 1938,
-        "tokens": 52387697,
-        "tareas_hechas": 34,
-        "llamadas_router": 577
+        "llamadas": 1996,
+        "tokens": 56968146,
+        "tareas_hechas": 35,
+        "llamadas_router": 588
       },
       "kpis": {
-        "entrada_por_llamada": 26629.752,
-        "pct_cache": 54.476,
-        "ratio_salida_entrada": 1.51,
-        "pct_local": 0.821,
+        "entrada_por_llamada": 28131.387,
+        "pct_cache": 58.302,
+        "ratio_salida_entrada": 1.457,
+        "pct_local": 0.762,
         "pct_metered": 0.0,
-        "pct_tokens_en_fallo": 44.579,
-        "latencia_p50": 8.29,
-        "tokens_motor_por_tarea": 116656.774,
-        "pct_llamadas_ok": 80.416,
-        "tareas_dia": 4.857,
-        "reintentos_por_tarea": 1.081,
+        "pct_tokens_en_fallo": 44.247,
+        "latencia_p50": 8.05,
+        "tokens_motor_por_tarea": 114698.274,
+        "pct_llamadas_ok": 81.122,
+        "tareas_dia": 5.0,
+        "reintentos_por_tarea": 1.079,
         "pct_propuestas_atendidas": 11.111,
-        "cobertura_medida": 93.447
+        "cobertura_medida": 93.737
+      }
+    },
+    {
+      "fecha": "2026-10-31",
+      "ts": 1793414517.370904,
+      "dias": 7,
+      "contexto": {
+        "llamadas": 2005,
+        "tokens": 57236108,
+        "tareas_hechas": 38,
+        "llamadas_router": 597
+      },
+      "kpis": {
+        "entrada_por_llamada": 28116.794,
+        "pct_cache": 58.07,
+        "ratio_salida_entrada": 1.529,
+        "pct_local": 0.759,
+        "pct_metered": 0.0,
+        "pct_tokens_en_fallo": 42.031,
+        "latencia_p50": 8.19,
+        "tokens_motor_por_tarea": 112694.778,
+        "pct_llamadas_ok": 81.407,
+        "tareas_dia": 5.429,
+        "reintentos_por_tarea": 1.024,
+        "pct_propuestas_atendidas": 11.111,
+        "cobertura_medida": 93.566
       }
     }
   ],
