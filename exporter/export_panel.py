@@ -65,6 +65,23 @@ bloque_retos = runpy.run_path(str(Path(__file__).with_name("retos_publicos.py"))
 _lo_reciente = runpy.run_path(str(Path(__file__).with_name("lo_reciente.py")))
 gtd_lo_reciente, ventana_serie = _lo_reciente["gtd_lo_reciente"], _lo_reciente["ventana_serie"]
 
+
+def historicas_del_panel(vault: Path) -> dict | None:
+    """Lo que el panel descuenta de la bandeja y de HOY por histórico, preguntado
+    al MISMO puente que usa panel_clon.py (orchestrator/lib/actualidad_panel.py,
+    junto al vault, como PANEL_GEN en el Makefile): la política de vigencia vive en
+    panel-mad y aquí no se copia. None si el puente no está; el puente, si falla
+    por dentro, devuelve conjuntos vacíos, y eso lo caza el cuadre con el panel."""
+    puente = vault.parent / "services" / "automejora" / "orchestrator" / "lib" / "actualidad_panel.py"
+    try:
+        p = runpy.run_path(str(puente))
+        hist = p["consultar_historicos"](vault)
+    except Exception:  # noqa: BLE001 — sin puente se reparte todo y el cuadre lo dice
+        return None
+    clave_captura, clave_accion = p["clave_captura"], p["clave_accion"]
+    return {"bandeja": lambda ln: clave_captura(ln) in hist["bandeja"],
+            "acciones": lambda ln: clave_accion(ln) in hist["acciones"]}
+
 # ---------------------------------------------------------------- avisos del lote
 
 class Avisos(list):
@@ -1076,7 +1093,19 @@ def main() -> int:
     # Retos (arco cero-a-cien, fase 7): la porción pública del índice, o «en revisión».
     overview["retos"] = bloque_retos(vault, avisos)
     # «¿Qué espera de MAD ahora mismo?» cuenta lo del día y dice aparte lo parado.
-    overview["gtd"]["lo_reciente"] = gtd_lo_reciente(vault, datetime.now(timezone.utc).date())
+    historicas = historicas_del_panel(vault)
+    if historicas is None:
+        avisos.nota("ℹ️ lo_reciente: sin el puente de vigencia del panel, la bandeja y HOY se reparten sin "
+                    "descontar lo histórico")
+    reciente = gtd_lo_reciente(vault, datetime.now(timezone.utc).date(), historicas)
+    overview["gtd"]["lo_reciente"] = reciente
+    # Del día + paradas tiene que ser lo mismo que el total que da el panel: el
+    # 01/11/2026 /actividad enseñó 290 + 804 = 1094 junto a un total de 1030.
+    for lista, total in (("bandeja", overview["gtd"].get("bandeja")), ("acciones_hoy", overview["gtd"].get("acciones_hoy"))):
+        r = reciente.get(lista)
+        if r is not None and isinstance(total, int) and r["del_dia"] + r["parados"] != total:
+            avisos.nota(f"⚠️ lo_reciente: {lista} reparte {r['del_dia']} + {r['parados']} = "
+                        f"{r['del_dia'] + r['parados']} y el panel cuenta {total}")
 
     ahora = datetime.now(timezone.utc).isoformat(timespec="seconds")
     salidas = {

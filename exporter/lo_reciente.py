@@ -136,11 +136,19 @@ def _propuesta_resuelta(detalle: str, vault: Path, bandeja_sin_triar: int | None
     return False
 
 
-def gtd_lo_reciente(vault: Path, hoy: date) -> dict:
+def gtd_lo_reciente(vault: Path, hoy: date, historicas: dict | None = None) -> dict:
     """Recuentos del día y parados de las listas que /actividad enseña.
-    Una lista que no se deja leer se queda fuera (null en la web), nunca a 0."""
+    Una lista que no se deja leer se queda fuera (null en la web), nunca a 0.
+
+    `historicas`: {"bandeja": f, "acciones": f}, con f(línea) -> True si la
+    política común de vigencia del panel la da por histórica. Se descuentan antes
+    de repartir, como hace el panel; la decisión no se copia aquí. Sin ellas, el
+    01/11/2026 la bandeja del escaparate sumaba 1094 y el panel contaba 1030."""
     gtd = vault / "08_PLANIFICACION" / "GTD"
     out: dict = {"umbral_dias": PARADO_DIAS}
+    historica = historicas or {}
+    captura_historica = historica.get("bandeja") or (lambda _ln: False)
+    accion_historica = historica.get("acciones") or (lambda _ln: False)
 
     def leer(p: Path) -> str | None:
         try:
@@ -152,7 +160,8 @@ def gtd_lo_reciente(vault: Path, hoy: date) -> dict:
     capturas = None
     if md is not None:
         bandeja = _seccion(md, "## 🗂 Bandeja")
-        capturas = [ln for ln in bandeja.splitlines() if ln.startswith("- [ ] ") and "^ejemplo" not in ln]
+        capturas = [ln for ln in bandeja.splitlines()
+                    if ln.startswith("- [ ] ") and "^ejemplo" not in ln and not captura_historica(ln)]
         out["bandeja"] = reparto([([f] if (f := _fecha(ln[6:16])) else [], plazo_escrito(ln, hoy))
                                   for ln in capturas], hoy)
 
@@ -167,7 +176,7 @@ def gtd_lo_reciente(vault: Path, hoy: date) -> dict:
     md = leer(gtd / "ACCIONES.md")
     if md is not None:
         hoy_md = _seccion(md, "## 🔥 HOY")
-        acciones = [ln for ln in hoy_md.splitlines() if ln.startswith("- [ ] ")]
+        acciones = [ln for ln in hoy_md.splitlines() if ln.startswith("- [ ] ") and not accion_historica(ln)]
         out["acciones_hoy"] = reparto([(fechas_de_movimiento(ln, hoy), plazo_escrito(ln, hoy)) for ln in acciones], hoy)
 
     md = leer(gtd / "ESPERANDO.md")

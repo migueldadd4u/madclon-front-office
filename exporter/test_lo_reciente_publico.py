@@ -1,6 +1,6 @@
 """Guardias de «Lo reciente manda» en el escaparate (orden de MAD, 01/11/2026).
 
-    python3 -m unittest discover -s exporter -p test_lo_reciente.py
+    python3 -m unittest discover -s exporter -p test_lo_reciente_publico.py
 """
 import json
 import runpy
@@ -96,6 +96,55 @@ class Listas(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             r = M["gtd_lo_reciente"](Path(d), HOY)
         self.assertEqual(r, {"umbral_dias": 14})
+
+
+class Historicas(unittest.TestCase):
+    """El panel descuenta de la bandeja y de HOY lo que su política de vigencia da
+    por histórico. El 01/11/2026 /actividad repartió 290 + 804 = 1094 junto a un
+    total de 1030: el escaparate repartía también las 64 históricas."""
+
+    def test_lo_historico_no_se_reparte(self):
+        with tempfile.TemporaryDirectory() as d:
+            v = Path(d)
+            gtd = v / "08_PLANIFICACION/GTD"
+            gtd.mkdir(parents=True)
+            (gtd / "QUE-NECESITO.md").write_text(
+                "## 🗂 Bandeja\n"
+                "- [ ] 2026-10-31 09:00 · cc · nueva ^26103109000000\n"
+                "- [ ] 2026-10-30 09:00 · cc · ya resuelta fuera ^26103009000000\n"
+                "- [ ] 2026-09-01 09:00 · cc · vieja ^26090109000000\n", encoding="utf-8")
+            (gtd / "ACCIONES.md").write_text(
+                "## 🔥 HOY\n"
+                "- [ ] Una (pedida por MAD 2026-10-30)\n"
+                "- [ ] Otra ya hecha ⟵ ^26102509000000\n", encoding="utf-8")
+            historicas = {"bandeja": lambda ln: ln.endswith("^26103009000000"),
+                          "acciones": lambda ln: "^26102509000000" in ln}
+            con = M["gtd_lo_reciente"](v, HOY, historicas)
+            sin = M["gtd_lo_reciente"](v, HOY)
+        self.assertEqual(con["bandeja"], {"del_dia": 1, "parados": 1})
+        self.assertEqual(con["acciones_hoy"], {"del_dia": 1, "parados": 0})
+        self.assertEqual(sin["bandeja"], {"del_dia": 2, "parados": 1}, "sin política, se reparte todo")
+
+    def test_decide_el_puente_del_panel(self):
+        import export_panel as ep
+        with tempfile.TemporaryDirectory() as d:
+            raiz = Path(d)
+            vault = raiz / "MAD-brain"
+            vault.mkdir()
+            self.assertIsNone(ep.historicas_del_panel(vault), "sin puente no se inventa nada")
+            lib = raiz / "services/automejora/orchestrator/lib"
+            lib.mkdir(parents=True)
+            (lib / "actualidad_panel.py").write_text(
+                "def consultar_historicos(vault, hermes=None):\n"
+                "    return {'bandeja': {'^26103009000000'}, 'acciones': set(), 'propuestas': set()}\n"
+                "def clave_captura(linea):\n"
+                "    return linea[-15:]\n"
+                "def clave_accion(linea):\n"
+                "    return None\n", encoding="utf-8")
+            h = ep.historicas_del_panel(vault)
+        self.assertTrue(h["bandeja"]("- [ ] 2026-10-30 09:00 · cc · x ^26103009000000"))
+        self.assertFalse(h["bandeja"]("- [ ] 2026-10-31 09:00 · cc · y ^26103109000000"))
+        self.assertFalse(h["acciones"]("- [ ] Una"))
 
 
 class Serie(unittest.TestCase):
