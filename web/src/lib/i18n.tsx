@@ -269,6 +269,15 @@ const STR = {
     en: 'Its data did not arrive complete in the last refresh and we would rather not show it half-baked. The rest of the dashboard is still available; this section returns on its own with the next refresh.'
   },
 
+  // página entera «en revisión» — algo rompió al pintarla (error.tsx y global-error.tsx).
+  // Nunca se enseña el texto de la excepción: puede arrastrar trozos del dato.
+  error_pagina_titulo: { es: 'Esta página está en revisión', en: 'This page is under review' },
+  error_pagina_texto: {
+    es: 'Algo de esta página no llegó como esperábamos y preferimos no enseñarla a medias. Puedes volver a intentarlo ahora o pasar más tarde.',
+    en: 'Something on this page did not arrive as expected and we would rather not show it half-baked. You can try again now or come back later.'
+  },
+  error_reintentar: { es: 'Volver a intentarlo', en: 'Try again' },
+
   // instantánea retenida por la fuente — estado protegido, no un error
   retenido_titulo: { es: 'Instantánea pública protegida', en: 'Public snapshot protected' },
   retenido_texto: {
@@ -714,6 +723,22 @@ const SECCIONES: Record<string, StrKey> = {
 
 type LangCtx = { lang: Lang; setLang: (l: Lang) => void; t: (k: StrKey) => string }
 
+const CLAVE_IDIOMA = 'madclon-lang'
+
+/** Texto de una clave en un idioma, sin contexto React (lo usa global-error.tsx). */
+export const traducir = (k: StrKey, lang: Lang): string => STR[k]?.[lang] ?? STR[k]?.es ?? k
+
+/** Idioma que eligió quien visita, o null si no eligió o el navegador no deja leerlo. */
+export const idiomaGuardado = (): Lang | null => {
+  try {
+    const guardado = window.localStorage.getItem(CLAVE_IDIOMA)
+
+    return guardado === 'en' || guardado === 'es' ? guardado : null
+  } catch {
+    return null
+  }
+}
+
 const Ctx = createContext<LangCtx>({ lang: 'es', setLang: () => {}, t: k => STR[k].es })
 
 export const LangProvider = ({ children }: { children: ReactNode }) => {
@@ -721,9 +746,9 @@ export const LangProvider = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname()
 
   useEffect(() => {
-    const guardado = window.localStorage.getItem('madclon-lang')
+    const guardado = idiomaGuardado()
 
-    if (guardado === 'en' || guardado === 'es') setLangState(guardado)
+    if (guardado) setLangState(guardado)
   }, [])
 
   useEffect(() => {
@@ -745,10 +770,10 @@ export const LangProvider = ({ children }: { children: ReactNode }) => {
 
   const setLang = (l: Lang) => {
     setLangState(l)
-    window.localStorage.setItem('madclon-lang', l)
+    window.localStorage.setItem(CLAVE_IDIOMA, l)
   }
 
-  const t = (k: StrKey): string => STR[k]?.[lang] ?? STR[k]?.es ?? k
+  const t = (k: StrKey): string => traducir(k, lang)
 
   return <Ctx.Provider value={{ lang, setLang, t }}>{children}</Ctx.Provider>
 }
