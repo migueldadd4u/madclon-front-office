@@ -28,16 +28,31 @@ Escribe en web/public/data/:
 REGLA DE PRIVACIDAD (bloqueante): solo métricas agregadas de sistema.
 NUNCA se exportan textos de esperas, correos, decisiones, personas, rutas
 locales ni credenciales. Si la salida contiene un patrón sensible, el
-exportador FALLA y no escribe nada.
+exportador FALLA y no escribe nada. Los patrones cazan lo mismo que el gate
+(web/scripts/public-safety.mjs): los dos pasan los canarios comunes de
+exporter/canarios-privacidad.json. Los identificadores privados del vault que
+no pueden salir se leen de un fichero EXTERNO (FO_TERMINOS_VETADOS o
+<vault>/00_SISTEMA/front-office/terminos-vetados.txt): el repo es público y una
+lista de vetados escrita aquí publicaría lo que veta. Sin ese fichero, no se
+exporta.
+
+VOLCADO ATÓMICO: el lote se escribe en una carpeta temporal hermana de la de
+salida, se relee y se vuelve a escanear, y solo entonces sustituye al anterior
+de un golpe. Ante cualquier fallo, los JSON anteriores quedan intactos.
 """
 from __future__ import annotations
 
 import argparse
+import errno
+import os
 import runpy
 import hashlib
 import json
 import re
+import shutil
+import stat
 import sys
+import tempfile
 from datetime import date, datetime, timezone
 from pathlib import Path
 
@@ -326,8 +341,8 @@ def slugs_de_grupo(vault: Path) -> set:
     return fuera
 
 
-def aplica_privacidad_clones(tokens: dict, vault: Path, avisos: list) -> None:
-    """Ningún slug de ficha de grupo puede salir en el material publicado.
+def aplica_privacidad_clones(tokens: dict, vault: Path, avisos: list, vetados=(), alias=None) -> None:
+    """Ningún slug de ficha de grupo ni término vetado puede salir en el material publicado.
 
     El 01/09/2026 el slug de un grupo privado llevaba desde el 18/08 servido en
     https://migueldadd4u.github.io/madclon-front-office/data/tokens.json, y el
@@ -340,15 +355,29 @@ def aplica_privacidad_clones(tokens: dict, vault: Path, avisos: list) -> None:
     una sola, en vez de borrarlas: así los totales de la página siguen
     cuadrando y no se publica tampoco el consumo por grupo. Mismo criterio que
     `aplica_conexiones()` — el texto privado no sale del vault, el cruce se
-    conserva."""
+    conserva.
+
+    01/11/2026: los términos vetados (fichero externo, ver `cargar_terminos_vetados`)
+    se redactan igual. Sustituyen al mapa de «nombre público» que vivía en este
+    fichero con el slug en claro: si el fichero da un alias (`término => alias`),
+    la fila sale con ese alias, como antes; si no, como «privado»."""
     grupos = slugs_de_grupo(vault)
     if not grupos:
         avisos.append("⚠️ 10_SITIOS: no encuentro fichas de grupo; no puedo redactar por_clon")
+    grupos |= {t.lower() for t in vetados}
+    if not grupos:
         return
+    # Un alias que a su vez sea un término vetado o un slug de grupo no se usa.
+    alias = {t: a for t, a in (alias or {}).items() if a.lower() not in grupos}
 
     filas, privada, tocados = [], None, []
     for fila in tokens.get("por_clon", []):
         nombre = str(fila.get("clon") or "").strip()
+        publico = alias.get(nombre.lower().strip("*"))
+        if publico:
+            filas.append({**fila, "clon": publico})
+            tocados.append(nombre)
+            continue
         if nombre.lower().strip("*") not in grupos:
             filas.append(fila)
             continue
@@ -654,16 +683,87 @@ def build_pulso(tokens: dict, sistema: dict, serie: dict, hoy: date) -> dict:
 
 # ------------------------------------------------------------ privacidad
 
-# Los slugs de grupo NO se escriben aquí (01/11/2026): este repo es público y una
-# lista de vetados dentro de la guardia publica justo lo que protege. Se leen del
-# vault en cada pasada (slugs_de_grupo): aplica_privacidad_clones los redacta en
-# origen y patrones_de_grupo() corta la exportación si reaparecen en otro campo.
+# Nada privado se escribe aquí (01/11/2026): este repo es público y una lista de
+# vetados dentro de la guardia publica justo lo que protege. Dos fuentes, las dos
+# fuera del repo: los slugs de grupo se leen del vault en cada pasada
+# (slugs_de_grupo → aplica_privacidad_clones los redacta en origen y
+# patrones_de_grupo() corta si reaparecen) y los TÉRMINOS VETADOS, de un fichero
+# del vault privado, cortan la exportación si reaparecen por cualquier campo.
 # G6 (gate-grupos) lo vigila además desde el lado del vault.
+ENV_TERMINOS_VETADOS = "FO_TERMINOS_VETADOS"
+VETADOS_EN_VAULT = Path("00_SISTEMA") / "front-office" / "terminos-vetados.txt"
+
+
+class SinTerminosVetados(Exception):
+    """No hay lista de términos vetados que aplicar: el exportador no publica a ciegas."""
+
+
+def ruta_terminos_vetados(vault: Path) -> Path:
+    """La de FO_TERMINOS_VETADOS si está puesta; si no, la del vault que se exporta."""
+    env = os.environ.get(ENV_TERMINOS_VETADOS)
+    return Path(env).expanduser() if env else vault / VETADOS_EN_VAULT
+
+
+def cargar_terminos_vetados(ruta: Path) -> list:
+    """Un término por línea; `#` y líneas en blanco se ignoran. En minúsculas, sin repetidos.
+
+    Falla CERRADO (SinTerminosVetados) si el fichero no se puede leer o no tiene
+    ningún término: un fichero que desaparece o llega vacío no puede convertirse
+    en «no hay nada que vetar»."""
+    try:
+        texto = ruta.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise SinTerminosVetados(
+            f"no puedo leer el fichero de términos vetados {ruta} ({exc.strerror or exc}). "
+            f"Es la lista privada de identificadores del vault que no pueden salir al escaparate "
+            f"público; sin ella no se publica. Créalo (un término por línea) o apunta "
+            f"{ENV_TERMINOS_VETADOS} a él") from exc
+    terminos = [t for t, _ in _lineas_vetados(texto)]
+    if not terminos:
+        raise SinTerminosVetados(
+            f"el fichero de términos vetados {ruta} no tiene ningún término (¿truncado?); "
+            f"sin ellos no se publica. Revisa el fichero o {ENV_TERMINOS_VETADOS}")
+    return list(dict.fromkeys(terminos))
+
+
+def _lineas_vetados(texto: str) -> list:
+    """[(término, alias|None)]. Una línea `término => alias` veta el término y dice
+    con qué nombre público sale su fila (lo que antes era NOMBRE_PUBLICO_CLON, con
+    el slug en claro en este repo)."""
+    pares = []
+    for ln in texto.splitlines():
+        ln = ln.strip()
+        if not ln or ln.startswith("#"):
+            continue
+        termino, _, alias = ln.partition("=>")
+        if termino.strip():
+            pares.append((termino.strip().lower(), alias.strip() or None))
+    return pares
+
+
+def cargar_alias_publicos(ruta: Path) -> dict:
+    """{término: alias} de las líneas `término => alias`. Se llama después de
+    `cargar_terminos_vetados`, que ya ha fallado cerrado si el fichero no se lee."""
+    return {t: a for t, a in _lineas_vetados(ruta.read_text(encoding="utf-8")) if a}
+
+
+# La UNIÓN de lo que cazaban este escáner y el del gate (public-safety.mjs), que
+# hasta el 01/11/2026 no detectaban lo mismo: aquí faltaban /home/, rutas de
+# Windows, claves sk- y PRIVATE KEY, +34 y los teléfonos en 3-3-3 y 2-3-2-2.
+# El contrato son los canarios comunes (exporter/canarios-privacidad.json).
+# Se aplican a claves Y valores de texto: el gate lee el JSON entero.
 PATRONES_PROHIBIDOS = [
     (r"@", "posible email"),
-    (r"/Users/", "ruta local"),
+    (r"(?i)/Users/|/home/|\b[A-Z]:\\", "ruta local"),
+    (r"\+34[\s.-]?\d{2,3}[\s.-]?\d{2,3}[\s.-]?\d{2,4}", "posible teléfono"),
+    # 3-2-2-2 con o sin separadores (y los nueve seguidos dentro de un texto)
     (r"(?<!\d)(?:\+?34[ .-]?)?[6-9]\d{2}[ .-]?\d{2}[ .-]?\d{2}[ .-]?\d{2}(?!\d)", "posible teléfono"),
+    # 3-3-3 solo con espacio o guion: con puntos es una cifra de miles (723.101.422 tokens)
+    (r"(?<!\d)[6-9]\d{2}[\s-]\d{3}[\s-]\d{3}(?!\d)", "posible teléfono"),
+    # fijo 2-3-2-2 (91 000 00 00)
+    (r"(?<!\d)[89]\d[\s.-]\d{3}[\s.-]\d{2}[\s.-]\d{2}(?!\d)", "posible teléfono"),
     (r"(?i)(password|token[_-]?de|secret|api[_-]?key|bearer)", "posible credencial"),
+    (r"(?i)\bsk-[a-z0-9_-]{8,}|-----BEGIN [A-Z ]*PRIVATE KEY-----", "posible clave"),
 ]
 
 
@@ -675,22 +775,187 @@ def patrones_de_grupo(vault: Path) -> list:
             for s in sorted(slugs_de_grupo(vault)) if "-" in s and len(s) >= 6]
 
 
-def audit_privacidad(obj, ruta="$", extra=()):
-    """Recorre el JSON; devuelve lista de violaciones (solo valores string)."""
+def _hallazgos_texto(texto: str, ruta: str, vetados, extra=()) -> list:
+    hallazgos = []
+    for patron, que in (*PATRONES_PROHIBIDOS, *extra):
+        if re.search(patron, texto):
+            # el slug no se repite en el log: el motivo y la ruta bastan
+            muestra = "[slug de grupo]" if que == "slug de ficha del vault" else repr(texto[:80])
+            hallazgos.append(f"{ruta}: {que} → {muestra}")
+    bajo = texto.lower()
+    if any(t in bajo for t in vetados):
+        # Sin eco del término: solo dónde está.
+        hallazgos.append(f"{ruta}: término vetado (fichero externo)")
+    return hallazgos
+
+
+def audit_privacidad(obj, ruta="$", vetados=(), extra=()):
+    """Recorre el JSON; devuelve lista de violaciones en claves y valores de texto.
+    `extra`: patrones de slugs de grupo del vault (patrones_de_grupo)."""
     hallazgos = []
     if isinstance(obj, dict):
         for k, v in obj.items():
-            hallazgos += audit_privacidad(v, f"{ruta}.{k}", extra)
+            if isinstance(k, str):
+                hallazgos += _hallazgos_texto(k, f"{ruta}.<clave>", vetados, extra)
+            hallazgos += audit_privacidad(v, f"{ruta}.{k}", vetados, extra)
     elif isinstance(obj, list):
         for i, v in enumerate(obj):
-            hallazgos += audit_privacidad(v, f"{ruta}[{i}]", extra)
+            hallazgos += audit_privacidad(v, f"{ruta}[{i}]", vetados, extra)
     elif isinstance(obj, str):
-        for patron, que in (*PATRONES_PROHIBIDOS, *extra):
-            if re.search(patron, obj):
-                # el slug no se repite en el log: el motivo y la ruta bastan
-                muestra = "[slug de grupo]" if que == "slug de ficha del vault" else repr(obj[:80])
-                hallazgos.append(f"{ruta}: {que} → {muestra}")
+        hallazgos += _hallazgos_texto(obj, ruta, vetados, extra)
     return hallazgos
+
+# ------------------------------------------------------------ volcado atómico
+# Hasta el 01/11/2026 los seis JSON se escribían uno a uno sobre web/public/data:
+# un fallo a mitad (un valor que no se serializa, el disco lleno, un kill) dejaba
+# un lote MEZCLADO —manifest nuevo con tokens viejos— que el refresco nocturno
+# podía commitear y publicar. Ahora el lote se escribe entero en una carpeta
+# temporal HERMANA (mismo disco), se relee y se vuelve a escanear, y solo entonces
+# sustituye a la carpeta anterior en un único paso del sistema de ficheros
+# (renamex_np/RENAME_SWAP en macOS, renameat2/RENAME_EXCHANGE en Linux). Donde ese
+# intercambio no existe, `os.replace` fichero a fichero con copia de respaldo y
+# marcha atrás si uno falla (ahí, y solo ahí, un kill a mitad aún podría mezclar).
+
+
+class VolcadoAbortado(Exception):
+    """El lote nuevo no llegó entero: los JSON anteriores siguen en su sitio."""
+
+
+def serializa_publico(obj) -> str:
+    """JSON compacto: lo que se escribe y lo que mide el tope de TOPE_FICHERO_PUBLICO
+    son el mismo texto (con indent=2 la serie pesaba un 48 % más)."""
+    return json.dumps(obj, ensure_ascii=False, separators=(",", ":"))
+
+
+def escribe_json(ruta: Path, obj) -> None:
+    """Un documento del lote, a disco y sincronizado antes de darlo por escrito."""
+    texto = serializa_publico(obj)
+    with open(ruta, "w", encoding="utf-8") as f:
+        f.write(texto)
+        f.flush()
+        os.fsync(f.fileno())
+
+
+def intercambia_directorios(a: Path, b: Path) -> bool:
+    """Intercambia `a` y `b` en una sola operación atómica. False si aquí no se puede.
+
+    Nunca deja nada a medias: o intercambia, o no toca ninguna de las dos."""
+    import ctypes
+    try:
+        libc = ctypes.CDLL(None, use_errno=True)
+    except OSError:
+        return False
+    if sys.platform == "darwin":
+        fn = getattr(libc, "renamex_np", None)
+        if fn is None:
+            return False
+        fn.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_uint]
+        rc = fn(os.fsencode(a), os.fsencode(b), 0x2)  # RENAME_SWAP
+    elif sys.platform.startswith("linux"):
+        fn = getattr(libc, "renameat2", None)
+        if fn is None:
+            return False
+        fn.argtypes = [ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p, ctypes.c_uint]
+        rc = fn(-100, os.fsencode(a), -100, os.fsencode(b), 0x2)  # AT_FDCWD, RENAME_EXCHANGE
+    else:
+        return False
+    if rc == 0:
+        return True
+    err = ctypes.get_errno()
+    if err in {errno.ENOTSUP, errno.EOPNOTSUPP, errno.EINVAL, errno.ENOSYS}:
+        return False
+    raise OSError(err, os.strerror(err), str(b))
+
+
+def barre_temporales(outdir: Path) -> None:
+    """Restos de una pasada que murió a mitad (solo los nuestros, por prefijo)."""
+    for prefijo in (f".{outdir.name}-nuevo-", f".{outdir.name}-viejo-"):
+        for resto in outdir.parent.glob(f"{prefijo}*"):
+            if resto.is_dir() and not resto.is_symlink():
+                shutil.rmtree(resto, ignore_errors=True)
+                print(f"· barrido un temporal de una pasada anterior: {resto.name}")
+
+
+def valida_lote(carpeta: Path, nombres: list, vetados, extra=()) -> None:
+    """Relee de DISCO lo que se va a publicar: que parsee y que pase el escáner."""
+    for nombre in nombres:
+        try:
+            doc = json.loads((carpeta / nombre).read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            raise VolcadoAbortado(f"{nombre} no se puede releer como JSON ({exc})") from exc
+        hallazgos = audit_privacidad(doc, vetados=vetados, extra=extra)
+        if hallazgos:
+            raise VolcadoAbortado(f"{nombre} releído de disco no pasa el escáner "
+                                  f"({len(hallazgos)} hallazgo(s), el primero: {hallazgos[0]})")
+    sobran = sorted({p.name for p in carpeta.iterdir()} - set(nombres))
+    if sobran:
+        raise VolcadoAbortado(f"la carpeta del lote nuevo trae ficheros de más: {sobran}")
+
+
+def _reemplaza_uno_a_uno(nuevo: Path, outdir: Path, nombres: list) -> None:
+    respaldo = Path(tempfile.mkdtemp(prefix=f".{outdir.name}-viejo-", dir=outdir.parent))
+    hechos, conservar_respaldo = [], False
+    try:
+        for nombre in nombres:
+            destino = outdir / nombre
+            if destino.exists():
+                try:
+                    os.link(destino, respaldo / nombre)
+                except OSError:
+                    shutil.copy2(destino, respaldo / nombre)
+            os.replace(nuevo / nombre, destino)
+            hechos.append(nombre)
+    except Exception as exc:
+        fallo = nombre
+        try:
+            for nombre in reversed(hechos):
+                if (respaldo / nombre).exists():
+                    os.replace(respaldo / nombre, outdir / nombre)
+                else:
+                    (outdir / nombre).unlink(missing_ok=True)
+        except Exception:
+            conservar_respaldo = True  # la marcha atrás también falló: el respaldo es lo único bueno
+            raise
+        raise VolcadoAbortado(f"falló el reemplazo de {fallo} ({exc}); "
+                              f"deshechos los {len(hechos)} ya reemplazados") from exc
+    finally:
+        if not conservar_respaldo:
+            shutil.rmtree(respaldo, ignore_errors=True)
+
+
+def vuelca_lote(salidas: dict, outdir: Path, vetados=(), extra=()) -> None:
+    """Escribe el lote entero o no escribe nada (VolcadoAbortado)."""
+    outdir.parent.mkdir(parents=True, exist_ok=True)
+    barre_temporales(outdir)
+    nombres = list(salidas)
+    nuevo = Path(tempfile.mkdtemp(prefix=f".{outdir.name}-nuevo-", dir=outdir.parent))
+    try:
+        try:
+            for nombre, obj in salidas.items():
+                escribe_json(nuevo / nombre, obj)
+        except Exception as exc:
+            raise VolcadoAbortado(f"no se pudo escribir el lote nuevo ({type(exc).__name__}: {exc})") from exc
+        valida_lote(nuevo, nombres, vetados, extra)
+
+        if not outdir.exists():
+            nuevo.chmod(0o755)
+            os.rename(nuevo, outdir)
+            return
+        # Lo que hubiera en data/ y no sea del lote viaja con él (el gate ya lo rechaza;
+        # este volcado no es quien lo borra).
+        for extra in outdir.iterdir():
+            if extra.name not in salidas:
+                (shutil.copytree if extra.is_dir() else shutil.copy2)(extra, nuevo / extra.name)
+        nuevo.chmod(stat.S_IMODE(outdir.stat().st_mode))  # mkdtemp la crea 0700
+        try:
+            intercambiado = intercambia_directorios(nuevo, outdir)
+        except OSError as exc:
+            raise VolcadoAbortado(f"falló el intercambio atómico de carpetas ({exc})") from exc
+        if not intercambiado:
+            _reemplaza_uno_a_uno(nuevo, outdir, nombres)
+        # Tras el intercambio, `nuevo` guarda el lote anterior: se borra abajo.
+    finally:
+        shutil.rmtree(nuevo, ignore_errors=True)
 
 # --------------------------------------------------------------------- main
 
@@ -734,13 +999,33 @@ def main() -> int:
     ap.add_argument("--claves-conexiones", action="store_true",
                     help="imprime `clave ← etiqueta` de buzones y agendas y sale, sin escribir nada. "
                          "Sirve para mantener exporter/conexiones.md; su salida NO se pega en el repo")
+    ap.add_argument("--prueba-sin-vetados", action="store_true",
+                    help="SOLO PRUEBAS: si falta el fichero de términos vetados, exporta igual; el lote "
+                         "sale con un aviso BLOQUEANTE en manifest.json y la cordura no lo publica")
     args = ap.parse_args()
 
     vault = Path(args.vault).expanduser().resolve()
     outdir = Path(args.out).expanduser().resolve()
     s00 = vault / "00_SISTEMA"
 
+    # Lo primero, antes de leer nada: sin la lista de términos vetados no se exporta.
+    vetados, sin_vetados, alias = [], False, {}
+    if not args.claves_conexiones:
+        try:
+            vetados = cargar_terminos_vetados(ruta_terminos_vetados(vault))
+            alias = cargar_alias_publicos(ruta_terminos_vetados(vault))
+        except SinTerminosVetados as exc:
+            if not args.prueba_sin_vetados:
+                print(f"⛔ EXPORTACIÓN BLOQUEADA: {exc}. Para pruebas: --prueba-sin-vetados.",
+                      file=sys.stderr)
+                return 3
+            sin_vetados = True
+            print(f"⚠️ --prueba-sin-vetados: {exc}. El lote sale marcado como NO publicable.",
+                  file=sys.stderr)
+
     avisos = Avisos()
+    if sin_vetados:
+        avisos.append("⚠️ lote exportado sin la lista de términos vetados (modo de prueba): no publicable")
     for rel in ["Vistas-Principales/PANEL-CLON.md", "Vistas-Principales/PANEL-TOKENS.md",
                 "cuadros-de-mando/SISTEMA-COMPLETO.md", "Monitorizacion/tokens/serie-kpi.jsonl"]:
         if not (s00 / rel).exists():
@@ -762,7 +1047,7 @@ def main() -> int:
         return 0
 
     aplica_conexiones(sistema, avisos)
-    aplica_privacidad_clones(tokens, vault, avisos)
+    aplica_privacidad_clones(tokens, vault, avisos, vetados, alias)
 
     # El rol crudo del vault NO se publica. Su sustituto público tampoco viaja
     # por aquí: lo hornea el build desde exporter/misiones.md y se cruza por
@@ -808,7 +1093,7 @@ def main() -> int:
     violaciones = []
     de_grupo = patrones_de_grupo(vault)
     for nombre, obj in salidas.items():
-        violaciones += [f"{nombre}::{v}" for v in audit_privacidad(obj, extra=de_grupo)]
+        violaciones += [f"{nombre}::{v}" for v in audit_privacidad(obj, vetados=vetados, extra=de_grupo)]
     if violaciones:
         print("⛔ EXPORTACIÓN BLOQUEADA por privacidad:", file=sys.stderr)
         for v in violaciones:
@@ -821,10 +1106,7 @@ def main() -> int:
     # noches seguidas mientras este exportador y la cordura decían «publicable».
     # Ahora se escribe compacto (con indent=2 la serie pesaba un 48 % más) y el
     # tope se comprueba aquí: pasarlo bloquea, y acercarse se avisa con tiempo.
-    def serializa(obj):
-        return json.dumps(obj, ensure_ascii=False, separators=(",", ":"))
-
-    textos = {nombre: serializa(obj) for nombre, obj in salidas.items()}
+    textos = {nombre: serializa_publico(obj) for nombre, obj in salidas.items()}
     for nombre, texto in textos.items():
         peso = len(texto.encode("utf-8"))
         if peso > TOPE_FICHERO_PUBLICO:
@@ -835,11 +1117,14 @@ def main() -> int:
                         f"del tope de {TOPE_FICHERO_PUBLICO} B: recortarlo antes de que bloquee")
     salidas["manifest.json"]["avisos"] = list(avisos)
     salidas["manifest.json"]["avisos_bloqueantes"] = avisos.bloqueantes
-    textos["manifest.json"] = serializa(salidas["manifest.json"])
 
-    outdir.mkdir(parents=True, exist_ok=True)
-    for nombre, texto in textos.items():
-        (outdir / nombre).write_text(texto, encoding="utf-8")
+    # --- volcado atómico: el lote entero o nada ---
+    try:
+        vuelca_lote(salidas, outdir, vetados, de_grupo)
+    except VolcadoAbortado as exc:
+        print(f"⛔ VOLCADO ABORTADO: {exc}. Los JSON anteriores de {outdir} quedan intactos.",
+              file=sys.stderr)
+        return 4
     print(f"✅ exportados {len(salidas)} ficheros a {outdir}")
     bloqueantes = avisos.bloqueantes
     for a in avisos:

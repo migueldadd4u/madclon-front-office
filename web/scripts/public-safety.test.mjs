@@ -18,6 +18,7 @@ import {
   auditPublicDataDirectory,
   auditRuntimeSource,
   auditServiceWorkerSource,
+  cargarTerminosVetados,
   validatePublicDocument
 } from './public-safety.mjs'
 
@@ -474,4 +475,103 @@ test('el postbuild distingue el transporte inerte de Next de una mutación de ap
 test('Hardware público no admite el antiguo enlace privado como excepción', () => {
   const url = 'https://macstudio-de-clon.tail89283c.ts.net/hardware'
   assert.ok(auditRuntimeSource(`<a href='${url}'>Hardware</a>`, 'src/components/layout/vertical/VerticalMenu.tsx').length > 0)
+})
+
+// ---------------------------------------------------------------- canarios comunes
+// Los mismos canarios SINTÉTICOS que pasa el exportador (exporter/test_privacidad_publico.py):
+// un patrón que solo cace uno de los dos escáneres se ve en rojo en el otro.
+const CANARIOS = JSON.parse(readFileSync(new URL('../../exporter/canarios-privacidad.json', import.meta.url), 'utf8'))
+const VETADOS_DE_PRUEBA = CANARIOS.vetados_de_prueba
+const TOKENS_LEGADO = { contador: {}, kpis: {}, intervenciones: [] }
+const PRIVACIDAD = new Set(['PUBLIC_DATA_SENSITIVE_CONTENT', 'PUBLIC_DATA_VETOED_TERM'])
+
+function validaTokens(doc, vetados = VETADOS_DE_PRUEBA) {
+  return validatePublicDocument('tokens.json', doc, JSON.stringify(doc), { vetados })
+}
+
+test('canarios comunes: el gate caza los mismos que el exportador, como valor y como clave', () => {
+  for (const canario of CANARIOS.detectar) {
+    const comoValor = validaTokens({ ...TOKENS_LEGADO, campo: canario.valor })
+    const comoClave = validaTokens({ ...TOKENS_LEGADO, filas: [{ [canario.valor]: 1 }] })
+
+    assert.ok(comoValor.some(item => PRIVACIDAD.has(item.code)), `no caza como valor: ${canario.tipo}`)
+    assert.ok(comoClave.some(item => PRIVACIDAD.has(item.code)), `no caza como clave: ${canario.tipo}`)
+  }
+})
+
+test('canarios limpios: cifras de miles, fechas y textos de indicador no bloquean', () => {
+  for (const limpio of CANARIOS.limpios) {
+    assert.deepEqual(validaTokens({ ...TOKENS_LEGADO, campo: limpio.valor }), [], limpio.tipo)
+  }
+})
+
+test('sin lista de vetados el gate no se inventa el término', () => {
+  const vetado = CANARIOS.detectar.find(canario => canario.requiere_vetados)
+
+  assert.deepEqual(validaTokens({ ...TOKENS_LEGADO, campo: vetado.valor }, []), [])
+})
+
+test('términos vetados: variable, fichero junto al checkout o ninguno (CI)', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'vetados-test-'))
+
+  try {
+    const fichero = join(dir, 'vetados.txt')
+
+    writeFileSync(fichero, '# cabecera\n\n  Uno-Inventado \n# otro\ndos-inventado\nuno-inventado\n')
+    assert.deepEqual(cargarTerminosVetados({ env: { FO_TERMINOS_VETADOS: fichero } }), {
+      estado: 'ok',
+      terminos: ['uno-inventado', 'dos-inventado']
+    })
+    assert.equal(cargarTerminosVetados({ env: {}, porDefecto: fichero }).estado, 'ok')
+    // «término => alias»: se veta el término; el alias es nombre público y no se veta.
+    writeFileSync(fichero, 'uno-inventado => perfil-inventado\ndos-inventado\n')
+    assert.deepEqual(cargarTerminosVetados({ env: { FO_TERMINOS_VETADOS: fichero } }).terminos,
+      ['uno-inventado', 'dos-inventado'])
+    writeFileSync(fichero, '# cabecera\n\n  Uno-Inventado \n# otro\ndos-inventado\nuno-inventado\n')
+    assert.deepEqual(cargarTerminosVetados({ env: {}, porDefecto: join(dir, 'no-existe.txt') }), {
+      estado: 'sin-fichero',
+      terminos: []
+    })
+    assert.equal(cargarTerminosVetados({ env: { FO_TERMINOS_VETADOS: join(dir, 'no-existe.txt') } }).estado, 'ilegible')
+    writeFileSync(fichero, '# solo cabecera\n')
+    assert.equal(cargarTerminosVetados({ env: { FO_TERMINOS_VETADOS: fichero } }).estado, 'ilegible')
+  } finally {
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+test('CLI: un término vetado en los datos bloquea sin hacer eco; una variable rota también bloquea', () => {
+  withFixture(webRoot => {
+    const vetados = join(webRoot, 'vetados.txt')
+    const data = join(webRoot, 'public', 'data')
+    const env = { ...process.env, FO_TERMINOS_VETADOS: vetados }
+
+    writeFileSync(vetados, `${VETADOS_DE_PRUEBA.join('\n')}\n`)
+    writeDocuments(data, { ...SAFE_DOCUMENTS, 'tokens.json': { ...TOKENS_LEGADO, nota: 'Perfil TERMINO-VETADO-DE-PRUEBA' } })
+
+    const bloqueado = spawnSync(process.execPath, [SAFETY_CLI, '--source'], { cwd: webRoot, encoding: 'utf8', env })
+
+    assert.equal(bloqueado.status, 1)
+    assert.equal(
+      bloqueado.stderr,
+      'PUBLIC SAFETY BLOQUEADO · source · 1 hallazgos\n' + '  - data/tokens.json: PUBLIC_DATA_VETOED_TERM [privacy]\n'
+    )
+    assert.equal(`${bloqueado.stdout}${bloqueado.stderr}`.toLowerCase().includes(VETADOS_DE_PRUEBA[0]), false)
+
+    writeDocuments(data, SAFE_DOCUMENTS)
+
+    const roto = spawnSync(process.execPath, [SAFETY_CLI, '--source'], {
+      cwd: webRoot,
+      encoding: 'utf8',
+      env: { ...env, FO_TERMINOS_VETADOS: join(webRoot, 'no-existe.txt') }
+    })
+
+    assert.equal(roto.status, 1)
+    assert.match(roto.stderr, /PUBLIC_VETOED_TERMS_UNREADABLE/)
+    assert.equal(roto.stderr.includes('no-existe'), false)
+
+    const limpio = spawnSync(process.execPath, [SAFETY_CLI, '--source'], { cwd: webRoot, encoding: 'utf8', env })
+
+    assert.equal(limpio.status, 0, limpio.stderr)
+  })
 })

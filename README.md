@@ -70,11 +70,19 @@ activos. **Nunca** personas identificables, nombres internos privados, credencia
 telemetría privada. Los activos públicos van pineados por SHA-256 y el service worker
 pasa una auditoría propia (solo GET, mismo origen, caché con caducidad y purga).
 
+El escáner del exportador y el del gate cazan lo mismo: los dos pasan los canarios
+sintéticos de `exporter/canarios-privacidad.json`. Los **términos vetados** (identificadores
+privados del vault) no se escriben en este repo: se leen de `FO_TERMINOS_VETADOS` o de
+`<vault>/00_SISTEMA/front-office/terminos-vetados.txt`. Sin ese fichero el exportador no
+escribe nada (salida 3); el gate los comprueba si lo encuentra. El exportador vuelca el
+lote **entero o nada**: carpeta temporal hermana, relectura y escaneo, e intercambio de
+golpe con `web/public/data`.
+
 ## Uso diario
 
 ```bash
 cd web
-npm run test:public-safety   # regresiones herméticas
+npm test                     # todas las pruebas herméticas (las mismas que la CI)
 npm run check:public-safety  # debe quedar verde antes de construir
 npm run gate                 # build nuevo + matriz completa local
 ```
@@ -93,11 +101,16 @@ git push -u origin main
 ```
 
 El workflow se ejecuta cuando `main` recibe cambios en `web/public/data/**` y también
-admite `workflow_dispatch`. Antes de subir el artefacto ejecuta las regresiones de
-privacidad, el gate sobre las fuentes, el build estático y el gate sobre `web/out`.
-Si falla cualquiera de esas puertas, GitHub Pages conserva el último despliegue válido.
-No hay un segundo horario en Actions: el productor nocturno de datos es quien dispara
-el flujo mediante su push.
+admite `workflow_dispatch`. Antes de subir el artefacto ejecuta las pruebas herméticas
+(`yarn test` y los unittest del exportador), el gate sobre las fuentes, el build estático
+y el gate sobre `web/out`. Si falla cualquiera de esas puertas, GitHub Pages conserva el
+último despliegue válido. No hay un segundo horario en Actions: el productor nocturno de
+datos es quien dispara el flujo mediante su push.
+
+`.github/workflows/ci.yml` corre esas mismas pruebas en cada push y cada PR, de cualquier
+rama, sin construir ni publicar (solo permiso de lectura). La lista de pruebas vive en el
+script `test` de `web/package.json`; `scripts/suite-ci.test.mjs` falla si aparece una
+prueba nueva que no esté ahí ni apartada con su motivo.
 
 > ⚠️ **Licencia**: el tema Materialize es de pago (Envato/Pixinvent). Publicar su código
 > fuente en un repo **público** incumple la licencia — usa un repo **privado**

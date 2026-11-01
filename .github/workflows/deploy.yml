@@ -27,9 +27,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Node 22: la versión con soporte que se usa en local, y la primera que lee
+      # TypeScript sin compilar (tema-claro.test.mjs importa themeConfig.ts).
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: yarn
           cache-dependency-path: web/yarn.lock
 
@@ -37,12 +39,18 @@ jobs:
         working-directory: web
         run: yarn install --frozen-lockfile --non-interactive
 
-      - name: Public safety regressions
+      # No se construye sin pasar antes todas las pruebas herméticas. La lista vive
+      # en el script `test` de web/package.json; las que no pueden correr aquí
+      # (necesitan navegador) están en scripts/suite-ci.test.mjs con su motivo.
+      - name: Pruebas herméticas (privacidad, contrato, copy, tema, CI)
         working-directory: web
-        run: yarn test:public-safety
+        run: yarn test
 
-      - name: Public hardware collector regressions
-        run: python3 -m unittest discover -s exporter -p test_hardware_publico.py
+      # Productor de datos: hardware público y retos públicos, sin red ni vault.
+      # El patrón recoge también privacidad y volcado de export_panel.py (01/11/2026):
+      # herméticos, con términos vetados de prueba; el cruce con el fichero real solo corre en el Mac.
+      - name: Pruebas del exportador (hardware, retos, privacidad y volcado)
+        run: python3 -m unittest discover -s exporter -p 'test_*publico*.py'
 
       - name: Public safety gate (source)
         working-directory: web
