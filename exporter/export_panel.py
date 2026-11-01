@@ -60,6 +60,10 @@ from pathlib import Path
 collect_public_hardware = runpy.run_path(str(Path(__file__).with_name("hardware_publico.py")))["collect_public_hardware"]
 # El avance de los retos públicos: lo calcula el panel privado, aquí solo se valida y se copia.
 bloque_retos = runpy.run_path(str(Path(__file__).with_name("retos_publicos.py")))["bloque_retos"]
+# «Lo reciente manda» (orden de MAD, 01/11/2026): lo del día y lo parado, y la
+# serie con ventana. Mismos umbrales que el panel privado (lib/lo-reciente.ts).
+_lo_reciente = runpy.run_path(str(Path(__file__).with_name("lo_reciente.py")))
+gtd_lo_reciente, ventana_serie = _lo_reciente["gtd_lo_reciente"], _lo_reciente["ventana_serie"]
 
 # ---------------------------------------------------------------- avisos del lote
 
@@ -1071,6 +1075,8 @@ def main() -> int:
     overview["hardware"] = collect_public_hardware()
     # Retos (arco cero-a-cien, fase 7): la porción pública del índice, o «en revisión».
     overview["retos"] = bloque_retos(vault, avisos)
+    # «¿Qué espera de MAD ahora mismo?» cuenta lo del día y dice aparte lo parado.
+    overview["gtd"]["lo_reciente"] = gtd_lo_reciente(vault, datetime.now(timezone.utc).date())
 
     ahora = datetime.now(timezone.utc).isoformat(timespec="seconds")
     salidas = {
@@ -1085,7 +1091,7 @@ def main() -> int:
         "overview.json": overview,
         "clones.json": sistema,
         "tokens.json": tokens,
-        "serie.json": serie,
+        "serie.json": ventana_serie(serie),
         "pulso.json": build_pulso(tokens, sistema, serie, datetime.now(timezone.utc).date()),
     }
 
@@ -1134,7 +1140,7 @@ def main() -> int:
     print(f"   crons={len(overview.get('crons', []))} clones={len(sistema['clones'])} "
           f"integraciones={len(sistema['integraciones'])} "
           f"kpis={sum(len(v) for v in tokens['kpis'].values())} "
-          f"puntos_serie={len(serie['serie'])}")
+          f"puntos_serie={len(salidas['serie.json']['serie'])}/{len(serie['serie'])}")
     return 0
 
 

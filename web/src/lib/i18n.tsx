@@ -634,6 +634,7 @@ const STR = {
   act_bandeja: { es: 'capturas sin clasificar', en: 'captures not yet sorted' },
   act_esperas: { es: 'respuestas de terceros vencidas', en: 'overdue third-party replies' },
   act_decisiones: { es: 'decisiones abiertas del sistema', en: 'open system decisions' },
+  act_parados: { es: 'y {n} paradas hace más de {d} días', en: 'plus {n} stalled for more than {d} days' },
   act_motor: { es: 'El motor que se mejora solo · 7 días', en: 'The engine that improves itself · 7 days' },
   act_motor_sub_1: {
     es: 'cada noche se autoaudita y propone mejoras · coste en factura variable:',

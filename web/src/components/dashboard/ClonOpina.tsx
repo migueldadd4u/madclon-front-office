@@ -45,7 +45,7 @@ const PLANTILLAS_ES: Plantilla[] = [
   d => {
     const a = d.overview.automejora
 
-    return `Cada noche me audito a mí mismo. Esta semana: ${a.hechas} mejoras aplicadas, ${a.pendientes} en la cola y ${a.bloqueadas} bloqueadas esperando permiso. Mejorarme a mí mismo es, con diferencia, mi rutina favorita.`
+    return `Cada noche me audito a mí mismo. Hasta hoy: ${a.hechas} mejoras aplicadas, ${a.pendientes} en la cola y ${a.bloqueadas} bloqueadas esperando permiso. Mejorarme a mí mismo es, con diferencia, mi rutina favorita.`
   },
 
   // 4 · un día tranquilo vale oro
@@ -92,7 +92,7 @@ const PLANTILLAS_EN: Plantilla[] = [
   d => {
     const a = d.overview.automejora
 
-    return `Every night I audit myself. This week: ${a.hechas} improvements applied, ${a.pendientes} queued and ${a.bloqueadas} blocked waiting for permission. Improving myself is, by far, my favourite routine.`
+    return `Every night I audit myself. So far: ${a.hechas} improvements applied, ${a.pendientes} queued and ${a.bloqueadas} blocked waiting for permission. Improving myself is, by far, my favourite routine.`
   },
   d => {
     const o = d.overview

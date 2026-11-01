@@ -9,6 +9,8 @@ export type Manifest = {
 
 export type Cron = { nombre: string; ambito: string; estado: string; ultima: string }
 
+export type RepartoReciente = { del_dia: number; parados: number }
+
 export type Overview = {
   hardware?: unknown
   gtd: {
@@ -18,6 +20,15 @@ export type Overview = {
     esperas_listadas: number | null
     decisiones: number | null
     acciones_hoy: number | null
+
+    /** «Lo reciente manda» (01/11/2026): lo del día y lo parado más de `umbral_dias`. Solo recuentos. */
+    lo_reciente?: {
+      umbral_dias: number
+      bandeja?: RepartoReciente
+      acciones_hoy?: RepartoReciente
+      esperas_vencidas?: RepartoReciente
+      decisiones?: RepartoReciente
+    }
   }
   personas: { fichas_curadas: number | null; staged: number | null }
   automejora: {
@@ -193,6 +204,11 @@ export type SerieData = {
   serie: PuntoSerie[]
   linea_base: { congelada?: string; kpis?: Record<string, { valor: number } | number> }
   intervenciones_raw: { id: string; fecha: string; que: string; kpi: string }[]
+
+  /** Desde el 01/11/2026 la serie viaja con ventana; los récords se calculan sobre la serie entera. */
+  records?: Record<string, { valor: number; fecha: string }>
+  ventana_dias?: number
+  desde_total?: string
 }
 
 export type PanelData = {

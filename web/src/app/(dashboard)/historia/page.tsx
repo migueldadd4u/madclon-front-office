@@ -26,7 +26,7 @@ import type { Lang, StrKey } from '@/lib/i18n'
 
 // Data Imports
 import { fmt, fmtCorto } from '@/lib/data'
-import type { PanelData } from '@/lib/data'
+import type { PanelData, SerieData } from '@/lib/data'
 import { HITOS_BUILD } from '@/lib/historia-hitos'
 
 // La línea de tiempo NO se escribe aquí: nace en exporter/historia.md, fuente
@@ -59,7 +59,15 @@ const fechaLarga = (iso: string, lang: Lang) =>
     year: 'numeric'
   })
 
-// Máximo de la serie por métrica, conservando la fecha en la que se marcó
+// Máximo de la serie por métrica, conservando la fecha en la que se marcó. Desde
+// el 01/11/2026 la serie pública viaja con ventana (los últimos días) y el
+// exportador manda los récords de la serie ENTERA en `records`: mandan ellos.
+const recordDe = (serie: SerieData, clave: string) => {
+  const r = serie.records?.[clave]
+
+  return r ? { v: r.valor, f: r.fecha } : maxPor(serie.serie, clave)
+}
+
 const maxPor = (puntos: { fecha: string; contexto?: Record<string, number> }[], clave: string) =>
   puntos.reduce<{ v: number; f: string } | null>((acc, p) => {
     const v = p.contexto?.[clave]
@@ -273,9 +281,9 @@ const HistoriaPage = () => {
             {/* Récords del sistema: techos medidos de la serie con su fecha */}
             {(() => {
               const records = [
-                { rec: maxPor(data.serie.serie, 'tokens'), label: t('rec_tokens'), icon: 'ri-brain-line', color: 'warning' as const, formato: fmtCorto },
-                { rec: maxPor(data.serie.serie, 'tareas_hechas'), label: t('rec_tareas'), icon: 'ri-checkbox-circle-line', color: 'success' as const, formato: undefined },
-                { rec: maxPor(data.serie.serie, 'llamadas'), label: t('rec_llamadas'), icon: 'ri-exchange-line', color: 'info' as const, formato: undefined }
+                { rec: recordDe(data.serie, 'tokens'), label: t('rec_tokens'), icon: 'ri-brain-line', color: 'warning' as const, formato: fmtCorto },
+                { rec: recordDe(data.serie, 'tareas_hechas'), label: t('rec_tareas'), icon: 'ri-checkbox-circle-line', color: 'success' as const, formato: undefined },
+                { rec: recordDe(data.serie, 'llamadas'), label: t('rec_llamadas'), icon: 'ri-exchange-line', color: 'info' as const, formato: undefined }
               ].filter(r => r.rec !== null)
 
               if (records.length === 0) return null

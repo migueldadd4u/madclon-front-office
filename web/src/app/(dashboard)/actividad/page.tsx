@@ -47,6 +47,15 @@ const ActividadPage = () => {
     {({ overview, manifest }) => {
       const { gtd, automejora, personas } = overview
 
+      // «Lo reciente manda» (orden de MAD, 01/11/2026): «ahora mismo» es lo que se
+      // ha movido en las dos últimas semanas; lo parado se cuenta debajo, no se calla.
+      const reciente = gtd.lo_reciente
+
+      const delDia = (r: { del_dia: number } | undefined, total: number | null) => (r ? r.del_dia : total)
+
+      const parados = (r: { parados: number } | undefined) =>
+        r && r.parados > 0 && reciente ? t('act_parados').replace('{n}', fmt(r.parados)).replace('{d}', String(reciente.umbral_dias)) : undefined
+
       const colaTotal = Math.max(
         automejora.hechas + automejora.bloqueadas + automejora.aparcadas + automejora.pendientes,
         1
@@ -74,23 +83,25 @@ const ActividadPage = () => {
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-            <StatCard icon='ri-inbox-line' valor={fmt(gtd.bandeja)} countTo={gtd.bandeja} label={t('act_bandeja')} color='info' />
+            <StatCard icon='ri-inbox-line' valor={fmt(delDia(reciente?.bandeja, gtd.bandeja))} countTo={delDia(reciente?.bandeja, gtd.bandeja)} label={t('act_bandeja')} detalle={parados(reciente?.bandeja)} color='info' />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
             <StatCard
               icon='ri-hourglass-line'
-              valor={fmt(gtd.esperas_vencidas)}
-              countTo={gtd.esperas_vencidas}
+              valor={fmt(delDia(reciente?.esperas_vencidas, gtd.esperas_vencidas))}
+              countTo={delDia(reciente?.esperas_vencidas, gtd.esperas_vencidas)}
               label={t('act_esperas')}
-              color={(gtd.esperas_vencidas ?? 0) > 0 ? 'error' : 'success'}
+              detalle={parados(reciente?.esperas_vencidas)}
+              color={(delDia(reciente?.esperas_vencidas, gtd.esperas_vencidas) ?? 0) > 0 ? 'error' : 'success'}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
             <StatCard
               icon='ri-list-check-3'
-              valor={fmt(gtd.decisiones)}
-              countTo={gtd.decisiones}
+              valor={fmt(delDia(reciente?.decisiones, gtd.decisiones))}
+              countTo={delDia(reciente?.decisiones, gtd.decisiones)}
               label={t('act_decisiones')}
+              detalle={parados(reciente?.decisiones)}
               color='secondary'
             />
           </Grid>
