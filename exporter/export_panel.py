@@ -434,6 +434,9 @@ RE_ICONO = re.compile(r"^ri-[a-z0-9-]+$")
 # el sistema lo diga en voz alta (principio de MAD: nada muere en silencio).
 DIAS_HISTORIA_RANCIA = 21
 
+# Bytes por fichero que deja publicar web/scripts/public-safety.mjs (64 * 1024).
+TOPE_FICHERO_PUBLICO = 64 * 1024
+
 # ------------------------------------------------------ oficios públicos de la flota
 # Misma doctrina que los capítulos, y por el mismo motivo. Hasta el 13/08/2026 el
 # rol y la misión de cada tarjeta de /flota se copiaban TAL CUAL del vault (la
@@ -803,10 +806,31 @@ def main() -> int:
             print(f"  - {v}", file=sys.stderr)
         return 2
 
+    # --- tope de tamaño: el mismo de web/scripts/public-safety.mjs ---
+    # POR QUÉ (01/11/2026). serie.json crece un punto por noche y el 22/10 pasó
+    # de 64 KiB: la Action de Pages lo bloqueó (PUBLIC_DATA_FILE_TOO_LARGE) once
+    # noches seguidas mientras este exportador y la cordura decían «publicable».
+    # Ahora se escribe compacto (con indent=2 la serie pesaba un 48 % más) y el
+    # tope se comprueba aquí: pasarlo bloquea, y acercarse se avisa con tiempo.
+    def serializa(obj):
+        return json.dumps(obj, ensure_ascii=False, separators=(",", ":"))
+
+    textos = {nombre: serializa(obj) for nombre, obj in salidas.items()}
+    for nombre, texto in textos.items():
+        peso = len(texto.encode("utf-8"))
+        if peso > TOPE_FICHERO_PUBLICO:
+            avisos.append(f"⚠️ {nombre} pesa {peso} B y Pages no publica más de "
+                          f"{TOPE_FICHERO_PUBLICO} B por fichero (public-safety.mjs)")
+        elif peso > TOPE_FICHERO_PUBLICO * 0.85:
+            avisos.nota(f"⚠️ {nombre} pesa {peso} B, el {100 * peso // TOPE_FICHERO_PUBLICO} % "
+                        f"del tope de {TOPE_FICHERO_PUBLICO} B: recortarlo antes de que bloquee")
+    salidas["manifest.json"]["avisos"] = list(avisos)
+    salidas["manifest.json"]["avisos_bloqueantes"] = avisos.bloqueantes
+    textos["manifest.json"] = serializa(salidas["manifest.json"])
+
     outdir.mkdir(parents=True, exist_ok=True)
-    for nombre, obj in salidas.items():
-        (outdir / nombre).write_text(json.dumps(obj, ensure_ascii=False, indent=2),
-                                     encoding="utf-8")
+    for nombre, texto in textos.items():
+        (outdir / nombre).write_text(texto, encoding="utf-8")
     print(f"✅ exportados {len(salidas)} ficheros a {outdir}")
     bloqueantes = avisos.bloqueantes
     for a in avisos:

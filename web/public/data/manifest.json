@@ -1,12 +1,1 @@
-{
-  "generado": "2026-11-01T02:43:15+00:00",
-  "version": 1,
-  "avisos": [],
-  "avisos_bloqueantes": [],
-  "fuentes": [
-    "PANEL-CLON",
-    "PANEL-TOKENS",
-    "cuadros-de-mando",
-    "Monitorizacion/tokens"
-  ]
-}
+{"generado":"2026-11-01T02:43:15+00:00","version":1,"avisos":[],"avisos_bloqueantes":[],"fuentes":["PANEL-CLON","PANEL-TOKENS","cuadros-de-mando","Monitorizacion/tokens"]}

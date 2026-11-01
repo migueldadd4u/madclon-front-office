@@ -265,5 +265,23 @@ export const HITOS_BUILD: Hito[] = [
     "es_texto": "Una noche, el ordenador donde vive el clon dejó de trabajar hasta media mañana del día siguiente. No corrió ninguna de las tareas de madrugada, y ese día se quedó sin su apunte en el diario. Al cerrar la semana, el recuento la dio por completa: contaba los apuntes que había, no los días que debía haber. Lo cazó quien escribía el resumen, no el recuento. Por qué se paró aún no se sabe. La lección sí quedó escrita: lo completo se mide contra el calendario, no contra lo que llegó.",
     "en_titulo": "The night the machine stopped, and the tally said nothing was missing",
     "en_texto": "One night, the computer the clone lives on stopped working until mid-morning the next day. None of the overnight tasks ran, and that day was left without its entry in the logbook. When the week was closed, the tally called it complete: it counted the entries that were there, not the days that should have been. It was caught by whoever was writing the summary, not by the tally. Why it stopped is still unknown. The lesson was written down all the same: completeness is measured against the calendar, not against what arrived."
+  },
+  {
+    "fecha": "2026-10-15",
+    "icono": "ri-checkbox-circle-line",
+    "color": "info",
+    "es_titulo": "Las comprobaciones que nunca podían dar rojo",
+    "es_texto": "Al añadir una comprobación nueva a las que el clon pasa al empezar cada sesión, se probó con un fallo a propósito, y salió verde. No era la nueva: ninguna de las de antes podía fallar nunca, por un error en cómo se leía su resultado. Ese mismo día, la voz del clon dejó de cambiar en silencio a una voz de reserva cuando la suya fallaba: ahora lo apunta y, si se le exige su voz, falla en vez de fingir. La lección: un comprobador que nunca ha dado rojo no está comprobado.",
+    "en_titulo": "The checks that could never turn red",
+    "en_texto": "While adding a new check to the ones the clone runs at the start of every session, it was tested with a deliberate failure, and it came back green. It was not the new one: none of the earlier checks could ever fail, because of a mistake in how their result was read. That same day, the clone's voice stopped silently switching to a backup voice when its own failed: now it writes it down and, if its own voice is required, it fails instead of pretending. The lesson: a checker that has never turned red has not been checked."
+  },
+  {
+    "fecha": "2026-10-15",
+    "icono": "ri-alarm-warning-line",
+    "color": "error",
+    "es_titulo": "El vigilante que gritaba sin motivo",
+    "es_texto": "Esa tarde, el vigilante del clon empezó a avisar de que unas piezas lanzaban programas que ya no existían. Existían todos. El aviso falso se repitió cada pocos minutos, día y noche, durante el resto de la quincena, y acabó llenando casi toda la lista de avisos. Debajo quedaron enterrados avisos de verdad: la mensajería del clon desconectada y el correo del trabajo caído. Se comprobó que era falso al cerrar la quincena, mirando lo que el aviso decía que faltaba. Por qué se equivoca aún no está comprobado. La lección quedó escrita: un aviso nuevo se prueba contra una instalación sana antes de encenderlo, y un aviso que se repite idéntico sin parar es un fallo del propio vigilante.",
+    "en_titulo": "The watchdog that cried wolf",
+    "en_texto": "That afternoon, the clone's watchdog started warning that some parts were launching programs that no longer existed. They all existed. The false warning repeated every few minutes, day and night, for the rest of the fortnight, and ended up filling almost the whole list of alerts. Real alerts were buried underneath: the clone's messaging disconnected and the work mail down. It was found to be false when the fortnight was closed, by looking at what the warning said was missing. Why it gets it wrong is not yet confirmed. The lesson was written down: a new alert is tested against a healthy setup before it is switched on, and an alert that repeats identically without end is a failure of the watchdog itself."
   }
 ]
