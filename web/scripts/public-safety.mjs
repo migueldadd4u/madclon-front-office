@@ -104,7 +104,9 @@ export function cargarTerminosVetados({ env = process.env, porDefecto = VETADOS_
       .split(/\r?\n/)
       .map(linea => linea.trim())
       .filter(linea => linea && !linea.startsWith('#'))
-      .map(linea => linea.toLowerCase())
+      // «término => alias»: el alias es el nombre público de esa fila; se veta solo el término
+      .map(linea => linea.split('=>')[0].trim().toLowerCase())
+      .filter(Boolean)
 
     return terminos.length ? { estado: 'ok', terminos: [...new Set(terminos)] } : { estado: 'ilegible', terminos: [] }
   } catch {

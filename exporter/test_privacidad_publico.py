@@ -77,6 +77,33 @@ class TerminosVetadosTest(unittest.TestCase):
         f.write_text("# cabecera\n\n  Uno-Inventado  \n# otro comentario\ndos-inventado\n", encoding="utf-8")
         self.assertEqual(ep.cargar_terminos_vetados(f), ["uno-inventado", "dos-inventado"])
 
+    def test_termino_con_alias_publico(self):
+        # «término => alias»: el término se veta y el alias es el nombre con el
+        # que esa fila salía ya en la web (antes, NOMBRE_PUBLICO_CLON en claro).
+        f = self.dir / "vetados.txt"
+        f.write_text("# cabecera\nUno-Inventado => perfil-inventado\ndos-inventado\n", encoding="utf-8")
+        self.assertEqual(ep.cargar_terminos_vetados(f), ["uno-inventado", "dos-inventado"])
+        self.assertEqual(ep.cargar_alias_publicos(f), {"uno-inventado": "perfil-inventado"})
+
+    def test_una_fila_con_alias_conserva_su_nombre_publico(self):
+        tokens = {"por_clon": [{"clon": "ceo", "tokens": 5, "llamadas": 1, "modelos": "m"},
+                               {"clon": "Uno-Inventado", "tokens": 7, "llamadas": 2, "modelos": "x"},
+                               {"clon": "dos-inventado", "tokens": 3, "llamadas": 1, "modelos": "y"}]}
+        avisos = ep.Avisos()
+        ep.aplica_privacidad_clones(tokens, self.dir / "vault-sin-sitios", avisos,
+                                    vetados=["uno-inventado", "dos-inventado"],
+                                    alias={"uno-inventado": "perfil-inventado"})
+        self.assertEqual([f["clon"] for f in tokens["por_clon"]], ["ceo", "perfil-inventado", "privado"])
+        self.assertEqual(tokens["por_clon"][1]["modelos"], "x")
+        self.assertEqual(ep.audit_privacidad(tokens, vetados=["uno-inventado", "dos-inventado"]), [])
+
+    def test_un_alias_que_tambien_esta_vetado_no_se_usa(self):
+        tokens = {"por_clon": [{"clon": "uno-inventado", "tokens": 7, "llamadas": 2, "modelos": "x"}]}
+        ep.aplica_privacidad_clones(tokens, self.dir / "vault-sin-sitios", ep.Avisos(),
+                                    vetados=["uno-inventado", "dos-inventado"],
+                                    alias={"uno-inventado": "dos-inventado"})
+        self.assertEqual([f["clon"] for f in tokens["por_clon"]], ["privado"])
+
     def test_sin_fichero_o_sin_terminos_falla_cerrado(self):
         with self.assertRaises(ep.SinTerminosVetados):
             ep.cargar_terminos_vetados(self.dir / "no-existe.txt")

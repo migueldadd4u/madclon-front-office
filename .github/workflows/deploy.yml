@@ -47,9 +47,9 @@ jobs:
         run: yarn test
 
       # Productor de datos: hardware público y retos públicos, sin red ni vault.
-      # TODO: cuando exista la prueba del exportador principal (export_panel.py),
-      # añadirla aquí y en ci.yml si es hermética.
-      - name: Pruebas del exportador (hardware y retos)
+      # El patrón recoge también privacidad y volcado de export_panel.py (01/11/2026):
+      # herméticos, con términos vetados de prueba; el cruce con el fichero real solo corre en el Mac.
+      - name: Pruebas del exportador (hardware, retos, privacidad y volcado)
         run: python3 -m unittest discover -s exporter -p 'test_*publico*.py'
 
       - name: Public safety gate (source)

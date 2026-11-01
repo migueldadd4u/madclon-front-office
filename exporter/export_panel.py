@@ -341,7 +341,7 @@ def slugs_de_grupo(vault: Path) -> set:
     return fuera
 
 
-def aplica_privacidad_clones(tokens: dict, vault: Path, avisos: list, vetados=()) -> None:
+def aplica_privacidad_clones(tokens: dict, vault: Path, avisos: list, vetados=(), alias=None) -> None:
     """Ningún slug de ficha de grupo ni término vetado puede salir en el material publicado.
 
     El 01/09/2026 el slug de una ficha de grupo del vault llevaba desde el 18/08
@@ -359,17 +359,25 @@ def aplica_privacidad_clones(tokens: dict, vault: Path, avisos: list, vetados=()
 
     01/11/2026: los términos vetados (fichero externo, ver `cargar_terminos_vetados`)
     se redactan igual. Sustituyen al mapa de «nombre público» que vivía en este
-    fichero con el slug en claro: una fila así sale ahora como «privado»."""
+    fichero con el slug en claro: si el fichero da un alias (`término => alias`),
+    la fila sale con ese alias, como antes; si no, como «privado»."""
     grupos = slugs_de_grupo(vault)
     if not grupos:
         avisos.append("⚠️ 10_SITIOS: no encuentro fichas de grupo; no puedo redactar por_clon")
     grupos |= {t.lower() for t in vetados}
     if not grupos:
         return
+    # Un alias que a su vez sea un término vetado o un slug de grupo no se usa.
+    alias = {t: a for t, a in (alias or {}).items() if a.lower() not in grupos}
 
     filas, privada, tocados = [], None, []
     for fila in tokens.get("por_clon", []):
         nombre = str(fila.get("clon") or "").strip()
+        publico = alias.get(nombre.lower().strip("*"))
+        if publico:
+            filas.append({**fila, "clon": publico})
+            tocados.append(nombre)
+            continue
         if nombre.lower().strip("*") not in grupos:
             filas.append(fila)
             continue
@@ -705,13 +713,33 @@ def cargar_terminos_vetados(ruta: Path) -> list:
             f"Es la lista privada de identificadores del vault que no pueden salir al escaparate "
             f"público; sin ella no se publica. Créalo (un término por línea) o apunta "
             f"{ENV_TERMINOS_VETADOS} a él") from exc
-    terminos = [ln.strip().lower() for ln in texto.splitlines()
-                if ln.strip() and not ln.strip().startswith("#")]
+    terminos = [t for t, _ in _lineas_vetados(texto)]
     if not terminos:
         raise SinTerminosVetados(
             f"el fichero de términos vetados {ruta} no tiene ningún término (¿truncado?); "
             f"sin ellos no se publica. Revisa el fichero o {ENV_TERMINOS_VETADOS}")
     return list(dict.fromkeys(terminos))
+
+
+def _lineas_vetados(texto: str) -> list:
+    """[(término, alias|None)]. Una línea `término => alias` veta el término y dice
+    con qué nombre público sale su fila (lo que antes era NOMBRE_PUBLICO_CLON, con
+    el slug en claro en este repo)."""
+    pares = []
+    for ln in texto.splitlines():
+        ln = ln.strip()
+        if not ln or ln.startswith("#"):
+            continue
+        termino, _, alias = ln.partition("=>")
+        if termino.strip():
+            pares.append((termino.strip().lower(), alias.strip() or None))
+    return pares
+
+
+def cargar_alias_publicos(ruta: Path) -> dict:
+    """{término: alias} de las líneas `término => alias`. Se llama después de
+    `cargar_terminos_vetados`, que ya ha fallado cerrado si el fichero no se lee."""
+    return {t: a for t, a in _lineas_vetados(ruta.read_text(encoding="utf-8")) if a}
 
 
 # La UNIÓN de lo que cazaban este escáner y el del gate (public-safety.mjs), que
@@ -957,10 +985,11 @@ def main() -> int:
     s00 = vault / "00_SISTEMA"
 
     # Lo primero, antes de leer nada: sin la lista de términos vetados no se exporta.
-    vetados, sin_vetados = [], False
+    vetados, sin_vetados, alias = [], False, {}
     if not args.claves_conexiones:
         try:
             vetados = cargar_terminos_vetados(ruta_terminos_vetados(vault))
+            alias = cargar_alias_publicos(ruta_terminos_vetados(vault))
         except SinTerminosVetados as exc:
             if not args.prueba_sin_vetados:
                 print(f"⛔ EXPORTACIÓN BLOQUEADA: {exc}. Para pruebas: --prueba-sin-vetados.",
@@ -994,7 +1023,7 @@ def main() -> int:
         return 0
 
     aplica_conexiones(sistema, avisos)
-    aplica_privacidad_clones(tokens, vault, avisos, vetados)
+    aplica_privacidad_clones(tokens, vault, avisos, vetados, alias)
 
     # El rol crudo del vault NO se publica. Su sustituto público tampoco viaja
     # por aquí: lo hornea el build desde exporter/misiones.md y se cruza por

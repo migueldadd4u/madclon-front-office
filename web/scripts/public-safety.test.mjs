@@ -523,6 +523,11 @@ test('términos vetados: variable, fichero junto al checkout o ninguno (CI)', ()
       terminos: ['uno-inventado', 'dos-inventado']
     })
     assert.equal(cargarTerminosVetados({ env: {}, porDefecto: fichero }).estado, 'ok')
+    // «término => alias»: se veta el término; el alias es nombre público y no se veta.
+    writeFileSync(fichero, 'uno-inventado => perfil-inventado\ndos-inventado\n')
+    assert.deepEqual(cargarTerminosVetados({ env: { FO_TERMINOS_VETADOS: fichero } }).terminos,
+      ['uno-inventado', 'dos-inventado'])
+    writeFileSync(fichero, '# cabecera\n\n  Uno-Inventado \n# otro\ndos-inventado\nuno-inventado\n')
     assert.deepEqual(cargarTerminosVetados({ env: {}, porDefecto: join(dir, 'no-existe.txt') }), {
       estado: 'sin-fichero',
       terminos: []
