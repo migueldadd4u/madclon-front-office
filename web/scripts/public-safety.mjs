@@ -14,7 +14,7 @@ import { isPublicHardware } from '../src/lib/hardware-public.mjs'
 import { createHash } from 'node:crypto'
 import { existsSync, lstatSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { extname, join, relative, resolve, sep } from 'node:path'
-import { pathToFileURL } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 export const PUBLIC_SCHEMA = 'madclon.public-containment.v1'
 export const PUBLIC_DATA_FILES = ['manifest.json', 'overview.json', 'clones.json', 'tokens.json', 'serie.json', 'pulso.json']
@@ -56,14 +56,74 @@ const PRIVATE_ARTIFACT_MARKERS = []
 // Contenido sensible BLOQUEANTE en documentos de datos: si el JSON contiene un
 // email, un teléfono, una ruta local o un secreto, el build falla siempre,
 // independientemente del esquema. Teléfonos solo con separadores o prefijo +34:
-// una cifra de tokens de 9 dígitos NUNCA debe disparar el tripwire.
+// una cifra de tokens de 9 dígitos NUNCA debe disparar el tripwire — tampoco
+// escrita con puntos de miles (723.101.422): por eso el 3-3-3 no admite puntos.
+// Esta lista se pasa sobre el JSON en bruto.
 const SENSITIVE_DATA_PATTERNS = [
   /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/,
   /\+34[\s.-]?\d{2,3}[\s.-]?\d{2,3}[\s.-]?\d{2,4}/,
-  /\b[6789]\d{2}[\s.-]\d{3}[\s.-]\d{3}\b/,
+  /\b[6789]\d{2}[\s-]\d{3}[\s-]\d{3}\b/,
   /\/Users\/|\/home\/|[A-Z]:\\/i,
   /sk-[a-zA-Z0-9]{8,}|-----BEGIN [A-Z ]*PRIVATE KEY-----|bearer\s+[a-z0-9._-]{8,}|api[_-]?key"?\s*[:=]\s*"?[a-z0-9._-]{8,}/i
 ]
+
+// Y esta, sobre cada texto del JSON ya decodificado (claves y valores, nunca los
+// números): son los MISMOS patrones que `PATRONES_PROHIBIDOS` del exportador
+// (exporter/export_panel.py), que hasta el 01/11/2026 no cazaban lo mismo que el
+// gate. El contrato que los mantiene iguales son los canarios comunes de
+// exporter/canarios-privacidad.json, que pasan los tests de los dos lados.
+const SENSITIVE_TEXT_PATTERNS = [
+  /@/,
+  /\/Users\/|\/home\/|\b[A-Z]:\\/i,
+  /\+34[\s.-]?\d{2,3}[\s.-]?\d{2,3}[\s.-]?\d{2,4}/,
+  /(?<!\d)(?:\+?34[ .-]?)?[6-9]\d{2}[ .-]?\d{2}[ .-]?\d{2}[ .-]?\d{2}(?!\d)/,
+  /(?<!\d)[6-9]\d{2}[\s-]\d{3}[\s-]\d{3}(?!\d)/,
+  /(?<!\d)[89]\d[\s.-]\d{3}[\s.-]\d{2}[\s.-]\d{2}(?!\d)/,
+  /(password|token[_-]?de|secret|api[_-]?key|bearer)/i,
+  /\bsk-[a-z0-9_-]{8,}|-----BEGIN [A-Z ]*PRIVATE KEY-----/i
+]
+
+// Términos vetados: identificadores PRIVADOS del vault que no pueden salir. No se
+// escriben aquí —el repo es público y la lista de una guardia se publica con el
+// commit—: se leen de FO_TERMINOS_VETADOS o, si no está, del fichero del vault
+// junto a este checkout (../MAD-brain). En GitHub Actions no existe ninguno y no se
+// comprueban (el exportador, que sí los tiene, ya no escribe un lote que los lleve).
+// Una variable puesta que no lleva a un fichero con términos BLOQUEA.
+const VETADOS_POR_DEFECTO = fileURLToPath(
+  new URL('../../../MAD-brain/00_SISTEMA/front-office/terminos-vetados.txt', import.meta.url)
+)
+
+export function cargarTerminosVetados({ env = process.env, porDefecto = VETADOS_POR_DEFECTO } = {}) {
+  const explicita = env.FO_TERMINOS_VETADOS
+  const ruta = explicita || porDefecto
+
+  if (!explicita && !existsSync(ruta)) return { estado: 'sin-fichero', terminos: [] }
+
+  try {
+    const terminos = readFileSync(ruta, 'utf8')
+      .split(/\r?\n/)
+      .map(linea => linea.trim())
+      .filter(linea => linea && !linea.startsWith('#'))
+      .map(linea => linea.toLowerCase())
+
+    return terminos.length ? { estado: 'ok', terminos: [...new Set(terminos)] } : { estado: 'ilegible', terminos: [] }
+  } catch {
+    return { estado: 'ilegible', terminos: [] }
+  }
+}
+
+function textosDe(value, output = []) {
+  if (typeof value === 'string') output.push(value)
+  else if (Array.isArray(value)) value.forEach(item => textosDe(item, output))
+  else if (isRecord(value)) {
+    for (const [key, item] of Object.entries(value)) {
+      output.push(key)
+      textosDe(item, output)
+    }
+  }
+
+  return output
+}
 
 function finding(code, file, area) {
   return { code, file, area }
@@ -166,7 +226,7 @@ function isWithheldDocument(name, value) {
   return value.status === 'withheld'
 }
 
-function validateLegacyDocument(name, value, source, file, findings) {
+function validateLegacyDocument(name, value, source, file, findings, vetados) {
   const shape = LEGACY_DATA_SHAPES[name]
 
   if (!shape || !shape(value)) {
@@ -179,15 +239,31 @@ function validateLegacyDocument(name, value, source, file, findings) {
     findings.push(finding('PUBLIC_HARDWARE_INVALID', file, 'hardware'))
   }
 
-  if (SENSITIVE_DATA_PATTERNS.some(pattern => pattern.test(source))) {
+  // Los textos se sacan de `source` (lo que de verdad se sirve) si es JSON válido.
+  let decoded = value
+
+  try {
+    decoded = JSON.parse(source)
+  } catch {}
+
+  const textos = textosDe(decoded)
+
+  if (
+    SENSITIVE_DATA_PATTERNS.some(pattern => pattern.test(source)) ||
+    textos.some(texto => SENSITIVE_TEXT_PATTERNS.some(pattern => pattern.test(texto)))
+  ) {
     findings.push(finding('PUBLIC_DATA_SENSITIVE_CONTENT', file, 'privacy'))
+  }
+
+  if (vetados.length && textos.some(texto => vetados.some(termino => texto.toLowerCase().includes(termino)))) {
+    findings.push(finding('PUBLIC_DATA_VETOED_TERM', file, 'privacy'))
   }
 }
 
 // Contrato dual: el documento retenido canónico sigue siendo válido (estado
 // transitorio) y la proyección legada con contenido saneado también. Un
 // documento que no es NINGUNA de las dos cosas produce hallazgos.
-export function validatePublicDocument(name, value, source = null) {
+export function validatePublicDocument(name, value, source = null, { vetados = cargarTerminosVetados().terminos } = {}) {
   const file = `data/${name}`
   const findings = []
 
@@ -229,17 +305,20 @@ export function validatePublicDocument(name, value, source = null) {
     return findings
   }
 
-  validateLegacyDocument(name, value, source ?? JSON.stringify(value), file, findings)
+  validateLegacyDocument(name, value, source ?? JSON.stringify(value), file, findings, vetados.map(t => t.toLowerCase()))
 
   return findings
 }
 
-export function auditPublicDataDirectory(directory) {
+export function auditPublicDataDirectory(directory, { vetados = cargarTerminosVetados() } = {}) {
   const findings = []
 
   if (!existsSync(directory)) {
     return [finding('PUBLIC_DATA_DIRECTORY_MISSING', 'data', 'directory')]
   }
+
+  // Sin ruta ni valor: el gate nunca imprime lo que inspecciona.
+  if (vetados.estado === 'ilegible') findings.push(finding('PUBLIC_VETOED_TERMS_UNREADABLE', 'vetados', 'configuration'))
 
   const entries = readdirSync(directory, { withFileTypes: true })
   const allowed = new Set(PUBLIC_DATA_FILES)
@@ -277,7 +356,7 @@ export function auditPublicDataDirectory(directory) {
       continue
     }
 
-    const documentFindings = validatePublicDocument(name, value, source)
+    const documentFindings = validatePublicDocument(name, value, source, { vetados: vetados.terminos })
 
     findings.push(...documentFindings)
 
@@ -870,7 +949,9 @@ function main() {
   const findings = auditPublicSafety({ mode })
 
   if (findings.length === 0) {
-    console.log(`PUBLIC SAFETY OK · ${mode} · allowlist ${PUBLIC_SCHEMA}`)
+    const vetados = cargarTerminosVetados().estado === 'ok' ? 'comprobados' : 'sin fichero, no comprobados'
+
+    console.log(`PUBLIC SAFETY OK · ${mode} · allowlist ${PUBLIC_SCHEMA} · términos vetados: ${vetados}`)
 
     return
   }

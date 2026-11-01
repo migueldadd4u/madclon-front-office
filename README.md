@@ -70,6 +70,14 @@ activos. **Nunca** personas identificables, nombres internos privados, credencia
 telemetría privada. Los activos públicos van pineados por SHA-256 y el service worker
 pasa una auditoría propia (solo GET, mismo origen, caché con caducidad y purga).
 
+El escáner del exportador y el del gate cazan lo mismo: los dos pasan los canarios
+sintéticos de `exporter/canarios-privacidad.json`. Los **términos vetados** (identificadores
+privados del vault) no se escriben en este repo: se leen de `FO_TERMINOS_VETADOS` o de
+`<vault>/00_SISTEMA/front-office/terminos-vetados.txt`. Sin ese fichero el exportador no
+escribe nada (salida 3); el gate los comprueba si lo encuentra. El exportador vuelca el
+lote **entero o nada**: carpeta temporal hermana, relectura y escaneo, e intercambio de
+golpe con `web/public/data`.
+
 ## Uso diario
 
 ```bash

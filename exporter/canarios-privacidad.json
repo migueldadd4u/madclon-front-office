@@ -1,0 +1,32 @@
+{
+  "_que_es": "Canarios SINTÉTICOS de privacidad, comunes a los dos escáneres: exporter/export_panel.py (audit_privacidad, el productor) y web/scripts/public-safety.mjs (el gate). Ninguno es un dato real: dominio .invalid, teléfonos 600/91 con ceros, rutas de un «usuario» genérico y claves que no sirven para nada. Los tests de los dos lados leen ESTE fichero, así que un patrón que solo cace uno de los dos se ve en rojo en el otro.",
+  "_vetados": "Los términos vetados reales viven fuera del repo (FO_TERMINOS_VETADOS o <vault>/00_SISTEMA/front-office/terminos-vetados.txt). Aquí solo hay uno de prueba, inventado, que los tests escriben en un fichero temporal.",
+  "vetados_de_prueba": ["termino-vetado-de-prueba"],
+  "detectar": [
+    {"tipo": "correo", "valor": "canario.inventado@ejemplo.invalid"},
+    {"tipo": "teléfono +34 en 3-3-3", "valor": "+34 600 000 000"},
+    {"tipo": "teléfono 3-3-3", "valor": "600 000 000"},
+    {"tipo": "teléfono 3-2-2-2", "valor": "600 00 00 00"},
+    {"tipo": "teléfono fijo 2-3-2-2", "valor": "91 000 00 00"},
+    {"tipo": "teléfono sin separadores dentro de un texto", "valor": "llamar al 600000000"},
+    {"tipo": "ruta /home", "valor": "/home/usuario/notas"},
+    {"tipo": "ruta /Users", "valor": "/Users/usuario/notas"},
+    {"tipo": "ruta de Windows", "valor": "C:\\Users\\usuario\\notas"},
+    {"tipo": "clave sk-", "valor": "sk-canarioInventado0000"},
+    {"tipo": "clave sk- de proyecto", "valor": "sk-proj-canarioInventado0000"},
+    {"tipo": "clave privada PEM", "valor": "-----BEGIN PRIVATE KEY-----"},
+    {"tipo": "token Bearer", "valor": "Authorization: Bearer canario.inventado.0000"},
+    {"tipo": "api_key con valor", "valor": "api_key=canario-inventado-0000"},
+    {"tipo": "contraseña", "valor": "password: canario-inventado"},
+    {"tipo": "secreto de cliente", "valor": "client_secret: canario-inventado"},
+    {"tipo": "término vetado (fichero externo)", "valor": "perfil Termino-Vetado-De-Prueba en el desglose", "requiere_vetados": true}
+  ],
+  "limpios": [
+    {"tipo": "cifra de tokens de 9 cifras con puntos de miles", "valor": "723.101.422"},
+    {"tipo": "cifra de tokens de 9 cifras sin separador (número)", "valor": 776511939},
+    {"tipo": "marca de tiempo ISO", "valor": "2026-11-01T03:43:00+00:00"},
+    {"tipo": "porcentaje con coma decimal", "valor": "90,8 %"},
+    {"tipo": "fecha española", "valor": "01/11/2026"},
+    {"tipo": "texto de indicador", "valor": "Tokens consumidos (total acumulado)"}
+  ]
+}
