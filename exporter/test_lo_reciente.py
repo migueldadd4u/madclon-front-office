@@ -68,6 +68,16 @@ class Listas(unittest.TestCase):
                 "## 1. Vieja\nEstado: pendiente de MAD\nDesde cuando espera: 2026-06-20.\n\n"
                 "## 2. Nueva\nEstado: pendiente de MAD\nDesde cuando espera: 2026-10-25.\n\n"
                 "## 3. Hecha\nEstado: DECIDIDA\nDesde cuando espera: 2026-10-25.\n", encoding="utf-8")
+            (gtd / "PROPUESTAS.md").write_text(
+                "# 🤝 PROPUESTAS\n\n## 2026-07-07 · 2 propuesta(s)\n<!-- generado: proponedor -->\n"
+                "- [ ] **P0707-01 · 🟡 gtd** Vieja propuesta\n      evidencia: x · acción: y\n"
+                "- [ ] **P0707-02 · 🟡 personas** Curar lote de fichas\n"
+                "      evidencia: 07_PERSONAS/_promovidas-GLM/ · acción: OK (id: personas:promovidas-glm)\n\n"
+                "## 2026-10-30 · 2 propuesta(s)\n"
+                "- [ ] **P1030-01 · 🟢 gtd** Reciente\n"
+                "- [x] **P1030-02 · 🟢 gtd** Aprobada\n", encoding="utf-8")
+            (v / "07_PERSONAS/_promovidas-GLM").mkdir(parents=True)
+            (v / "07_PERSONAS/_promovidas-GLM/_LEEME.md").write_text("vacío", encoding="utf-8")
 
             r = M["gtd_lo_reciente"](v, HOY)
 
@@ -76,8 +86,10 @@ class Listas(unittest.TestCase):
         self.assertEqual(r["acciones_hoy"], {"del_dia": 1, "parados": 1})
         self.assertEqual(r["esperas_vencidas"], {"del_dia": 1, "parados": 1})
         self.assertEqual(r["decisiones"], {"del_dia": 1, "parados": 1})
+        # La del lote vacío no cuenta (como en el panel); la aprobada tampoco.
+        self.assertEqual(r["propuestas"], {"del_dia": 1, "parados": 1})
         texto = json.dumps(r, ensure_ascii=False)
-        for palabra in ("Café", "Notaría", "Oferta", "Vieja", "nueva"):
+        for palabra in ("Café", "Notaría", "Oferta", "Vieja", "nueva", "Curar", "Aprobada"):
             self.assertNotIn(palabra, texto, "solo recuentos: ni un texto cruza a lo público")
 
     def test_lista_ilegible_no_es_cero(self):

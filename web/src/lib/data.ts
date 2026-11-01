@@ -24,6 +24,7 @@ export type Overview = {
     /** «Lo reciente manda» (01/11/2026): lo del día y lo parado más de `umbral_dias`. Solo recuentos. */
     lo_reciente?: {
       umbral_dias: number
+      propuestas?: RepartoReciente
       bandeja?: RepartoReciente
       acciones_hoy?: RepartoReciente
       esperas_vencidas?: RepartoReciente

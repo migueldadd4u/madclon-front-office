@@ -76,9 +76,10 @@ const ActividadPage = () => {
           <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
             <StatCard
               icon='ri-vote-line'
-              valor={fmt(gtd.propuestas)}
-              countTo={gtd.propuestas}
+              valor={fmt(delDia(reciente?.propuestas, gtd.propuestas))}
+              countTo={delDia(reciente?.propuestas, gtd.propuestas)}
               label={t('act_propuestas')}
+              detalle={parados(reciente?.propuestas)}
               color='warning'
             />
           </Grid>

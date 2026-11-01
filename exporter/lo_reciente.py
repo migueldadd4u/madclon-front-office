@@ -99,8 +99,45 @@ def _seccion(md: str, cabecera: str) -> str:
     return partes[1][: fin.start()] if fin else partes[1]
 
 
+def _propuestas_sin_marca(md: str) -> list[tuple[date | None, str]]:
+    """(día del bloque, detalle) de cada propuesta de PROPUESTAS.md que sigue sin
+    marcar: «- [ ] **P…» dentro de un bloque «## AAAA-MM-DD · N propuesta(s)»."""
+    out: list[list] = []
+    dia, actual = None, None
+    for ln in md.splitlines():
+        if m := re.match(r"## (20\d{2}-\d{2}-\d{2}) · \d+ propuesta\(s\)$", ln):
+            dia, actual = _fecha(m.group(1)), None
+        elif ln.startswith("- ["):
+            actual = [dia, ""] if ln.startswith("- [ ] **P") else None
+            if actual is not None:
+                out.append(actual)
+        elif ln.strip() == "---":
+            actual = None
+        elif actual is not None:
+            actual[1] += ln.strip() + "\n"
+    return [(d, detalle) for d, detalle in out]
+
+
+def _propuesta_resuelta(detalle: str, vault: Path, bandeja_sin_triar: int | None) -> bool:
+    """Las dos comprobaciones de actualidad.ts (panel) que se leen en el vault:
+    triar la bandeja cuando ya no queda nada y curar el lote de fichas cuando está
+    vacío. Las que miran fuera del vault no se repiten aquí; si no se puede
+    comprobar, sigue contando (la edad nunca prueba cierre)."""
+    m = re.search(r"\(id: ([a-z][a-z0-9:._-]+)\)", detalle)
+    ident = m.group(1) if m else None
+    if ident == "gtd:bandeja-sin-triar":
+        return bandeja_sin_triar == 0
+    if ident == "personas:promovidas-glm":
+        try:
+            lote = (vault / "07_PERSONAS" / "_promovidas-GLM").iterdir()
+            return not any(p.is_file() and p.suffix == ".md" and not p.name.startswith("_") for p in lote)
+        except OSError:
+            return False
+    return False
+
+
 def gtd_lo_reciente(vault: Path, hoy: date) -> dict:
-    """Recuentos del día y parados de las cuatro listas que /actividad enseña.
+    """Recuentos del día y parados de las listas que /actividad enseña.
     Una lista que no se deja leer se queda fuera (null en la web), nunca a 0."""
     gtd = vault / "08_PLANIFICACION" / "GTD"
     out: dict = {"umbral_dias": PARADO_DIAS}
@@ -112,11 +149,20 @@ def gtd_lo_reciente(vault: Path, hoy: date) -> dict:
             return None
 
     md = leer(gtd / "QUE-NECESITO.md")
+    capturas = None
     if md is not None:
         bandeja = _seccion(md, "## 🗂 Bandeja")
         capturas = [ln for ln in bandeja.splitlines() if ln.startswith("- [ ] ") and "^ejemplo" not in ln]
         out["bandeja"] = reparto([([f] if (f := _fecha(ln[6:16])) else [], plazo_escrito(ln, hoy))
                                   for ln in capturas], hoy)
+
+    # Propuestas del clon: se fechan por el día de su bloque (el proponedor no
+    # las vuelve a escribir: una de julio sigue siendo de julio).
+    md = leer(gtd / "PROPUESTAS.md")
+    if md is not None:
+        sin_triar = len(capturas) if capturas is not None else None
+        out["propuestas"] = reparto([([dia] if dia else [], None) for dia, detalle in _propuestas_sin_marca(md)
+                                     if not _propuesta_resuelta(detalle, vault, sin_triar)], hoy)
 
     md = leer(gtd / "ACCIONES.md")
     if md is not None:
