@@ -21,7 +21,8 @@
     "check:contrato": "node scripts/check-contrato.mjs",
     "check:public-safety": "node scripts/public-safety.mjs --source",
     "check:public-safety:out": "node scripts/public-safety.mjs --out",
-    "test:public-safety": "node --test scripts/public-safety.test.mjs scripts/hardware-public.test.mjs scripts/check-contrato-retos.test.mjs scripts/sw-datos.test.mjs"
+    "test:public-safety": "node --test scripts/public-safety.test.mjs scripts/hardware-public.test.mjs scripts/check-contrato-retos.test.mjs scripts/sw-datos.test.mjs",
+    "test": "node --test scripts/check-contrato-retos.test.mjs scripts/check-hardcode.test.mjs scripts/hardware-public.test.mjs scripts/lockfile-unico.test.mjs scripts/modos-color.test.mjs scripts/playwright-home.test.mjs scripts/public-safety.test.mjs scripts/suite-ci.test.mjs scripts/sw-datos.test.mjs scripts/tema-claro.test.mjs"
   },
   "dependencies": {
     "@emotion/cache": "11.14.0",
