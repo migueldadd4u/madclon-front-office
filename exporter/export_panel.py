@@ -256,7 +256,7 @@ def parse_panel_tokens(md: str) -> dict:
     for f in tabla_md(sec.splitlines()):
         if len(f) >= 4 and f[0] != "Clon":  # salta solo la cabecera
             nombre = f[0].strip("*")
-            out["por_clon"].append({"clon": NOMBRE_PUBLICO_CLON.get(nombre, nombre),
+            out["por_clon"].append({"clon": nombre,
                                     "tokens": num_es(f[1]),
                                     "llamadas": num_es(f[2]), "modelos": f[3]})
 
@@ -329,7 +329,7 @@ def slugs_de_grupo(vault: Path) -> set:
 def aplica_privacidad_clones(tokens: dict, vault: Path, avisos: list) -> None:
     """Ningún slug de ficha de grupo puede salir en el material publicado.
 
-    El 01/09/2026 `"clon": "amigos-lqdlia"` llevaba desde el 18/08 servido en
+    El 01/09/2026 el slug de un grupo privado llevaba desde el 18/08 servido en
     https://migueldadd4u.github.io/madclon-front-office/data/tokens.json, y el
     refresco nocturno lo reescribía cada madrugada. `public-safety.mjs` no podía
     cazarlo porque valida FORMA y esquema, no semántica: no sabe qué texto sale
@@ -654,14 +654,12 @@ def build_pulso(tokens: dict, sistema: dict, serie: dict, hoy: date) -> dict:
 
 # ------------------------------------------------------------ privacidad
 
-# Perfiles cuyo slug coincide con una ficha del vault (grupo/persona): el slug no
-# sale del vault. Aquí se sustituye en origen; el patrón de abajo corta la
-# exportación si el slug reaparece por cualquier otro campo, y G6 (gate-grupos)
-# lo vigila además desde el lado del vault.
-NOMBRE_PUBLICO_CLON = {"amigos-lqdlia": "perfil-social"}
-
+# Los slugs de grupo NO se escriben aquí (01/11/2026): este repo es público y una
+# lista de vetados dentro de la guardia publica justo lo que protege. Se leen del
+# vault en cada pasada (slugs_de_grupo): aplica_privacidad_clones los redacta en
+# origen y patrones_de_grupo() corta la exportación si reaparecen en otro campo.
+# G6 (gate-grupos) lo vigila además desde el lado del vault.
 PATRONES_PROHIBIDOS = [
-    (r"amigos-lqdlia", "slug de ficha del vault"),
     (r"@", "posible email"),
     (r"/Users/", "ruta local"),
     (r"(?<!\d)(?:\+?34[ .-]?)?[6-9]\d{2}[ .-]?\d{2}[ .-]?\d{2}[ .-]?\d{2}(?!\d)", "posible teléfono"),
@@ -669,19 +667,29 @@ PATRONES_PROHIBIDOS = [
 ]
 
 
-def audit_privacidad(obj, ruta="$"):
+def patrones_de_grupo(vault: Path) -> list:
+    """Un patrón por slug de grupo del vault. Solo los que tienen forma de slug
+    (con guion): los `nombre:` sueltos pueden ser palabras corrientes y cortarían
+    la exportación por cualquier texto que las contenga."""
+    return [(rf"(?i)(?<![\w-]){re.escape(s)}(?![\w-])", "slug de ficha del vault")
+            for s in sorted(slugs_de_grupo(vault)) if "-" in s and len(s) >= 6]
+
+
+def audit_privacidad(obj, ruta="$", extra=()):
     """Recorre el JSON; devuelve lista de violaciones (solo valores string)."""
     hallazgos = []
     if isinstance(obj, dict):
         for k, v in obj.items():
-            hallazgos += audit_privacidad(v, f"{ruta}.{k}")
+            hallazgos += audit_privacidad(v, f"{ruta}.{k}", extra)
     elif isinstance(obj, list):
         for i, v in enumerate(obj):
-            hallazgos += audit_privacidad(v, f"{ruta}[{i}]")
+            hallazgos += audit_privacidad(v, f"{ruta}[{i}]", extra)
     elif isinstance(obj, str):
-        for patron, que in PATRONES_PROHIBIDOS:
+        for patron, que in (*PATRONES_PROHIBIDOS, *extra):
             if re.search(patron, obj):
-                hallazgos.append(f"{ruta}: {que} → {obj[:80]!r}")
+                # el slug no se repite en el log: el motivo y la ruta bastan
+                muestra = "[slug de grupo]" if que == "slug de ficha del vault" else repr(obj[:80])
+                hallazgos.append(f"{ruta}: {que} → {muestra}")
     return hallazgos
 
 # --------------------------------------------------------------------- main
@@ -798,8 +806,9 @@ def main() -> int:
 
     # --- auditoría de privacidad: cualquier hallazgo bloquea la escritura ---
     violaciones = []
+    de_grupo = patrones_de_grupo(vault)
     for nombre, obj in salidas.items():
-        violaciones += [f"{nombre}::{v}" for v in audit_privacidad(obj)]
+        violaciones += [f"{nombre}::{v}" for v in audit_privacidad(obj, extra=de_grupo)]
     if violaciones:
         print("⛔ EXPORTACIÓN BLOQUEADA por privacidad:", file=sys.stderr)
         for v in violaciones:
