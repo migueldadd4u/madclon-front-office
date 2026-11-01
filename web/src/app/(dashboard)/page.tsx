@@ -36,6 +36,7 @@ import type { Lang, StrKey } from '@/lib/i18n'
 // Data Imports
 import { fmt, fmtCorto, fmtFecha } from '@/lib/data'
 import type { PanelData } from '@/lib/data'
+import { mediaTokensSerie } from '@/lib/serie-publica.mjs'
 
 /** Sustituye {marcadores} en las plantillas bilingües por valores. */
 const reemplaza = (plantilla: string, valores: Record<string, string>) =>
@@ -85,7 +86,8 @@ const InicioPage = () => {
         const saludOk = (overview.salud_global ?? '').includes('🟢')
         const diasVida = Math.max(1, Math.floor((Date.now() - new Date('2026-04-14T00:00:00').getTime()) / 86_400_000))
 
-        // Puntos del pulso con fecha corta y larga; % de «día normal» = tokens del día / media de la serie
+        // Puntos del pulso con fecha corta y larga; % de «día normal» = tokens del día / media de
+        // toda la serie medida (la calcula el exportador: el gráfico solo trae los días recientes)
         const pts = data.serie.serie.map(p => ({
           fecha: new Date(`${p.fecha}T00:00:00`).toLocaleDateString(lang === 'en' ? 'en-GB' : 'es-ES', { day: 'numeric', month: 'short' }),
           fechaLarga: new Date(`${p.fecha}T00:00:00`).toLocaleDateString(lang === 'en' ? 'en-GB' : 'es-ES', {
@@ -97,7 +99,7 @@ const InicioPage = () => {
           tareas: p.contexto?.tareas_hechas ?? 0
         }))
 
-        const mediaTokens = pts.length > 0 ? pts.reduce((a, p) => a + p.tokens, 0) / pts.length : 0
+        const mediaTokens = mediaTokensSerie(data.serie)
         const pctDia = (v: number) => (mediaTokens > 0 ? Math.round((v / mediaTokens) * 100) : null)
 
         return (

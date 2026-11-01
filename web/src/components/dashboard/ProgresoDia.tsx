@@ -12,11 +12,13 @@ import { useLang } from '@/lib/i18n'
 // Data Imports
 import { fmtCorto } from '@/lib/data'
 import type { PanelData } from '@/lib/data'
+import { mediaTokensPrevios } from '@/lib/serie-publica.mjs'
 
 // Barra de progreso del día — compara el último día medido con el ritmo
-// habitual (media de los días anteriores de la serie): «fue el X % de un día
-// normal». La barra crece desde 0 al entrar; con prefers-reduced-motion ya
-// aparece en su valor final. Solo cifras agregadas de serie.json.
+// habitual (media de los días anteriores de la serie, toda la medida, que
+// calcula el exportador): «fue el X % de un día normal». La barra crece desde 0
+// al entrar; con prefers-reduced-motion ya aparece en su valor final. Solo
+// cifras agregadas de serie.json.
 
 const reemplaza = (plantilla: string, valores: Record<string, string>) =>
   Object.entries(valores).reduce((acc, [k, v]) => acc.replaceAll(`{${k}}`, v), plantilla)
@@ -33,13 +35,11 @@ const ProgresoDia = ({ data }: { data: PanelData }) => {
     return () => cancelAnimationFrame(id)
   }, [])
 
-  if (puntos.length < 2) return null
+  const media = mediaTokensPrevios(data.serie)
+
+  if (!puntos.length || media === null || media <= 0) return null
 
   const ultimo = puntos.at(-1)!.contexto!.tokens!
-  const anteriores = puntos.slice(0, -1).map(p => p.contexto!.tokens!)
-  const media = anteriores.reduce((a, b) => a + b, 0) / anteriores.length
-
-  if (media <= 0) return null
 
   const pct = Math.round((ultimo / media) * 100)
   const ancho = Math.min(100, Math.max(4, pct))

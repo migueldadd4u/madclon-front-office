@@ -203,6 +203,11 @@ const LEGACY_DATA_SHAPES = {
   'overview.json': v => isRecord(v.gtd) && isRecord(v.personas) && isRecord(v.automejora) && Array.isArray(v.crons),
   'clones.json': v => Array.isArray(v.clones) && Array.isArray(v.integraciones),
   'tokens.json': v => isRecord(v.contador) && isRecord(v.kpis) && Array.isArray(v.intervenciones),
+
+  // Desde el 01/11/2026 `serie` es solo la ventana de días recientes y lo que pide la
+  // serie entera viaja en `records` y `medias`. No se exigen: un lote anterior no los
+  // trae, la web vuelve a contar sobre los puntos, y bloquear por ellos dejaría sin
+  // publicar TODO.
   'serie.json': v => Array.isArray(v.serie) && isRecord(v.linea_base),
   // Contrato del pulso diario para loquedigalaia-web (su data/schema/pulso.schema.json):
   // esquema cerrado, solo agregados numéricos, indicador obligatorio de tokens.

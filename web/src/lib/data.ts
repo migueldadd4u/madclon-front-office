@@ -207,6 +207,9 @@ export type SerieData = {
 
   /** Desde el 01/11/2026 la serie viaja con ventana; los récords se calculan sobre la serie entera. */
   records?: Record<string, { valor: number; fecha: string }>
+
+  /** Medias de tokens de la serie entera (portada y ProgresoDia); se leen con lib/serie-publica.mjs. */
+  medias?: { tokens?: number; tokens_previos?: number | null }
   ventana_dias?: number
   desde_total?: string
 }

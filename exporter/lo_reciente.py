@@ -28,6 +28,9 @@ PLAZO_CERCA_DIAS = 7
 # pública y el escaparate se quedó once noches con los datos del 21/10.
 VENTANA_SERIE_DIAS = 60
 RECORDS_SERIE = ("tokens", "tareas_hechas", "llamadas")
+# La web no pinta intervenciones_raw, pero también crecía sin techo (las que usa
+# tokens.json se leen antes, de la lista entera).
+VENTANA_INTERVENCIONES = 5
 
 ISO = re.compile(r"\b(20\d{2}-\d{2}-\d{2})\b")
 ANCLA = re.compile(r"\^(\d{2})(\d{2})(\d{2})\d{6,}\b")
@@ -148,9 +151,33 @@ def gtd_lo_reciente(vault: Path, hoy: date) -> dict:
     return out
 
 
+def _es_numero(v) -> bool:
+    return isinstance(v, (int, float)) and not isinstance(v, bool)
+
+
+def _media(valores: list):
+    # Suma a mano y en orden: sum() de Python 3.12 compensa el redondeo y el
+    # último decimal no saldría igual que el reduce con el que contaba la web.
+    total = 0
+    for v in valores:
+        total += v
+    return total / len(valores)
+
+
+def medias_serie(puntos: list) -> dict:
+    """Las dos medias de tokens que la web contaba recorriendo la serie: la del
+    «día normal» de la portada (un día sin dato cuenta 0) y la de ProgresoDia
+    (los días medidos menos el último)."""
+    tokens = [(p.get("contexto") or {}).get("tokens") for p in puntos]
+    medidos = [t for t in tokens if _es_numero(t)]
+    return {"tokens": _media([t if _es_numero(t) else 0 for t in tokens]) if tokens else 0,
+            "tokens_previos": _media(medidos[:-1]) if len(medidos) >= 2 else None}
+
+
 def ventana_serie(serie: dict, dias: int = VENTANA_SERIE_DIAS) -> dict:
-    """Los últimos `dias` de la serie y, sobre la serie ENTERA, los récords que
-    enseña /historia (valor y fecha), para que la ventana no los recorte."""
+    """Los últimos `dias` de la serie y, sobre la serie ENTERA, lo que la web
+    contaba recorriéndola: los récords de /historia (valor y fecha) y las medias
+    de la portada y de ProgresoDia, para que la ventana no los cambie."""
     puntos = serie.get("serie", [])
     records = {}
     for clave in RECORDS_SERIE:
@@ -161,9 +188,11 @@ def ventana_serie(serie: dict, dias: int = VENTANA_SERIE_DIAS) -> dict:
                 mejor = {"valor": v, "fecha": p.get("fecha")}
         if mejor:
             records[clave] = mejor
+    extra = {"records": records, "medias": medias_serie(puntos), "ventana_dias": dias,
+             "intervenciones_raw": serie.get("intervenciones_raw", [])[-VENTANA_INTERVENCIONES:]}
     fechas = sorted(f for f in (str(p.get("fecha", ""))[:10] for p in puntos) if _fecha(f))
     if not fechas:
-        return {**serie, "records": records, "ventana_dias": dias}
+        return {**serie, **extra}
     corte = (_fecha(fechas[-1]) - timedelta(days=dias - 1)).isoformat()
     recientes = [p for p in puntos if str(p.get("fecha", ""))[:10] >= corte]
-    return {**serie, "serie": recientes, "records": records, "ventana_dias": dias, "desde_total": fechas[0]}
+    return {**serie, **extra, "serie": recientes, "desde_total": fechas[0]}

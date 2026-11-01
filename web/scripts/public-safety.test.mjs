@@ -197,6 +197,24 @@ test('la proyección legada saneada pasa; la incompleta o sensible queda bloquea
   assert.deepEqual(cifraTokens, [])
 })
 
+test('serie.json con ventana: récords y medias pasan, y el escáner también mira dentro de ellos', () => {
+  const serie = {
+    serie: [{ fecha: '2026-11-01', contexto: { tokens: 62444945 } }],
+    linea_base: {},
+    intervenciones_raw: [],
+    records: { tokens: { valor: 75516064, fecha: '2026-07-26' } },
+    medias: { tokens: 27478989.282828283, tokens_previos: null },
+    ventana_dias: 60,
+    desde_total: '2026-07-26'
+  }
+
+  assert.deepEqual(validatePublicDocument('serie.json', serie), [])
+
+  const conEmail = { ...serie, records: { tokens: { valor: 1, fecha: 'persona@example.com' } } }
+
+  assert.ok(validatePublicDocument('serie.json', conEmail).some(item => item.code === 'PUBLIC_DATA_SENSITIVE_CONTENT'))
+})
+
 test('la allowlist rechaza contenido semántico añadido aunque use el schema correcto', () => {
   const extra = validatePublicDocument('tokens.json', {
     schema: PUBLIC_SCHEMA,
