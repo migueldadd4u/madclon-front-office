@@ -119,3 +119,15 @@ prueba nueva que no esté ahí ni apartada con su motivo.
 
 El job nocturno solo regenera y sube los JSON. La publicación pertenece a este workflow,
 que serializa los despliegues y nunca publica un lote que no supere todos los gates.
+
+## Consumo contrastado (01/11/2026)
+
+La página de tokens conserva el registro del clon y muestra aparte los agregados
+de CodexBar. El exportador lee únicamente tokens, valoración a precio de lista,
+moneda y fecha; no publica proyectos, sesiones ni cuentas. El lector se activa
+solo cuando existe la observación privada autorizada de esta integración en el
+vault. Una captura manual caduca en 24 horas y no se vuelve a fechar al exportar.
+El lector local se vuelve a consultar en cada exportación; un fallo deja la fuente
+ausente, nunca como cero. La página también descarta observaciones de más de 24 h.
+Se destaca el mayor valor de la misma moneda, mostrando fuente y cobertura; no
+se suman registros que pueden solaparse ni se confunde precio de lista con factura.

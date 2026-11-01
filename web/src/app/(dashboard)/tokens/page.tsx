@@ -45,6 +45,14 @@ const TokensPage = () => {
   <DataGate necesita={['tokens']}>
     {({ tokens }) => {
       const c = tokens.contador
+      const observaciones = (tokens.observaciones_30d ?? []).filter(o => {
+        const age = Date.now() - Date.parse(o.observed_at)
+        return o.days === 30 && age >= 0 && age <= 86400000 && Number.isFinite(o.tokens) && o.tokens >= 0 && Number.isFinite(o.amount) && o.amount >= 0
+      })
+      const euros = observaciones.filter(o => o.currency === 'EUR').sort((a, b) => b.amount - a.amount)[0]
+      const eurosRegistro = c.ventana_30d == null ? null : c.ventana_30d / 1000000 * 3
+      const eurosMayor = euros && (eurosRegistro == null || euros.amount > eurosRegistro) ? euros : null
+      const mayorTokens = observaciones.reduce((a, b) => b.tokens > (a?.tokens ?? -1) ? b : a, observaciones[0])
       const datosClon = [...tokens.por_clon].sort((a, b) => (b.tokens ?? 0) - (a.tokens ?? 0))
 
       return (
@@ -52,7 +60,7 @@ const TokensPage = () => {
           <Grid size={12}>
             <Typography component='h1' variant='h4' className='mbe-1'>{t('tokens_titulo')}</Typography>
             <Typography color='text.secondary' className='max-is-3xl'>
-              {t('tokens_intro_1')}
+              {t('tokens_intro_1')} {t('consumo_alcance')}
             </Typography>
           </Grid>
 
@@ -141,11 +149,19 @@ const TokensPage = () => {
                     <Typography variant='body2' color='text.secondary'>{t('eur_valor')}</Typography>
                   </div>
                   <Typography variant='h3' className='font-mono' sx={{ background: 'linear-gradient(90deg,#7A7FFF,#06C9A8)', WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent' }}>
-                    <CountUp to={c.ventana_30d !== null && c.ventana_30d !== undefined ? (c.ventana_30d / 1_000_000) * 3 : null} format={n => `~ ${fmt(Math.round(n))} €`} />
+                    <CountUp to={eurosMayor?.amount ?? eurosRegistro} format={n => `~ ${fmt(n)} €`} />
                   </Typography>
                 </div>
-                <Typography variant='caption' color='text.secondary'>{t('eur_nota')}</Typography>
-                <Typography variant='caption' color='customColors.textoLogro' fontWeight={600}>{t('eur_cero')}</Typography>
+                <Typography variant='caption' color='text.secondary'>
+                  {eurosMayor ? `${eurosMayor.source} · ${eurosMayor.manual ? eurosMayor.observed_at.slice(0, 10) : eurosMayor.observed_at} · ${t('consumo_manual')}` : t('eur_nota')}
+                </Typography>
+                {observaciones.length > 0 && <Typography variant='body2'>
+                  {t('consumo_mayor')}: {fmtCorto(Math.max(c.ventana_30d ?? 0, mayorTokens?.tokens ?? 0))} tokens. {t('consumo_solape')}
+                </Typography>}
+                {observaciones.map(o => <Typography key={o.source} variant='caption' color='text.secondary'>
+                  {o.source}: {o.approximate_tokens ? '≈ ' : ''}{fmtCorto(o.tokens)} tokens · ≈ {fmt(o.amount)} {o.currency} {t('consumo_lista')} · {o.manual ? o.observed_at.slice(0, 10) : o.observed_at} · {o.manual ? t('consumo_captura') : t('consumo_local')}
+                </Typography>)}
+                <Typography variant='caption' color='customColors.textoLogro' fontWeight={600}>{t('consumo_no_factura')}</Typography>
               </CardContent>
             </Card>
           </Grid>

@@ -1067,6 +1067,8 @@ def main() -> int:
 
         return 0
 
+    tokens["observaciones_30d"] = runpy.run_path(str(Path(__file__).with_name("consumo_publico.py")))["collect"](vault)
+
     aplica_conexiones(sistema, avisos)
     aplica_privacidad_clones(tokens, vault, avisos, vetados, alias)
 
@@ -1116,7 +1118,7 @@ def main() -> int:
         "manifest.json": {"generado": ahora, "version": 1, "avisos": list(avisos),
                           "avisos_bloqueantes": avisos.bloqueantes,
                           "fuentes": ["PANEL-CLON", "PANEL-TOKENS", "cuadros-de-mando",
-                                      "Monitorizacion/tokens"]},
+                                      "Monitorizacion/tokens", *(["CodexBar"] if tokens.get("observaciones_30d") else [])]},
         "overview.json": overview,
         "clones.json": sistema,
         "tokens.json": tokens,

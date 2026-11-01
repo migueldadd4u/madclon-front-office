@@ -173,6 +173,7 @@ export type Kpi = {
 }
 
 export type TokensData = {
+  observaciones_30d?: { source: string; observed_at: string; days: number; tokens: number; amount: number; currency: string; manual: boolean; approximate_tokens?: boolean }[]
   contador: {
     medido_tokens: number | null
     medido_llamadas: number | null

@@ -330,6 +330,15 @@ const STR = {
   ab_antes: { es: 'antes', en: 'before' },
   ab_hoy: { es: 'hoy', en: 'today' },
 
+  consumo_alcance: { es: 'El contador y los desgloses siguientes corresponden al registro del clon; CodexBar se contrasta aparte en la valoración de 30 días.', en: 'The counters and breakdowns below cover the clone register; CodexBar is compared separately in the valuation.' },
+  consumo_manual: { es: 'Observación manual, no lectura en vivo. Equivalente a precio de lista; no dinero pagado. Mayor valoración disponible en EUR; las coberturas difieren y no se suman.', en: 'Manual observation, not a live reading. List-price equivalent, not money paid. Highest available EUR valuation; coverage differs and sources are not added together.' },
+  consumo_mayor: { es: 'Mayor registro disponible de 30 días', en: 'Largest available record' },
+  consumo_solape: { es: 'Fuentes con coberturas distintas; no es un total deduplicado del clon.', en: 'Sources have different coverage; this is not a deduplicated clone total.' },
+  consumo_lista: { es: 'a precio de lista', en: 'at list price' },
+  consumo_captura: { es: 'captura manual', en: 'manual screenshot' },
+  consumo_local: { es: 'registros locales', en: 'local records' },
+  consumo_no_factura: { es: 'Las suscripciones pagadas y las cuotas restantes se consultan por separado. Estas valoraciones no acreditan gasto variable ni ahorro.', en: 'Paid subscriptions and remaining quotas are tracked separately. These valuations do not establish variable spending or savings.' },
+
   // coste en euros (estimado)
   eur_titulo: { es: '¿Y todo eso, en euros?', en: 'And all that, in euros?' },
   eur_valor: {
