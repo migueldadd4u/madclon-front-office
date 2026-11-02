@@ -314,3 +314,21 @@ es_texto: Esa tarde, el vigilante del clon empezó a avisar de que unas piezas l
 en_titulo: The watchdog that cried wolf
 en_texto: That afternoon, the clone's watchdog started warning that some parts were launching programs that no longer existed. They all existed. The false warning repeated every few minutes, day and night, for the rest of the fortnight, and ended up filling almost the whole list of alerts. Real alerts were buried underneath: the clone's messaging disconnected and the work mail down. It was found to be false when the fortnight was closed, by looking at what the warning said was missing. Why it gets it wrong is not yet confirmed. The lesson was written down: a new alert is tested against a healthy setup before it is switched on, and an alert that repeats identically without end is a failure of the watchdog itself.
 fuente: 2026-10-25_handoff_v6-92-bitacora-2026-10-12-a-2026-10-25.md §4.3 (ALERTS.md:1132, primer aviso 2026-10-15 18:40:26; hooks en 265e348ea y 516ee95d0)
+
+### 2026-10-31
+icono: ri-hard-drive-2-line
+color: success
+es_titulo: Una copia que nadie ha restaurado no es una copia
+es_texto: El clon estrena un respaldo diario de lo que necesita para volver a arrancar: su motor, su código y sus bases de datos, copiadas aunque estén en uso. Con él queda escrita la receta para reconstruirlo desde cero en un ordenador nuevo. Esa misma tarde se hizo la prueba que casi nunca se hace: se restauró la copia entera en un disco aparte, y salió completa. La lección: un respaldo vale cuando se ha devuelto a la vida, no cuando se ha guardado.
+en_titulo: A backup nobody has restored is not a backup
+en_texto: The clone gets a daily backup of everything it needs to start up again: its engine, its code and its databases, copied even while in use. Alongside it, the recipe for rebuilding it from scratch on a new computer is written down. That same afternoon came the test that almost never gets done: the whole backup was restored onto a separate disk, and it came back complete. The lesson: a backup counts once it has been brought back to life, not once it has been stored.
+fuente: 2026-11-01_handoff_v6-93-bitacora-2026-10-26-a-2026-11-01.md §4.2 (commits 545f3a6b9 31/10 16:33 y 1458c7d53 31/10 19:16)
+
+### 2026-11-01
+icono: ri-user-search-line
+color: warning
+es_titulo: Una cuenta compartida no dice quién escribió
+es_texto: El clon rescata conversaciones antiguas que solo vivían en la cuenta de otro asistente de IA y las ordena en su memoria privada. Daba por hecho que todo lo de esa cuenta era de MAD. No lo era. Un proyecto que se le había atribuido por el tema apareció junto al trabajo de otra persona de las mismas fechas, y salió de la memoria. Unas expresiones que MAD supuestamente tenía vetadas entraron en las normas de escritura del clon y salieron poco después: la cuenta la usaba más gente, y las frases venían de conversaciones que no eran suyas. La lección: lo que sale de una cuenta compartida entra con la autoría en duda, y nunca habla en nombre del dueño.
+en_titulo: A shared account does not say who wrote it
+en_texto: The clone rescues old conversations that only lived in the account of another AI assistant and files them into its private memory. It took for granted that everything in that account was MAD's. It was not. A project credited to MAD because of its topic turned up next to someone else's work from the same dates, and it left the memory. Some expressions MAD had supposedly banned went into the clone's writing rules and came out shortly after: more people used the account, and the phrases came from other people's conversations. The lesson: whatever comes out of a shared account goes in with its authorship in doubt, and never speaks for the owner.
+fuente: 2026-11-01_handoff_v6-93-bitacora-2026-10-26-a-2026-11-01.md §4.5 (commits 8971e2b39 19:41, revertido por 249220f4e 20:08, y bbc1cb82d 22:44)
