@@ -1,7 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-
 import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
@@ -9,10 +7,12 @@ import Typography from '@mui/material/Typography'
 import Chip from '@mui/material/Chip'
 import Box from '@mui/material/Box'
 import Alert from '@mui/material/Alert'
+import Button from '@mui/material/Button'
+import LinearProgress from '@mui/material/LinearProgress'
 
 import { useLang } from '@/lib/i18n'
-import { usePanelData } from '@/lib/data'
-import { HARDWARE_INVENTORY, HARDWARE_VERIFIED_AT, HARDWARE_BENCHMARK, FP4_PFLOPS, isPublicHardware } from '@/lib/hardware-public.mjs'
+import { usePublishedHardware } from '@/lib/usePublishedHardware'
+import { HARDWARE_INVENTORY, HARDWARE_VERIFIED_AT, HARDWARE_BENCHMARK, FP4_PFLOPS } from '@/lib/hardware-public.mjs'
 
 const GIB = 1024 ** 3
 const STALE_MS = 36 * 60 * 60 * 1000
@@ -20,7 +20,7 @@ const STALE_MS = 36 * 60 * 60 * 1000
 type Row = [string, string]
 
 function Facts({ rows }: { rows: Row[] }) {
-  return <Box component='dl' sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', gap: 2, m: 0 }}>
+  return <Box component='dl' sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 2, m: 0, overflowWrap: 'anywhere' }}>
     {rows.map(([label, value]) => <Box key={label} sx={{ display: 'contents' }}>
       <Typography component='dt' variant='body2' color='text.secondary'>{label}</Typography>
       <Typography component='dd' variant='body2' sx={{ m: 0, textAlign: 'right', fontWeight: 600 }}>{value}</Typography>
@@ -28,32 +28,49 @@ function Facts({ rows }: { rows: Row[] }) {
   </Box>
 }
 
+function Gauge({ label, value, missing, locale }: { label: string; value: number | null; missing: string; locale: string }) {
+  return <Box>
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, mb: 1 }}>
+      <Typography component='span' variant='body2'>{label}</Typography>
+      <Typography component='span' variant='body2' fontWeight={500} sx={{ whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>
+        {value === null ? missing : `${value.toLocaleString(locale, { maximumFractionDigits: 1 })} %`}
+      </Typography>
+    </Box>
+    {value === null
+      ? <Box aria-hidden sx={{ height: 8, bgcolor: 'action.disabledBackground', borderRadius: 1 }} />
+      : <LinearProgress variant='determinate' value={value} aria-label={label} sx={{ height: 8, borderRadius: 1 }} />}
+  </Box>
+}
+
 export default function HardwarePage() {
   const { lang } = useLang()
-  const { data, cargando, retenido } = usePanelData()
-  const [now, setNow] = useState<number | null>(null)
+  const { hardware: snapshot, retained, busy, error, checkedAt: now, refresh } = usePublishedHardware()
   const es = (spanish: string, english: string) => lang === 'es' ? spanish : english
   const locale = lang === 'es' ? 'es-ES' : 'en-GB'
   const missing = es('No disponible', 'Unavailable')
   const format = (value: number | null | undefined, unit = '') => value == null ? missing : `${value.toLocaleString(locale, { maximumFractionDigits: 1 })}${unit ? ` ${unit}` : ''}`
   const gib = (value: number | null | undefined) => format(value == null ? null : value / GIB, 'GiB')
-  const snapshot = !retenido && isPublicHardware(data.overview?.hardware) ? data.overview.hardware : null
   const bench = HARDWARE_BENCHMARK
-
-  useEffect(() => {
-    setNow(Date.now())
-    const interval = setInterval(() => setNow(Date.now()), 60000)
-
-    return () => clearInterval(interval)
-  }, [])
 
   return <Grid container spacing={6}>
     <Grid size={12}>
-      <Typography component='h1' variant='h4' className='mbe-2'>Hardware</Typography>
-      <Typography color='text.secondary'>{es('Las máquinas del clon, su capacidad y la última muestra de uso. Consulta pública, sin cuenta ni acceso a la red privada.', 'The clone’s machines, their capacity and latest usage sample. Public access, with no account or private network required.')}</Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 4 }}>
+        <Box sx={{ flex: '1 1 260px' }}>
+          <Typography component='h1' variant='h4' className='mbe-2'>Hardware</Typography>
+          <Typography color='text.secondary'>{es('El Mac Studio y el DGX: capacidad, carga y espacio disponible.', 'Mac Studio and DGX: capacity, workload and available storage.')}</Typography>
+        </Box>
+        <Button variant='contained' onClick={refresh} disabled={busy} startIcon={<i aria-hidden className='ri-refresh-line' />} sx={{ minHeight: 44 }}>
+          {busy ? es('Consultando…', 'Reading…') : es('Actualizar muestra publicada', 'Refresh published sample')}
+        </Button>
+      </Box>
     </Grid>
     <Grid size={12}>
-      <Alert severity='info'>{es('Instantáneas de la exportación habitual del portal; no es una lectura en directo. La fecha de cada equipo indica cuándo se midió. La capacidad instalada permanece visible si una medición falla.', 'Snapshots from the portal’s regular export, not live readings. Each machine’s timestamp shows when it was measured. Installed capacity remains visible if a measurement fails.')}</Alert>
+      <Alert severity='info'>{es('Al entrar y al pulsar el botón se consulta la última publicación del portal. No se vuelve a medir el hardware ni se actualiza en segundo plano. La fecha de cada equipo indica cuándo se midió.', 'Entering this page or pressing the button reads the portal’s latest publication. It does not measure the hardware again or refresh in the background. Each machine shows when it was measured.')}</Alert>
+      <Box role='status' aria-live='polite' sx={{ mt: 2 }}>
+        {busy && <Typography variant='body2'>{es('Consultando la publicación…', 'Reading the publication…')}</Typography>}
+        {error && <Alert severity='warning'>{es('No se ha podido actualizar la muestra publicada. Si había una lectura anterior, se conserva con su fecha. Puedes volver a intentarlo con el botón.', 'The published sample could not be refreshed. Any previous reading keeps its original date. You can try again with the button.')}</Alert>}
+        {retained && <Alert severity='warning'>{es('La fuente ha retenido los datos públicos. Se muestra solo la capacidad instalada.', 'The source has withheld public readings. Only installed capacity is shown.')}</Alert>}
+      </Box>
     </Grid>
     {HARDWARE_INVENTORY.map(machine => {
       const host = snapshot?.hosts.find(h => h.id === machine.id)
@@ -63,38 +80,58 @@ export default function HardwarePage() {
       const sample = future ? undefined : host
       const valid = sample?.sampled_at != null
       const partial = sample && Object.values(sample).some(v => v === null)
-      const status = cargando ? es('Cargando muestra', 'Loading sample') : !valid ? es('Sin muestra disponible', 'No sample available') : stale ? es('Muestra antigua', 'Old sample') : partial ? es('Muestra parcial', 'Partial sample') : es('Muestra publicada', 'Published sample')
+      const status = busy ? es('Cargando muestra', 'Loading sample') : !valid ? es('Sin muestra disponible', 'No sample available') : stale ? es('Muestra antigua', 'Old sample') : partial ? es('Muestra parcial', 'Partial sample') : es('Muestra publicada', 'Published sample')
       const ramUsed = sample?.ram_total_bytes != null && sample.ram_available_bytes != null ? sample.ram_total_bytes - sample.ram_available_bytes : null
+      const ramPercent = ramUsed !== null && sample?.ram_total_bytes ? 100 * ramUsed / sample.ram_total_bytes : null
+      const diskUnavailable = sample?.disk_total_bytes != null && sample.disk_available_bytes != null ? sample.disk_total_bytes - sample.disk_available_bytes : null
+      const diskPercent = diskUnavailable !== null && sample?.disk_total_bytes ? 100 * diskUnavailable / sample.disk_total_bytes : null
 
       return <Grid key={machine.id} size={{ xs: 12, lg: 6 }}>
-        <Card sx={{ height: '100%' }}><CardContent>
-          <Typography component='h2' variant='h5'>{machine.name}</Typography>
-          <Typography color='text.secondary' className='mbe-4'>{machine.chip}</Typography>
-          <Facts rows={[
-            [es('Núcleos CPU instalados', 'Installed CPU cores'), format(machine.cpuCores)],
-            [es('Procesador gráfico', 'Graphics processor'), machine.gpu],
-            [es('Núcleos GPU', 'GPU cores'), format(machine.gpuCores)],
-            [es('Memoria unificada nominal', 'Nominal unified memory'), format(machine.memory, machine.memoryUnit)],
-            [es('Ancho de banda nominal', 'Nominal bandwidth'), format(machine.bandwidthGBs, 'GB/s')]
-          ]} />
-          <Typography variant='body2' color='text.secondary' className='mbs-4'>{es('Fuente de capacidad', 'Capacity source')}: {machine.source} · {es('inventario verificado', 'inventory verified')} {HARDWARE_VERIFIED_AT}</Typography>
-          <Typography component='h3' variant='h6' className='mbs-6 mbe-2'>{es('Última muestra de uso', 'Latest usage sample')}</Typography>
-          <Chip size='small' variant='outlined' label={status} color={!valid || stale ? 'warning' : 'default'} className='mbe-2' />
-          <Typography variant='body2' color='text.secondary' className='mbe-4'>
-            {valid ? new Date(sample.sampled_at!).toLocaleString(locale, { timeZone: 'UTC' }) + ' UTC' : missing}
+        <Card sx={{ height: '100%', borderTop: '3px solid', borderColor: 'primary.main' }}><CardContent>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2, mb: 2 }}>
+            <Box>
+              <Typography variant='overline' color='text.secondary'>{machine.id === 'mac' ? 'APPLE · METAL' : 'NVIDIA · CUDA'}</Typography>
+              <Typography component='h2' variant='h5'>{machine.name}</Typography>
+            </Box>
+            <Chip size='small' variant='outlined' label={status} color={!valid || stale ? 'warning' : 'default'} />
+          </Box>
+          <Typography color='text.secondary'>{machine.chip} · {format(machine.cpuCores)} CPU · {format(machine.memory, machine.memoryUnit)}</Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ mt: 2, mb: 4 }}>
+            {machine.id === 'mac'
+              ? es('Función general: coordinación del clon, interfaces y servicios locales.', 'General role: clone coordination, interfaces and local services.')
+              : es('Función general: cálculo de IA y procesamiento de lotes.', 'General role: AI computation and batch processing.')}
           </Typography>
+          <Box sx={{ display: 'grid', gap: 3, mb: 5 }}>
+            <Gauge label={es('CPU utilizada', 'CPU usage')} value={sample?.cpu_percent ?? null} missing={missing} locale={locale} />
+            <Gauge label={es('GPU utilizada', 'GPU usage')} value={sample?.gpu_percent ?? null} missing={missing} locale={locale} />
+            <Gauge label={es('RAM usada estimada', 'Estimated RAM used')} value={ramPercent} missing={missing} locale={locale} />
+            <Gauge label={es('Disco no disponible', 'Disk unavailable')} value={diskPercent} missing={missing} locale={locale} />
+          </Box>
           <Facts rows={[
-            [es('CPU utilizada', 'CPU usage'), format(sample?.cpu_percent, '%')],
-            [es('GPU utilizada', 'GPU usage'), format(sample?.gpu_percent, '%')],
-            [es('RAM reconocida por el sistema', 'RAM recognized by the OS'), gib(sample?.ram_total_bytes)],
+            [es('Disco no disponible', 'Disk unavailable'), gib(diskUnavailable)],
+            [es('Disco disponible', 'Disk available'), gib(sample?.disk_available_bytes)],
+            [es('Disco raíz total', 'Root disk total'), gib(sample?.disk_total_bytes)],
             [es('RAM usada estimada', 'Estimated used RAM'), gib(ramUsed)],
             [es('RAM disponible estimada', 'Estimated available RAM'), gib(sample?.ram_available_bytes)],
             [es('Intercambio en disco usado', 'Swap used'), gib(sample?.swap_used_bytes)],
-            [es('Disco raíz total', 'Root disk total'), gib(sample?.disk_total_bytes)],
-            [es('Disco raíz disponible', 'Root disk available'), gib(sample?.disk_available_bytes)],
             [es('Temperatura GPU', 'GPU temperature'), format(sample?.gpu_temperature_c, '°C')],
             [es('Potencia GPU', 'GPU power'), format(sample?.gpu_power_w, 'W')]
           ]} />
+          <Typography variant='caption' component='p' color='text.secondary' sx={{ mt: 3 }}>
+            {es('Medido', 'Measured')}: {valid ? new Date(sample.sampled_at!).toLocaleString(locale, { timeZone: 'Europe/Madrid' }) + ' · Europe/Madrid' : missing}
+          </Typography>
+          <Box component='details' sx={{ mt: 3 }}>
+            <Box component='summary' sx={{ cursor: 'pointer', minHeight: 44, display: 'list-item' }}>{es('Capacidad instalada y fuentes', 'Installed capacity and sources')}</Box>
+            <Facts rows={[
+              [es('Núcleos CPU instalados', 'Installed CPU cores'), format(machine.cpuCores)],
+              [es('Procesador gráfico', 'Graphics processor'), machine.gpu],
+              [es('Núcleos GPU', 'GPU cores'), format(machine.gpuCores)],
+              [es('Memoria unificada nominal', 'Nominal unified memory'), format(machine.memory, machine.memoryUnit)],
+              [es('RAM reconocida por el sistema', 'RAM recognized by the OS'), gib(sample?.ram_total_bytes)],
+              [es('Ancho de banda nominal', 'Nominal bandwidth'), format(machine.bandwidthGBs, 'GB/s')]
+            ]} />
+            <Typography variant='body2' color='text.secondary' sx={{ mt: 2 }}>{machine.source} · {es('inventario verificado', 'inventory verified')} {HARDWARE_VERIFIED_AT}</Typography>
+          </Box>
         </CardContent></Card>
       </Grid>
     })}
@@ -115,6 +152,6 @@ export default function HardwarePage() {
       ]} />
       <Typography variant='body2' color='text.secondary' className='mbs-4'>{es('Fuente: registro corregido de puesta en marcha. Ensayos separados bajo esas condiciones; no son una medición actual, una suma de equipos ni una prueba de concurrencia máxima.', 'Source: corrected commissioning record. Separate tests under those conditions; not current measurements, a combined-machine total or a maximum-concurrency test.')}</Typography>
     </CardContent></Card></Grid>
-    <Grid size={12}><Typography variant='body2' color='text.secondary'>{es('CPU: muestra breve. RAM disponible: estimación del sistema operativo. Memoria unificada compartida con GPU. Disco raíz: no inventaría discos externos. No disponible significa que la fuente no lo ofrece o la lectura falló; nunca se sustituye por cero. Esta vista publica solo agregados, sin procesos, nombres de modelos cargados ni datos personales.', 'CPU: short sample. Available RAM: operating-system estimate. Unified memory is shared with the GPU. Root disk: external drives are not inventoried. Unavailable means the source does not provide it or the reading failed; it is never replaced with zero. This view publishes aggregates only, without processes, loaded-model names or personal data.')}</Typography></Grid>
+    <Grid size={12}><Typography variant='body2' color='text.secondary'>{es('CPU: muestra breve. RAM disponible: estimación del sistema operativo; GPU y RAM comparten memoria. Disco no disponible = total menos disponible, e incluye reservas del sistema: no equivale solo a archivos ocupados. Solo se mide el disco raíz, sin discos externos. No disponible en una cifra significa que la fuente no ofrece el dato o que la lectura falló; nunca se sustituye por cero. Funciones generales, no una lista de trabajos en curso. Solo se publican agregados.', 'CPU: short sample. Available RAM: OS estimate; GPU and RAM share memory. Unavailable disk = total minus available and includes system reservations, not just stored files. Only the root disk is measured, without external drives. An unavailable value means the source does not provide it or the reading failed; it is never replaced with zero. General roles, not a list of current jobs. Only aggregates are published.')}</Typography></Grid>
   </Grid>
 }

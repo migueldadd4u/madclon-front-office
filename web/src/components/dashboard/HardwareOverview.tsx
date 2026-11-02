@@ -35,9 +35,6 @@ export default function HardwareOverview({ hardware }: {hardware: unknown}) {
 
   useEffect(() => {
     setNow(Date.now())
-    const interval = setInterval(() => setNow(Date.now()), 60000)
-
-    return () => clearInterval(interval)
   }, [])
 
   return <Box component='section' aria-labelledby='hardware-home-title'>
