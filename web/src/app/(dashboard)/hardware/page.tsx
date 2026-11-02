@@ -59,7 +59,7 @@ export default function HardwarePage() {
           <Typography component='h1' variant='h4' className='mbe-2'>Hardware</Typography>
           <Typography color='text.secondary'>{es('El Mac Studio y el DGX: capacidad, carga y espacio disponible.', 'Mac Studio and DGX: capacity, workload and available storage.')}</Typography>
         </Box>
-        <Button variant='contained' onClick={refresh} disabled={busy} startIcon={<i aria-hidden className='ri-refresh-line' />} sx={{ minHeight: 44 }}>
+        <Button variant='outlined' onClick={refresh} disabled={busy} startIcon={<i aria-hidden className='ri-refresh-line' />} sx={{ minHeight: 44, color: 'text.primary' }}>
           {busy ? es('Consultando…', 'Reading…') : es('Actualizar muestra publicada', 'Refresh published sample')}
         </Button>
       </Box>
