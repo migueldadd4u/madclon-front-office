@@ -13,6 +13,7 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 
 // Component Imports
 import DataGate from '@/components/dashboard/DataGate'
+import ParaQuienDecide from '@/components/dashboard/ParaQuienDecide'
 import AntesDespues from '@/components/dashboard/AntesDespues'
 
 // Hook Imports
@@ -55,6 +56,10 @@ const EficienciaPage = () => {
                 {t('ef_soporte')}: {tokens.soporte}
               </Typography>
             )}
+          </Grid>
+
+          <Grid size={12}>
+            <ParaQuienDecide pagina='eficiencia' />
           </Grid>
 
           {/* Comparador antes/después contra la línea base */}

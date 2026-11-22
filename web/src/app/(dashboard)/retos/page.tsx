@@ -27,6 +27,7 @@ import type { RetoPublico, RetosPublicos } from '@/lib/data'
 
 // Component Imports
 import Link from '@/components/Link'
+import ParaQuienDecide from '@/components/dashboard/ParaQuienDecide'
 
 // Data Imports
 import { RETOS_BUILD } from '@/lib/copia-retos'
@@ -175,6 +176,12 @@ const RetosPage = () => {
             <AvanceRetos bloque={retos} cargando={cargando} lang={lang} titulo={titulo} texto={texto} />
           </CardContent>
         </Card>
+      </Grid>
+
+      {/* Qué sería un reto en un despacho público: ejemplos inventados, sin avance, para que
+          nadie los lea como los de arriba (arco «para quien decide», 22/11/2026). */}
+      <Grid size={12}>
+        <ParaQuienDecide pagina='retos' />
       </Grid>
 
       <Grid size={{ xs: 12, lg: 7 }}>

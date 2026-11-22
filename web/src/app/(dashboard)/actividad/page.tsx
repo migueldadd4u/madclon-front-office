@@ -15,6 +15,7 @@ import CustomAvatar from '@core/components/mui/Avatar'
 
 // Component Imports
 import DataGate from '@/components/dashboard/DataGate'
+import ParaQuienDecide from '@/components/dashboard/ParaQuienDecide'
 import StatCard from '@/components/dashboard/StatCard'
 import CountUp from '@/components/dashboard/CountUp'
 
@@ -56,10 +57,19 @@ const ActividadPage = () => {
       const parados = (r: { parados: number } | undefined) =>
         r && r.parados > 0 && reciente ? t('act_parados').replace('{n}', fmt(r.parados)).replace('{d}', String(reciente.umbral_dias)) : undefined
 
-      const colaTotal = Math.max(
-        automejora.hechas + automejora.bloqueadas + automejora.aparcadas + automejora.pendientes,
-        1
-      )
+      // El bloque del motor sale de una línea de texto de una vista del sistema. Cuando
+      // esa línea cambia de forma, alguna cifra no llega: cada fila dice «sin dato» por
+      // su cuenta y, si no llega ninguna, la tarjeta lo explica (22/11/2026: publicó
+      // cuatro filas en blanco y «undefined tokens» durante horas).
+      const filasMotor = [
+        { label: t('act_hechas'), valor: automejora.hechas, color: 'success' as const },
+        { label: t('act_pendientes'), valor: automejora.pendientes, color: 'info' as const },
+        { label: t('act_aparcadas'), valor: automejora.aparcadas, color: 'secondary' as const },
+        { label: t('act_bloqueadas'), valor: automejora.bloqueadas, color: 'error' as const }
+      ]
+
+      const conCifra = filasMotor.filter((f): f is typeof f & { valor: number } => typeof f.valor === 'number')
+      const colaTotal = Math.max(conCifra.reduce((suma, f) => suma + f.valor, 0), 1)
 
       return (
         <Grid container spacing={6}>
@@ -107,42 +117,54 @@ const ActividadPage = () => {
             />
           </Grid>
 
+          <Grid size={12}>
+            <ParaQuienDecide pagina='actividad' />
+          </Grid>
+
           {/* Automejora */}
           <Grid size={{ xs: 12, lg: 6 }}>
             <Card className='bs-full'>
               <CardHeader
                 title={t('act_motor')}
-                subheader={`${t('act_motor_sub_1')} ${automejora.metered} tokens`}
+                subheader={typeof automejora.metered === 'number' ? `${t('act_motor_sub_1')} ${automejora.metered} tokens` : t('act_motor_sub_sin')}
                 avatar={
                   <CustomAvatar color='primary' skin='light' variant='rounded'>
                     <i className='ri-settings-5-line' />
                   </CustomAvatar>
                 }
               />
-              <CardContent className='flex flex-col gap-3'>
-                {[
-                  { label: t('act_hechas'), valor: automejora.hechas, color: 'success' as const },
-                  { label: t('act_pendientes'), valor: automejora.pendientes, color: 'info' as const },
-                  { label: t('act_aparcadas'), valor: automejora.aparcadas, color: 'secondary' as const },
-                  { label: t('act_bloqueadas'), valor: automejora.bloqueadas, color: 'error' as const }
-                ].map(f => (
-                  <div key={f.label}>
-                    <div className='flex justify-between mbe-1'>
-                      <Typography variant='body2' color='text.secondary'>{f.label}</Typography>
-                      <Typography variant='body2' className='font-mono'>{f.valor}</Typography>
-                    </div>
-                    <LinearProgress
-                      variant='determinate'
-                      value={barras ? (f.valor / colaTotal) * 100 : 0}
-                      color={f.color}
-                      aria-label={`${f.label}: ${f.valor}`}
-                      sx={{ '& .MuiLinearProgress-bar': { transition: 'transform 1s cubic-bezier(.4,0,.2,1)' } }}
-                    />
+              <CardContent className='flex flex-col gap-3' data-motor={conCifra.length === 0 ? 'sin-dato' : 'ok'}>
+                {conCifra.length === 0 ? (
+                  <div role='status'>
+                    <Typography fontWeight={600}>{t('sin_dato_valor')}</Typography>
+                    <Typography variant='body2' color='text.secondary'>{t('act_motor_sin_dato')}</Typography>
                   </div>
-                ))}
-                <Typography variant='caption' color='text.secondary'>
-                  {fmt(automejora.llamadas)} {t('act_llamadas_consejo')}: {automejora.top}
-                </Typography>
+                ) : (
+                  filasMotor.map(f => (
+                    <div key={f.label}>
+                      <div className='flex justify-between mbe-1'>
+                        <Typography variant='body2' color='text.secondary'>{f.label}</Typography>
+                        <Typography variant='body2' className={typeof f.valor === 'number' ? 'font-mono' : undefined}>
+                          {typeof f.valor === 'number' ? f.valor : t('sin_dato_valor')}
+                        </Typography>
+                      </div>
+                      {typeof f.valor === 'number' && (
+                        <LinearProgress
+                          variant='determinate'
+                          value={barras ? (f.valor / colaTotal) * 100 : 0}
+                          color={f.color}
+                          aria-label={`${f.label}: ${f.valor}`}
+                          sx={{ '& .MuiLinearProgress-bar': { transition: 'transform 1s cubic-bezier(.4,0,.2,1)' } }}
+                        />
+                      )}
+                    </div>
+                  ))
+                )}
+                {typeof automejora.llamadas === 'number' && automejora.top && (
+                  <Typography variant='caption' color='text.secondary'>
+                    {fmt(automejora.llamadas)} {t('act_llamadas_consejo')}: {automejora.top}
+                  </Typography>
+                )}
               </CardContent>
             </Card>
           </Grid>

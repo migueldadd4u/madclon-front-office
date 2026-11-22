@@ -19,6 +19,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 
 
 // Component Imports
 import DataGate from '@/components/dashboard/DataGate'
+import ParaQuienDecide from '@/components/dashboard/ParaQuienDecide'
 import CountUp from '@/components/dashboard/CountUp'
 
 // Hook Imports
@@ -62,6 +63,10 @@ const TokensPage = () => {
             <Typography color='text.secondary' className='max-is-3xl'>
               {t('tokens_intro_1')} {t('consumo_alcance')}
             </Typography>
+          </Grid>
+
+          <Grid size={12}>
+            <ParaQuienDecide pagina='tokens' />
           </Grid>
 
           {/* Contador común */}

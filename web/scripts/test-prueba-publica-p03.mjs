@@ -197,29 +197,45 @@ async function continuidadTeclado(page) {
 
 async function editorial(page, idioma) {
   const demo = page.locator('section[aria-labelledby="demostracion"]')
+  const es = idioma === 'es'
 
-  assert.match(await demo.locator('[data-demo-sintetica]').innerText(), idioma === 'es' ? /Demostración sintética[\s\S]*inventados[\s\S]*No son un correo real ni un resultado de cliente/ : /Synthetic demonstration[\s\S]*invented[\s\S]*not a real email or a client result/)
-  assert.equal(await demo.locator('time').getAttribute('datetime'), '2026-10-20')
-  assert.match(await demo.locator('time').innerText(), idioma === 'es' ? /20 de octubre de 2026.*fuentes: correo, nota y agenda ficticios/ : /20 October 2026.*sources: the fictional email, note and calendar/)
-  assert.equal(await demo.locator('[data-demo-etapa]').count(), 4, 'el caso tiene entrada, trabajo, entrega y decisión humana')
-  assert.equal(await demo.locator('[data-demo-fuentes] dt').count(), 3, 'se pueden leer las tres fuentes usadas')
-  assert.match(await demo.locator('#mensaje-sintetico').innerText(), /10:00/)
-  const fuentes = await demo.locator('[data-demo-fuentes]').innerText()
+  // El rótulo va antes de los casos y dice las tres cosas: inventado, no es un cliente, la página no actúa.
+  assert.match(await demo.locator('[data-demo-sintetica]').innerText(), es ? /Caso ilustrativo[\s\S]*inventados[\s\S]*No son un cliente ni un resultado medido[\s\S]*no envía mensajes, no firma y no reserva citas/ : /Illustrative case[\s\S]*invented[\s\S]*not a client or a measured result[\s\S]*does not send messages, sign anything or book meetings/)
+  assert.equal(await demo.locator('time').getAttribute('datetime'), '2026-11-22')
+  assert.match(await demo.locator('time').innerText(), es ? /22 de noviembre de 2026/ : /22 November 2026/)
 
-  assert.match(fuentes, /10:00[\s\S]*11:00[\s\S]*11:30[\s\S]*12:00/, 'agenda y conflicto visibles')
-  assert.match(fuentes, idioma === 'es' ? /no ha autorizado el acceso a su buzón/ : /has not yet been authorised/, 'no se inventa acceso a otro buzón')
-  const borrador = await demo.locator('[data-demo-borrador]').innerText()
+  // Cuatro cargos, cuatro paneles en el documento y uno solo a la vista.
+  const paneles = demo.locator('[role="tabpanel"]')
 
-  assert.match(borrador, /11:30[\s\S]*30/, 'la respuesta propone la franja libre de la fuente')
-  assert.match(borrador, idioma === 'es' ? /tres ejemplos sin datos personales/ : /three examples without personal data/)
-  const humano = await demo.locator('[data-demo-etapa="4"]').innerText()
+  assert.equal(await demo.getByRole('tab').count(), 4, 'una pestaña por cargo')
+  assert.equal(await paneles.count(), 4, 'los cuatro casos viajan en el HTML')
+  assert.equal(await demo.locator('[role="tabpanel"]:not([hidden])').count(), 1, 'solo el caso elegido está a la vista')
+  assert.equal(await demo.getByRole('tab', { selected: true }).count(), 1)
 
-  assert.match(humano, idioma === 'es' ? /envías tú la respuesta revisada/ : /send the reviewed reply yourself/, 'la persona decide y envía')
-  assert.match(await demo.locator('[data-demo-estado-final]').innerText(), idioma === 'es' ? /reunión pendiente de confirmación/ : /meeting awaiting confirmation/, 'proponer hora no equivale a confirmar reunión')
+  for (let i = 0; i < 4; i++) {
+    const panel = paneles.nth(i)
+    const clave = await panel.getAttribute('data-caso')
+
+    // textContent y no innerText: un panel oculto no pinta, pero su texto está.
+    assert.equal(await panel.locator('[data-demo-etapa]').count(), 4, `${clave}: entrada, trabajo, entrega y decisión humana`)
+    assert.equal(await panel.locator('[data-demo-fuentes] li').count(), 6, `${clave}: seis entradas, cada una con su canal`)
+    assert.equal(await panel.locator('[data-mesa-decisiones] li').count(), 3, `${clave}: tres decisiones preparadas`)
+    assert.equal(await panel.locator('[data-mesa-compromisos] li').count(), 2, `${clave}: dos compromisos con fecha`)
+    assert.equal(await panel.locator('[data-mesa-aviso]').count(), 1, `${clave}: un aviso`)
+    assert.match(await panel.locator('[data-demo-decides]').textContent(), es ? /El clon no / : /The clone (does not|publishes nothing)/, `${clave}: la persona decide; el clon no envía, no firma, no publica`)
+    assert.ok((await panel.locator('[data-demo-cambia]').textContent()).length > 40, `${clave}: dice qué cambia`)
+  }
+
+  const visible = demo.locator('[role="tabpanel"]:not([hidden])')
+
+  assert.equal(await visible.getAttribute('data-caso'), 'alcaldia', 'sin enlace de cargo, se enseña el primero')
+  assert.match(await visible.locator('[data-demo-etapa="1"]').innerText(), es ? /por tercera vez[\s\S]*9:00[\s\S]*Nadie lo apuntó/ : /for the third time[\s\S]*9:00[\s\S]*Nobody wrote it down/, 'las entradas del caso se leen enteras')
+  assert.match(await visible.locator('[data-demo-etapa="2"]').innerText(), es ? /Ve el choque del jueves[\s\S]*Propone delegar/ : /Spots Thursday's clash[\s\S]*suggests delegating/, 'el clon propone; no reserva ni delega')
   assert.equal(await demo.locator('form').count(), 0, 'el relato no ejecuta una acción de negocio')
+  assert.equal(await demo.locator('input, textarea, select').count(), 0, 'ni pide datos a quien lee')
   const limites = await page.locator('#limite-0-contenido').innerText()
 
-  assert.match(limites, idioma === 'es' ? /no acredita precisión[\s\S]*ahorro ni resultados comerciales[\s\S]*trabajo en curso no es un éxito de cliente/ : /does not establish AI accuracy[\s\S]*savings or commercial results[\s\S]*work in progress is not a client success/)
+  assert.match(limites, es ? /no acreditan precisión de la IA[\s\S]*ahorro ni resultados[\s\S]*trabajo en curso no es un éxito de cliente/ : /do not establish AI accuracy[\s\S]*savings or results[\s\S]*work in progress is not a client success/)
 }
 
 async function cacheReal() {
@@ -409,7 +425,7 @@ try {
       const h1 = await page.locator('h1').innerText()
 
       await editorial(page, caso.idioma)
-      const enlace = page.locator('section[aria-labelledby="demostracion"]').getByRole('link', { name: caso.idioma === 'es' ? 'Ver los límites de este ejemplo' : 'See the limits of this example', exact: true })
+      const enlace = page.locator('section[aria-labelledby="demostracion"]').getByRole('link', { name: caso.idioma === 'es' ? 'Ver los límites de estos casos' : 'See the limits of these cases', exact: true })
 
       assert.equal(await enlace.count(), 1, 'demo ofrece enlace contextual único a sus límites')
       assert.equal(await enlace.getAttribute('href'), '#limites-privacidad')

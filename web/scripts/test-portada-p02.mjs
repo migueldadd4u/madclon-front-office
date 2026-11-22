@@ -295,7 +295,12 @@ try {
       const page = await ctx.newPage()
       await page.goto(base, { waitUntil: 'networkidle' })
       assert.equal(await page.locator('h1').count(), 1)
-      assert.equal(await page.locator('[data-escaparate-clon] .MuiCardActionArea-root').count(), 3)
+      // El cuerpo de la portada sigue entero aunque falle una fuente: es copy horneado, no dato.
+      assert.equal(await page.locator('[data-escaparate-clon] [data-recorrido] [data-columna]').count(), 3, 'recorrido: llega · hace · devuelve')
+      assert.equal(await page.locator('[data-escaparate-clon] [data-casos-cargo] [role="tabpanel"]').count(), 4, 'los cuatro casos por cargo')
+      assert.equal(await page.locator('[data-escaparate-clon] [data-niveles] [data-nivel]').count(), 5, 'punto de partida y cuatro niveles')
+      if (estado === 'retenido') assert.equal(await page.locator('[data-cifras-vivas]').count(), 0, 'retención: ni una cifra del clon en la portada')
+      else assert.equal(await page.locator('[data-cifras-vivas]').getAttribute('data-cifras-vivas'), 'ok', 'las cifras vivas no dependen del documento que falla')
       if (estado === 'ausente') {
         assert.ok(await page.getByRole('status').filter({ hasText: /revisión/ }).isVisible())
         assert.equal(await page.locator('.fo-pulso').count(), 0, 'dato ausente no fabrica gráfico ni cero')

@@ -676,7 +676,24 @@ async function navegador() {
   } catch (error) {
     errorPruebaP03 = `${error.stdout || ''}\n${error.stderr || error.message}`.slice(-3500)
   }
-  marca(23, 'P03: demo sintética, dos gestos a límites y caché real aislada', !errorPruebaP03, errorPruebaP03 || 'ES/EN · 390/1440 · teclado/historial · procedencia y SW con destino acotado')
+  marca(23, 'P03: casos ilustrativos rotulados, dos gestos a límites y caché real aislada', !errorPruebaP03, errorPruebaP03 || 'ES/EN · 390/1440 · teclado/historial · procedencia y SW con destino acotado')
+
+  // «Para quien decide» (22/11/2026): casos por cargo con sus pestañas y su enlace
+  // propio, el recorrido con cifras contra el JSON servido, la lectura de cada
+  // página y los huecos de automejora. Mismo export; cualquier fallo tumba el gate.
+  let errorCasos = ''
+
+  try {
+    await promisify(execFile)(process.execPath, ['scripts/test-casos.mjs'], {
+      cwd: RAIZ,
+      env: { ...process.env, PROTOTYPE_URL: url('') },
+      stdio: 'pipe',
+      timeout: 420000
+    })
+  } catch (error) {
+    errorCasos = `${error.stdout || ''}\n${error.stderr || error.message}`.slice(-3000)
+  }
+  marca(24, 'para quien decide: casos por cargo, lectura por página y huecos', !errorCasos, errorCasos || 'ES/EN · 375/1440 · diez rutas · teclado · enlace por cargo · cifras contra el JSON')
 
   const problemasHardware = []
 

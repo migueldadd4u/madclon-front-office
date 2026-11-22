@@ -1,5 +1,8 @@
 'use client'
 
+// React Imports
+import { useEffect, useRef } from 'react'
+
 // MUI Imports
 import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
@@ -14,6 +17,11 @@ import { useLang } from '@/lib/i18n'
 
 // Data Imports
 import { usePanelData, fmtCorto } from '@/lib/data'
+import { textoCurado } from '@/lib/casos'
+
+// Las preguntas de quien dirige una institución (arco «para quien decide», 22/11/2026).
+// Su texto no vive aquí: sale de exporter/casos.md, horneado en el build.
+const PREGUNTAS_INSTITUCION = ['pregunta-1', 'pregunta-2', 'pregunta-3', 'pregunta-4', 'pregunta-5', 'pregunta-6']
 
 const PREGUNTAS = [
   {
@@ -105,6 +113,26 @@ const PREGUNTAS = [
 const PreguntasPage = () => {
   const { lang, t } = useLang()
   const { data, faltantes } = usePanelData()
+  const institucionRef = useRef<HTMLHeadingElement>(null)
+
+  // Quien llega con `#institucion` (el enlace «Preguntas de quien dirige» de la portada)
+  // aterriza en ese grupo: la vista y el foco van a su título, también con teclado.
+  useEffect(() => {
+    const alGrupo = () => {
+      if (window.location.hash !== '#institucion') return
+      institucionRef.current?.scrollIntoView({ behavior: 'instant', block: 'start' })
+      institucionRef.current?.focus({ preventScroll: true })
+    }
+
+    const frame = window.requestAnimationFrame(alGrupo)
+
+    window.addEventListener('hashchange', alGrupo)
+
+    return () => {
+      window.cancelAnimationFrame(frame)
+      window.removeEventListener('hashchange', alGrupo)
+    }
+  }, [])
 
   // Rellena los huecos con los JSON. Si alguno de los tres documentos falta o no
   // validó, la respuesta usa su variante sin cifras: mejor decir dónde mirar
@@ -142,6 +170,38 @@ const PreguntasPage = () => {
             </AccordionSummary>
             <AccordionDetails>
               <Typography color='text.secondary'>{vivo(p[lang])}</Typography>
+            </AccordionDetails>
+          </Accordion>
+        ))}
+      </Grid>
+
+      {/* Lo que pregunta quien tiene un despacho, un equipo y una agenda llena. Llega aquí
+          el enlace «Preguntas de quien dirige» de la portada (`#institucion`). */}
+      <Grid size={{ xs: 12, lg: 10, xl: 8 }} data-preguntas-institucion>
+        <Typography
+          ref={institucionRef}
+          component='h2'
+          variant='h5'
+          id='institucion'
+          tabIndex={-1}
+          sx={{ scrollMarginBlockStart: 100, '&:focus': { outline: '2px solid', outlineColor: 'primary.main', outlineOffset: 4 } }}
+        >
+          {textoCurado('preguntas-institucion', lang).titulo}
+        </Typography>
+        <Typography color='text.secondary' className='mbe-4'>
+          {textoCurado('preguntas-institucion', lang).texto}
+        </Typography>
+        {PREGUNTAS_INSTITUCION.map((clave, i) => (
+          <Accordion key={clave} defaultExpanded={i === 0}>
+            <AccordionSummary
+              id={`${clave}-cabecera`}
+              aria-controls={`${clave}-contenido`}
+              expandIcon={<i className='ri-arrow-down-s-line text-xl' aria-hidden='true' />}
+            >
+              <Typography component='span' fontWeight={600}>{textoCurado(clave, lang).titulo}</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Typography color='text.secondary'>{textoCurado(clave, lang).texto}</Typography>
             </AccordionDetails>
           </Accordion>
         ))}
