@@ -53,7 +53,7 @@ const TokensPage = () => {
       const eurosRegistro = c.ventana_30d == null ? null : c.ventana_30d / 1000000 * 3
       const eurosMayor = euros && (eurosRegistro == null || euros.amount > eurosRegistro) ? euros : null
       const mayorTokens = observaciones.reduce((a, b) => b.tokens > (a?.tokens ?? -1) ? b : a, observaciones[0])
-      const datosClon = [...tokens.por_clon].sort((a, b) => (b.tokens ?? 0) - (a.tokens ?? 0))
+      const datosClon = tokens.por_clon.toSorted((a, b) => (b.tokens ?? 0) - (a.tokens ?? 0))
 
       return (
         <Grid container spacing={6}>

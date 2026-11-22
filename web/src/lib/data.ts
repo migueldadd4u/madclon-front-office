@@ -294,15 +294,8 @@ const validadores: Record<DocNombre, (v: unknown) => boolean> = {
 }
 
 async function leerDoc(nombre: DocNombre): Promise<unknown> {
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
-  let respuesta: Response
-
-  try {
-    respuesta = await fetch(`${BASE}/data/${nombre}.json`, { method: 'GET', signal: controller.signal })
-  } finally {
-    clearTimeout(timeout)
-  }
+  // El plazo cubre también la lectura del cuerpo, no solo la llegada de las cabeceras.
+  const respuesta = await fetch(`${BASE}/data/${nombre}.json`, { method: 'GET', signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) })
 
   if (!respuesta.ok) throw new Error(`${nombre}: HTTP ${respuesta.status}`)
 
