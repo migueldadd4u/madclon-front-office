@@ -332,3 +332,21 @@ es_texto: El clon rescata conversaciones antiguas que solo vivían en la cuenta 
 en_titulo: A shared account does not say who wrote it
 en_texto: The clone rescues old conversations that only lived in the account of another AI assistant and files them into its private memory. It took for granted that everything in that account was MAD's. It was not. A project credited to MAD because of its topic turned up next to someone else's work from the same dates, and it left the memory. Some expressions MAD had supposedly banned went into the clone's writing rules and came out shortly after: more people used the account, and the phrases came from other people's conversations. The lesson: whatever comes out of a shared account goes in with its authorship in doubt, and never speaks for the owner.
 fuente: 2026-11-01_handoff_v6-93-bitacora-2026-10-26-a-2026-11-01.md §4.5 (commits 8971e2b39 19:41, revertido por 249220f4e 20:08, y bbc1cb82d 22:44)
+
+### 2026-11-12
+icono: ri-alarm-warning-line
+color: error
+es_titulo: La avería que se pagaba en silencio
+es_texto: El clon tiene sondas que miran cada poco si ha llegado algo nuevo. A finales de octubre, la fuente de una de ellas estuvo averiada varios días. Cada intento fallido despertaba al modelo de IA, y cada despertar era una sesión de trabajo gastada en una avería. No se pagó en avisos: se pagó en trabajo del modelo. Hoy la sonda aprende a fallar callada: sale con «nada que hacer» y solo avisa cuando lleva varios fallos seguidos. Se probó con una racha larga de fallos seguidos. La lección: despertar al modelo es para cuando hay trabajo, no para cuando algo falla.
+en_titulo: The fault that was paid for in silence
+en_texto: The clone has probes that check every so often whether something new has arrived. In late October, the source behind one of them was down for several days. Every failed attempt woke the AI model up, and every wake-up was a work session spent on a fault. It was not paid for in alerts: it was paid for in the model's work. Today the probe learns to fail quietly: it exits with «nothing to do» and only raises an alert after several failures in a row. It was tested with a long run of failures in a row. The lesson: waking the model is for when there is work, not for when something fails.
+fuente: 2026-11-22_handoff_v6-94-bitacora-2026-11-02-a-2026-11-22.md §4.5 (commit 28bbf813d, 12/11 08:24)
+
+### 2026-11-15
+icono: ri-draft-line
+color: success
+es_titulo: El molde queda escrito
+es_texto: Levantar un clon nuevo queda hoy escrito como un proceso repetible, destilado del clon que se acababa de levantar. Es lo que el proyecto buscaba desde julio: que lo aprendido con un clon sirva de receta para el siguiente.
+en_titulo: The mould is written down
+en_texto: Bringing up a new clone is written down today as a repeatable process, distilled from the clone that had just been brought up. It is what the project had been after since July: that what is learned with one clone serves as the recipe for the next.
+fuente: 2026-11-22_handoff_v6-94-bitacora-2026-11-02-a-2026-11-22.md §4.3 (commit 1447fb63c, 15/11 13:23)
