@@ -20,6 +20,7 @@ import { generar } from './build-historia.mjs'
 import { generar as generarCopia } from './build-copia-publica.mjs'
 import { generar as generarRetos, titulosPublicosHorneados } from './build-copia-retos.mjs'
 import { generar as generarCasos } from './build-copia-casos.mjs'
+import { comprobarIconos } from './check-iconos.mjs'
 
 const COLORES_VALIDOS = ['primary', 'success', 'info', 'warning', 'error', 'secondary']
 const RE_ICONO = /^ri-[a-z0-9-]+$/
@@ -519,6 +520,20 @@ export function comprobarContrato(base = process.cwd()) {
     }
 
     notas.push(`${casos.orden.length} casos por cargo · ${Object.keys(casos.textos).length} bloques «para quien decide»`)
+  }
+
+  // ── 7 · todo icono que la web pide existe en el paquete de la plantilla ──────
+  // Pedir un `ri-*` que no está en el paquete no da error: pinta un hueco vacío.
+  // El 22/11/2026 había dos en producción desde hacía meses (ver check-iconos.mjs).
+  // Sin el paquete generado no se puede comprobar: se avisa, no se inventa un verde.
+  const iconos = comprobarIconos(base)
+
+  if (iconos.estado === 'sin-paquete') {
+    avisos.push('iconos: falta src/assets/iconify-icons/generated-icons.css (yarn build:icons); no se ha comprobado que existan')
+  } else {
+    iconos.faltan.forEach(f =>
+      falla('icono-inexistente', `${f.icono} en ${f.fichero}:${f.linea} no existe en el paquete de la plantilla: saldría un hueco vacío`))
+    notas.push(`${iconos.usados} iconos, ${iconos.faltan.length === 0 ? 'todos en el paquete' : `${iconos.faltan.length} que no existen`}`)
   }
 
   return { fallos, avisos, notas }
