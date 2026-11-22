@@ -91,6 +91,7 @@ Estado a 2026-08-01: **saldado** en la entrega 3. Las comprobaciones 9 y 10 del 
   «un día en la vida», donde el tamaño *es* el dato (cada punto marca una hora en 24 h) y la
   franja entera es enfocable y recorrible con las flechas.
 - **Foco visible siempre**, con anillo propio: el velo translúcido de MUI no cuenta como foco.
+- **Todo icono que se pide existe en el paquete de la plantilla.** Un `ri-*` que no está no da error: pinta un hueco vacío. Lo vigila `check-iconos.mjs` (regla `icono-inexistente` de `check-contrato`), nacida el 22/11/2026 de dos huecos que llevaban meses en producción.
 - **Cuatro anchos, no tres**: 320, 390, 834 y 1440. El 320 es donde revientan las franjas y las cabeceras.
 - **Con las utilidades de tailwind de esta plantilla no se pelea**: se emiten dentro de `@layer`
   con `!important`, y para las declaraciones importantes el orden de capas se invierte — una
