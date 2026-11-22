@@ -13,7 +13,7 @@ import { useLang } from '@/lib/i18n'
 
 // Data Imports
 import { usePanelData, DOCS } from '@/lib/data'
-import type { DocNombre, PanelData } from '@/lib/data'
+import type { DocNombre, PanelData, PanelDataCarga } from '@/lib/data'
 
 const SkeletonPanel = () => (
   <Grid container spacing={6} aria-hidden='true'>
@@ -67,9 +67,14 @@ type DataGateProps = {
   fallback?: (data: Partial<PanelData>) => ReactNode
 }
 
-const DataGate = ({ children, necesita, fallback }: DataGateProps) => {
+/**
+ * La misma puerta, con los datos ya leídos por quien la monta. La portada lee los
+ * documentos UNA vez y los reparte entre el recorrido de arriba y el sistema de
+ * abajo: dos lecturas habrían sido el doble de peticiones para el mismo lote.
+ */
+export const DataGateVista = ({ carga, children, necesita, fallback }: DataGateProps & { carga: PanelDataCarga }) => {
   const requeridos = necesita ?? DOCS
-  const { data, faltantes, sinNada, retenido, cargando } = usePanelData()
+  const { data, faltantes, sinNada, retenido, cargando } = carga
   const { lang, t } = useLang()
 
   const conFallback = (content: ReactNode, safeData: Partial<PanelData> = data) => <>{content}{fallback?.(safeData)}</>
@@ -116,6 +121,12 @@ const DataGate = ({ children, necesita, fallback }: DataGateProps) => {
   if (faltanRequeridos || !listos) return conFallback(<EnRevision />)
 
   return <>{children(data as PanelData)}</>
+}
+
+const DataGate = (props: DataGateProps) => {
+  const carga = usePanelData()
+
+  return <DataGateVista carga={carga} {...props} />
 }
 
 export default DataGate

@@ -212,11 +212,16 @@ def parse_panel_clon(md: str) -> dict:
         out["personas"] = {"fichas_curadas": num_es(m.group(1)),
                            "staged": int(m.group(2))}
 
-    m = re.search(r"Cola: (\d+) hechas · (\d+) bloqueadas · (\d+) aparcadas · (\d+) pendientes · "
+    # «pendientes» es OPCIONAL. La vista dejó de escribirlo y, como el patrón lo exigía,
+    # el bloque entero salía vacío: el 22/11/2026 el escaparate publicó «undefined
+    # mejoras aplicadas» en la portada. Si la cifra no viene, sale None y la web dice
+    # «sin dato» en esa fila; las demás cifras siguen saliendo.
+    m = re.search(r"Cola: (\d+) hechas · (\d+) bloqueadas · (\d+) aparcadas · (?:(\d+) pendientes · )?"
                   r"llamadas ([\d.]+) · \*\*metered: (\d+)\*\* · top: ([^\n]+)", md)
     if m:
         out["automejora"] = {"hechas": int(m.group(1)), "bloqueadas": int(m.group(2)),
-                             "aparcadas": int(m.group(3)), "pendientes": int(m.group(4)),
+                             "aparcadas": int(m.group(3)),
+                             "pendientes": int(m.group(4)) if m.group(4) is not None else None,
                              "llamadas": num_es(m.group(5)), "metered": int(m.group(6)),
                              "top": m.group(7).strip()}
 

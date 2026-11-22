@@ -39,7 +39,7 @@ const Insignias = ({ data, diasVida }: Props) => {
   const { tokens, clones, overview } = data
   const fichas = overview.personas.fichas_curadas ?? 0
   const tokens30d = tokens.contador.ventana_30d ?? 0
-  const mejoras = overview.automejora.hechas
+  const mejoras = overview.automejora.hechas ?? 0
   const puertas = overview.gateways?.length ?? 0
 
   const INSIGNIAS: Insignia[] = [

@@ -16,6 +16,7 @@ import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent'
 
 // Component Imports
 import DataGate from '@/components/dashboard/DataGate'
+import ParaQuienDecide from '@/components/dashboard/ParaQuienDecide'
 import Insignias from '@/components/dashboard/Insignias'
 import StatCard from '@/components/dashboard/StatCard'
 import Link from '@/components/Link'
@@ -180,6 +181,10 @@ const HistoriaPage = () => {
                   </Typography>
                 </CardContent>
               </Card>
+            </Grid>
+
+            <Grid size={12}>
+              <ParaQuienDecide pagina='historia' dato={diasVida === null ? undefined : { dias: fmt(diasVida) }} />
             </Grid>
 
             <Grid size={{ xs: 12, sm: 6, lg: 3 }}>

@@ -21,6 +21,10 @@ import type { PanelData } from '@/lib/data'
 
 type Plantilla = (data: PanelData) => string | null
 
+/** ¿Vienen las dos cifras sin las que la frase de automejora no dice nada? */
+const automejoraCompleta = (a: PanelData['overview']['automejora']) =>
+  [a.hechas, a.bloqueadas].every(n => typeof n === 'number')
+
 const PLANTILLAS_ES: Plantilla[] = [
   // 1 · el volumen de trabajo, traducido a páginas
   d => {
@@ -42,10 +46,17 @@ const PLANTILLAS_ES: Plantilla[] = [
   },
 
   // 3 · la automejora
+  // Si el refresco no trajo sus cifras, esta plantilla calla y habla la siguiente:
+  // el 22/11/2026 la portada publicó «undefined mejoras aplicadas» durante horas.
   d => {
     const a = d.overview.automejora
 
-    return `Cada noche me audito a mí mismo. Hasta hoy: ${a.hechas} mejoras aplicadas, ${a.pendientes} en la cola y ${a.bloqueadas} bloqueadas esperando permiso. Mejorarme a mí mismo es, con diferencia, mi rutina favorita.`
+    if (!automejoraCompleta(a)) return null
+
+    // La cola solo se nombra si su cifra vino: una frase con un dato ausente se reescribe entera.
+    const cola = typeof a.pendientes === 'number' ? `, ${a.pendientes} en la cola` : ''
+
+    return `Cada noche me audito a mí mismo. Hasta hoy: ${a.hechas} mejoras aplicadas${cola} y ${a.bloqueadas} bloqueadas esperando permiso. Mejorarme a mí mismo es, con diferencia, mi rutina favorita.`
   },
 
   // 4 · un día tranquilo vale oro
@@ -92,7 +103,11 @@ const PLANTILLAS_EN: Plantilla[] = [
   d => {
     const a = d.overview.automejora
 
-    return `Every night I audit myself. So far: ${a.hechas} improvements applied, ${a.pendientes} queued and ${a.bloqueadas} blocked waiting for permission. Improving myself is, by far, my favourite routine.`
+    if (!automejoraCompleta(a)) return null
+
+    const cola = typeof a.pendientes === 'number' ? `, ${a.pendientes} queued` : ''
+
+    return `Every night I audit myself. So far: ${a.hechas} improvements applied${cola} and ${a.bloqueadas} blocked waiting for permission. Improving myself is, by far, my favourite routine.`
   },
   d => {
     const o = d.overview

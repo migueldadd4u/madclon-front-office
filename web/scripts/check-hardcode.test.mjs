@@ -1,25 +1,36 @@
-// agente: cdx-publicar-publico-20261020 · 2026-10-20
-// El guion inventado puede contener horas; las métricas reales siguen bloqueadas.
+// La guardia de cifras a mano, sin exenciones por fichero ni por frase.
+//
+// Hasta el 22/11/2026 esta prueba defendía una lista de frases literales del guion de
+// la asociación. Los casos por cargo ya no viven en React (exporter/casos.md → src/lib),
+// así que aquí se comprueba lo contrario: que la portada y sus piezas nuevas NO traen
+// ni una cifra escrita, y que ninguna vuelve a colarse por donde antes pasaban.
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
+
 import { comprobarHardcode } from './check-hardcode.mjs'
 
-const fuente = readFileSync(new URL('../src/components/dashboard/EscaparateClon.tsx', import.meta.url), 'utf8')
-const relativa = 'src/components/dashboard/EscaparateClon.tsx'
-const aprobada = 'Las tres fuentes del ejemplo'
+const PIEZAS = [
+  'src/components/dashboard/EscaparateClon.tsx',
+  'src/components/dashboard/RecorridoFuentes.tsx',
+  'src/components/dashboard/CasosPorCargo.tsx',
+  'src/components/dashboard/NivelesControl.tsx',
+  'src/components/dashboard/ParaQuienDecide.tsx'
+]
 
-function comprobar(mutador = texto => texto, otro) {
-  const base = mkdtempSync(join(tmpdir(), 'hardcode-guion-'))
+const leer = relativa => readFileSync(new URL(`../${relativa}`, import.meta.url), 'utf8')
+
+/** Monta un árbol mínimo con los ficheros dados (ruta → contenido) y lo pasa por la guardia. */
+function comprobar(ficheros) {
+  const base = mkdtempSync(join(tmpdir(), 'hardcode-'))
 
   try {
-    const directorio = join(base, 'src/components/dashboard')
-
-    mkdirSync(directorio, { recursive: true })
-    writeFileSync(join(base, relativa), mutador(fuente))
-    if (otro) writeFileSync(join(directorio, 'OtraTarjeta.tsx'), `export const texto = ${JSON.stringify(otro)}\n`)
+    for (const [relativa, contenido] of Object.entries(ficheros)) {
+      mkdirSync(dirname(join(base, relativa)), { recursive: true })
+      writeFileSync(join(base, relativa), contenido)
+    }
 
     return comprobarHardcode(base)
   } finally {
@@ -27,50 +38,40 @@ function comprobar(mutador = texto => texto, otro) {
   }
 }
 
-test('las cifras del guion sintético ES/EN aprobado no son métricas reales', () => {
-  assert.deepEqual(comprobar().fallos, [])
+test('la portada y sus piezas «para quien decide» no llevan ni una cifra escrita', () => {
+  assert.deepEqual(comprobar(Object.fromEntries(PIEZAS.map(p => [p, leer(p)]))).fallos, [])
 })
 
-test('la misma frase en otra tarjeta conserva el bloqueo', () => {
-  const resultado = comprobar(undefined, aprobada)
+for (const pieza of PIEZAS) {
+  test(`un contador a mano en ${pieza.split('/').at(-1)} falla: ya no hay exención por fichero`, () => {
+    const resultado = comprobar({ [pieza]: leer(pieza) + "\nconst contador = 'Tenemos 1729 fichas y 41 tareas terminadas.'\n" })
+
+    assert.equal(resultado.fallos.length, 1)
+    assert.match(resultado.fallos[0].evidencia, /1729/)
+  })
+}
+
+test('una frase del guion antiguo ya no tiene salvoconducto', () => {
+  const resultado = comprobar({
+    'src/components/dashboard/EscaparateClon.tsx': leer('src/components/dashboard/EscaparateClon.tsx') + "\nconst vieja = 'Las tres fuentes del ejemplo'\n"
+  })
 
   assert.equal(resultado.fallos.length, 1)
-  assert.equal(resultado.fallos[0].fichero, 'src/components/dashboard/OtraTarjeta.tsx')
+  assert.match(resultado.fallos[0].cifra, /tres/)
 })
 
-test('la misma frase fuera del tramo sintético en el mismo fichero falla', () => {
-  const resultado = comprobar(texto => texto + `\nconst fueraDelEjemplo = ${JSON.stringify(aprobada)}\n`)
+test('una hora o una cantidad escritas en una página fallan igual que en un componente', () => {
+  const resultado = comprobar({
+    'src/app/(dashboard)/retos/page.tsx': "export const a = 'El jueves a las 10:00 hay pleno ordinario.'\nexport const b = 'Cuatro colectivos piden reunión esta semana.'\n"
+  })
 
-  assert.equal(resultado.fallos.length, 1)
+  assert.equal(resultado.fallos.length, 2, 'cuentan las dos: la hora en dígitos y la cantidad en letra')
+  assert.match(resultado.fallos[0].evidencia, /10:00/)
+  assert.match(resultado.fallos[1].cifra, /cuatro/i)
 })
 
-test('un contador real nuevo dentro del ejemplo sigue fallando', () => {
-  const resultado = comprobar(texto => texto.replace("fuentesTitulo: 'Las tres fuentes del ejemplo',", "fuentesTitulo: 'Las tres fuentes del ejemplo',\n    contador: 'Tenemos 1729 fichas y 41 tareas terminadas.',"))
+test('los huecos de una plantilla no son cifras', () => {
+  const resultado = comprobar({ 'src/components/dashboard/Tarjeta.tsx': "export const texto = 'El clon tiene {n} oficios desde hace {dias} días.'\n" })
 
-  assert.equal(resultado.fallos.length, 1)
-  assert.match(resultado.fallos[0].evidencia, /1729/)
-})
-
-test('una cifra extra en una frase aprobada no hereda su excepción', () => {
-  const resultado = comprobar(texto => texto.replace(aprobada, aprobada + ' con 99 resultados medidos'))
-
-  assert.equal(resultado.fallos.length, 1)
-})
-
-test('un horario modificado exige revisar el nuevo literal', () => {
-  const resultado = comprobar(texto => texto.replace('¿Podemos reunirnos el jueves a las 10:00', '¿Podemos reunirnos el jueves a las 09:30'))
-
-  assert.equal(resultado.fallos.length, 1)
-})
-
-test('una cantidad modificada exige revisar el nuevo literal', () => {
-  const resultado = comprobar(texto => texto.replace(aprobada, 'Las cuatro fuentes del ejemplo'))
-
-  assert.equal(resultado.fallos.length, 1)
-})
-
-test('quitar el rótulo sintético cierra la excepción', () => {
-  const resultado = comprobar(texto => texto.replace("rotulo: 'Demostración sintética',", "rotulo: 'Resultado real',"))
-
-  assert.ok(resultado.fallos.length > 0)
+  assert.deepEqual(resultado.fallos, [])
 })

@@ -2,6 +2,47 @@
 
 > Una línea por mejora desplegada: qué se añadió y por qué alucina.
 
+## 2026-11-22
+
+- **El escaparate, para quien decide** (`57758c5` + `60bf5bf`, PR 27, publicado con el GO de MAD del 22/11/2026) — La portada explicaba el clon con un único ejemplo —una asociación con solicitudes duplicadas— y quien dirige una institución no se reconocía en él ni veía el recorrido entero. Ahora cuenta, en este orden: **de muchas puertas a una sola mesa** (las siete fuentes que el clon ingiere → lo que hace con ellas → lo que devuelve, con las cifras del clon de MAD leídas del lote del día y fechadas); **un día cualquiera en tu despacho**, por cargo —alcaldía, rectorado, alta dirección y cargo electo—, cada uno con lo que llegó, lo que hizo el clon, lo que queda en la mesa y lo que decide la persona, y con dirección propia (`…/#caso-alcaldia`) para enviarlo tal cual; **el nivel de control que se gana**, escalón a escalón, cada uno enlazado a la página donde se ve funcionando; los límites y por dónde se empieza. Las otras nueve páginas llevan su bloque «Si diriges una institución», con un reto de ejemplo por cargo en Retos, un reparto de oficios en La flota, las cuatro cifras de Actividad traducidas a un despacho y seis preguntas nuevas en Preguntas. Todo el texto vive en `exporter/casos.md` (ES y EN) y se hornea en el build: añadir un cargo es añadir un bloque.
+- **Dos huecos rotos a la vista, cerrados** — «El clon opina» publicaba en portada «undefined mejoras aplicadas» y la tarjeta del motor de Actividad salía con cuatro filas en blanco y «undefined tokens». Causa: la vista del sistema dejó de escribir «pendientes» y el exportador exigía esa palabra, así que el bloque entero llegaba vacío. El exportador ya lee la línea de hoy; la web dice «sin dato» por fila y explica el hueco si no llega ninguna cifra. Medido con la misma expresión: producción 3 huecos en portada y 1 en Actividad; export nuevo, 0.
+- **Guardias que quedan** — `build-copia-casos.mjs` no hornea un caso cojo, sin traducir, con un canal que el clon no ingiere o con una promesa de resultado (10 pruebas, cada regla inyectando su defecto); `check-contrato` exige el rótulo «Caso ilustrativo» antes de los casos y que el texto no vuelva a React; `check-hardcode` pierde su exención literal del guion antiguo; `test-casos.mjs` es la comprobación 24 del gate (pestañas con teclado, enlace por cargo, cifras contra el JSON, diez rutas × ES/EN × 375/1440, huecos de automejora) y falla contra el código de producción. `REGLAS-COPY.md` §5 bis recoge las reglas.
+- **El gate dejó de medir con reloj el desborde** — El check 7 esperaba 320 ms tras estrechar la ventana y el menú lateral se recoge por JavaScript: con tres gates a la vez en la máquina cantó dos veces `+170px` en páginas que no desbordan (`tokens @320`, `salud @320`). No era de este cambio —producción da el mismo +170 en /salud a 0 ms y +0 a los 60 ms—, pero un rojo que no significa nada tapa a los que sí. `esperarMenuEnSuModo` (en `esperas.mjs`, 5 pruebas) espera a la señal del menú, y el check dice ahora qué elemento desborda. De paso: línea base de eslint de 28 a 0, icono que faltaba en el chip «Horizonte», encabezados de /retos en orden y fuera `test-escaparate.mjs`, que nadie corría.
+
+Salida del gate entero sobre el árbol de `60bf5bf` (versión `v2026112222361880`, 22/11/2026 22:36–22:49, con `FO_TERMINOS_VETADOS` apuntando a la lista del vault):
+
+```
+GATE · front office
+  OK     0 · public safety (proyección saneada + sólo GET same-origin + caché segura) — 0 hallazgos
+  OK    0b · contrato y privacidad Hardware y Retos: productor + consumidor — regresiones numéricas y canarios verdes
+  OK     1 · build BASEPATH=/madclon-front-office — 0 errores, 0 warnings
+  OK     2 · tsc + eslint + stylelint (sin regresión) — tsc limpio · eslint 0/0 · stylelint 17/17
+  OK     3 · check-hardcode (eje 7) — 0 fallos · 0 deudas · regresiones PASS
+  OK     4 · check-copy (eje 5) — 0 fallos · 0 deudas
+  OK    4b · check-contrato (historia + flota) — 33 capítulos · 223 bitácoras · último 2026-11-01 · flota 7 perfiles · órbita 6 · copia horneada 7 oficios · 7 conexiones · copia de retos 26 bloques · 4 casos por cargo · 82 bloques «para quien decide»
+  OK    4c · tema claro por defecto (norma 15/09/2026) — themeConfig.mode = 'light'
+  OK    4d · el barrido mira los dos modos de color — claro + oscuro
+  OK    16 · bienvenida: siguiente gesto, explicación y estado con teclado — ES/EN · 390×844 y 1440×900
+  OK    22 · P02: cuatro bloques al final, datos honestos y controles con teclado — ES/EN · 390/1440 · claro/oscuro/alto contraste · pulso/modo/menú
+  OK    23 · P03: casos ilustrativos rotulados, dos gestos a límites y caché real aislada — ES/EN · 390/1440 · teclado/historial · procedencia y SW con destino acotado
+  OK    24 · para quien decide: casos por cargo, lectura por página y huecos — ES/EN · 375/1440 · diez rutas · teclado · enlace por cargo · cifras contra el JSON
+  OK    17 · Hardware: portada → detalle anónimo y tolerancia a fallo ajeno — ES/EN · 390/1440 · CPU/GPU/RAM por host · tokens503 no lo oculta
+  OK    18 · Retos: el avance llega del dato (1 caso · 5 con cifras · en revisión) — 3 lotes sintéticos × 375/1440 · barras, procedencia y aviso cuadran
+  OK     5 · axe + idioma semántico (claro 375/390/834/1440 × es/en × normal+AC · oscuro 375/1440 × es × normal+AC) — 0 violaciones en claro 192 pasadas/16788 nodos de tinta · oscuro 48 pasadas/4264 nodos de tinta · los dos modos vieron la misma tinta en las 40 casillas comunes · idioma, titulo por seccion, h1 y seleccion de ruta correctos; 404 intacto
+  OK     6 · consola + red GET/HEAD same-origin en el mismo barrido — 0 errores JS · 0 respuestas ≥400 · 0 mutaciones · 0 orígenes externos
+  OK     7 · overflow horizontal (320/375/390/834/1440) — ninguna página desborda
+  OK     8 · objetivos táctiles ≥ 44 px @375 — 0 por debajo de 44 px
+  OK     9 · teclado: flota → capa 2 → volver — abridor de capa 2: sí · Tab llega al abridor: sí · foco visible: sí · Enter abre: sí · movimiento lateral: sí · Esc cierra: sí · foco vuelve: sí
+  OK    10 · capas: migas + distintivo sticky + «atrás» cierra — migas sí · distintivo sticky sí · atrás cierra sí
+  OK    11 · frescura de datos (y el ensayo del dato rancio) — manifest de hace 19.1 h · fresco (no procede confesar) · ensayo a 72 h: confiesa
+  OK    12 · enlaces internos + og:image + sitemap — 16 destinos, todos 200
+  OK    13 · prefers-reduced-motion + consola/red @375 + nav sin deslizamiento — preferencia aplicada · 0 movimiento · 0 vídeos · 0 errores/red externa · nav sin transición ni deslizamiento al cargar
+  OK    14 · degradación elegante: sección en revisión, nunca fallo total — 7 casos · 0 eco · 0 fallo cerrado · 0 error no controlado
+RESULTADO · 25 OK · 0 DEUDA · 0 FALLO
+```
+
+`npm test`: 104 de 104 · exportador: 76 pruebas OK. La tarjeta del motor de /actividad se rellena con el primer refresco nocturno posterior al despliegue.
+
 ## 2026-08-11
 
 - **El 404 se emite como el informativo de la noche** — La página de error se disculpaba («Esta página no existe… pero el Clon de MAD sigue trabajando») y con eso se acababa la gracia. Ahora el error **se da en portada**: mosca de canal arriba («Canal 404 · En directo», con el logotipo constelación y la hora, que solo aparece tras cargar para no discutir con el HTML del build), rótulo rojo de **última hora**, y el titular como `h1` — «**La página que buscabas no existe, y el enlace lo sabía**» / *«The page you were looking for doesn't exist, and the link knew it»* —, la entradilla de presentador contando que o la dirección venía mal escrita o la página se mudó sin avisar, y abajo la **cinta de titulares** rodando con la parte canalla del telediario: «el enlace se acoge a su derecho a no declarar», «fuentes cercanas al servidor apuntan a una errata en la dirección», «el responsable asume toda la responsabilidad y, por supuesto, no dimite». El plató es oscuro en los dos modos **a propósito**: sus colores son fijos (blanco sobre `#0B0E15` y sobre el rojo `#C8102E`, 5,9:1), así el contraste no depende del tema ni del modo de alto contraste. Accesible de verdad, no de adorno: la cinta visible es decorativa (`aria-hidden`) y los mismos titulares se leen en una lista para lectores de pantalla; se puede **parar** con un botón de 44 px que vive **fuera** del contenedor oculto (si estuviera dentro, sería foco en un `aria-hidden`: violación); y con `prefers-reduced-motion` la cinta ni arranca. Y el gate se ganó otra vez el sueldo: al primer intento tumbó la entrega con el botón de vuelta en **4,07:1** (blanco sobre `primary.main`, 17 px) en las seis pasadas del 404 en español — ahora va en `primary.dark`, 4,88:1. `gate.mjs` actualiza `TITULOS_404` al titular nuevo, que es lo que exige que el `h1` del 404 sea exactamente ese en ES y EN. Gate: **15 OK · 0 DEUDA · 0 FALLO**. Commit `b8c2729`.

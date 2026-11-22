@@ -19,6 +19,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 
 
 // Component Imports
 import DataGate from '@/components/dashboard/DataGate'
+import ParaQuienDecide from '@/components/dashboard/ParaQuienDecide'
 import CountUp from '@/components/dashboard/CountUp'
 
 // Hook Imports
@@ -45,10 +46,13 @@ const TokensPage = () => {
   <DataGate necesita={['tokens']}>
     {({ tokens }) => {
       const c = tokens.contador
+
       const observaciones = (tokens.observaciones_30d ?? []).filter(o => {
         const age = Date.now() - Date.parse(o.observed_at)
+
         return o.days === 30 && age >= 0 && age <= 86400000 && Number.isFinite(o.tokens) && o.tokens >= 0 && Number.isFinite(o.amount) && o.amount >= 0
       })
+
       const euros = observaciones.filter(o => o.currency === 'EUR').sort((a, b) => b.amount - a.amount)[0]
       const eurosRegistro = c.ventana_30d == null ? null : c.ventana_30d / 1000000 * 3
       const eurosMayor = euros && (eurosRegistro == null || euros.amount > eurosRegistro) ? euros : null
@@ -62,6 +66,10 @@ const TokensPage = () => {
             <Typography color='text.secondary' className='max-is-3xl'>
               {t('tokens_intro_1')} {t('consumo_alcance')}
             </Typography>
+          </Grid>
+
+          <Grid size={12}>
+            <ParaQuienDecide pagina='tokens' />
           </Grid>
 
           {/* Contador común */}

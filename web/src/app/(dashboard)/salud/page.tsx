@@ -16,6 +16,7 @@ import TableRow from '@mui/material/TableRow'
 
 // Component Imports
 import DataGate from '@/components/dashboard/DataGate'
+import ParaQuienDecide from '@/components/dashboard/ParaQuienDecide'
 import Latido from '@/components/dashboard/Latido'
 import PuntoVivo from '@/components/dashboard/PuntoVivo'
 
@@ -57,6 +58,10 @@ const SaludPage = () => {
               label={`${t('salud_global')}: ${overview.salud_global ?? '—'}`}
             />
           </div>
+        </Grid>
+
+        <Grid size={12}>
+          <ParaQuienDecide pagina='salud' />
         </Grid>
 
         {/* Accesos vigilados */}

@@ -15,6 +15,7 @@ import CustomAvatar from '@core/components/mui/Avatar'
 
 // Component Imports
 import DataGate from '@/components/dashboard/DataGate'
+import ParaQuienDecide from '@/components/dashboard/ParaQuienDecide'
 import CountUp from '@/components/dashboard/CountUp'
 import BarraEntra from '@/components/dashboard/BarraEntra'
 import AnatomiaClon, { COLORES_CLON as COLORES, ICONOS_CLON as ICONOS } from '@/components/dashboard/AnatomiaClon'
@@ -193,6 +194,10 @@ const FlotaPage = () => {
               </Grid>
             )
           })}
+
+          <Grid size={12}>
+            <ParaQuienDecide pagina='flota' dato={{ n: String(clones.clones.length) }} />
+          </Grid>
 
           {clonSel && (
             <AnatomiaClon

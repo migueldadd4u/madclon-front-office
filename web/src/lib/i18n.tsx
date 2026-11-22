@@ -73,16 +73,16 @@ const STR = {
 
   // ------------------------------------------------------------- portada
   home_titulo: {
-    es: 'De información dispersa a un siguiente paso claro',
-    en: 'From scattered information to a clear next step'
+    es: 'Todo lo que te llega, convertido en un siguiente paso claro',
+    en: 'Everything that reaches you, turned into a clear next step'
   },
-  home_eyebrow: { es: 'El Clon de MAD · explora una colaboración', en: 'The MAD Clone · explore a collaboration' },
+  home_eyebrow: { es: 'El Clon de MAD · para quien decide', en: 'The MAD Clone · for those who decide' },
   home_resumen: {
-    es: 'Organiza entradas, prepara decisiones con contexto y sigue los trabajos. Mira qué entrega el clon y qué sigue decidiendo una persona.',
-    en: 'Organize incoming information, prepare decisions with context and follow work. See what the clone delivers and what a person still decides.'
+    es: 'Correo, mensajes, llamadas, agenda, reuniones y documentos te entran por sitios distintos. El clon los une, prepara cada decisión con su contexto y sigue cada compromiso hasta que se cierra. Decidir y firmar sigue siendo cosa tuya.',
+    en: 'Email, messages, calls, calendar, meetings and documents reach you through different channels. The clone joins them up, prepares each decision with its context and follows every commitment until it is closed. Deciding and signing remain yours.'
   },
   home_explorar: { es: 'Ver retos públicos', en: 'View public challenges' },
-  home_como: { es: 'Ver un ejemplo', en: 'See an example' },
+  home_como: { es: 'Ver un caso como el tuyo', en: 'See a case like yours' },
   home_privacidad_limites: { es: 'Privacidad y límites', en: 'Privacy and limits' },
   home_sistema: { es: 'Ver el sistema por dentro', en: 'See inside the system' },
   home_sistema_sub: {
@@ -112,8 +112,8 @@ const STR = {
     en: 'These figures are from {fecha}: the nightly refresh has not run for {horas} h. We say so instead of showing you an old number with a fresh face.'
   },
   home_caption_datos: {
-    es: 'ejemplos sintéticos y retos autorizados; sin datos privados',
-    en: 'synthetic examples and authorized challenges; no private data'
+    es: 'casos ilustrativos y retos autorizados; sin datos privados',
+    en: 'illustrative cases and authorized challenges; no private data'
   },
   home_stat_tokens: { es: 'trabajo de IA en 30 días', en: 'AI work in 30 days' },
   home_stat_clones: { es: 'clones con oficio propio', en: 'clones with their own craft' },
@@ -648,6 +648,14 @@ const STR = {
   act_motor_sub_1: {
     es: 'cada noche se autoaudita y propone mejoras · coste en factura variable:',
     en: 'it audits itself and proposes improvements every night · metered-bill cost:'
+  },
+  act_motor_sub_sin: {
+    es: 'cada noche se autoaudita y propone mejoras',
+    en: 'it audits itself and proposes improvements every night'
+  },
+  act_motor_sin_dato: {
+    es: 'El refresco de esta noche no trajo las cifras del motor. Vuelven solas con el siguiente.',
+    en: 'Tonight’s refresh did not bring the engine figures. They return on their own with the next one.'
   },
   act_hechas: { es: 'mejoras completadas', en: 'completed improvements' },
   act_pendientes: { es: 'pendientes', en: 'pending' },

@@ -4,7 +4,7 @@
 > detrás, no entra aquí. Lo que se puede medir, lo mide `web/scripts/gate.mjs`; lo que
 > no, se revisa a mano en `CHECKLIST-RECIEN-LLEGADO.md`.
 
-Última revisión: **2026-08-01** (entregas 1-5 de la tanda v5).
+Última revisión: **2026-11-22** (arco «para quien decide»; antes, 2026-08-01, entregas 1-5 de la tanda v5).
 
 ---
 
@@ -96,9 +96,27 @@ Estado a 2026-08-01: **saldado** en la entrega 3. Las comprobaciones 9 y 10 del 
   con `!important`, y para las declaraciones importantes el orden de capas se invierte — una
   regla suelta con `!important` **pierde**. Si hay choque, se quita la utilidad, no se sube la apuesta.
 
+## 5 bis · Casos por cargo — a quién se le habla y con qué ejemplos (nacida del 22/11/2026)
+
+La portada explicaba el clon con un único ejemplo —una asociación con solicitudes
+duplicadas— y quien dirige una institución no se reconocía en él. Desde ese día:
+
+| Regla | Cómo se comprueba |
+|---|---|
+| **La portada cuenta el recorrido entero**: muchas fuentes de entrada → una sola memoria que las cruza → un solo sitio donde mirar. | `test-casos.mjs` (comprobación 24 del gate): tres columnas, siete canales |
+| **Los ejemplos son por cargo** (alcaldía, rectorado, alta dirección, cargo electo…), cada uno con sus cuatro etapas: lo que llegó, lo que hizo el clon, lo que tienes en la mesa y lo que decides tú. | `build-copia-casos.mjs` (esquema) y `copia-casos.test.mjs` |
+| **Todo caso es inventado y lo dice donde se lee**: rótulo «Caso ilustrativo» antes de los casos, con «no son un cliente ni un resultado medido». | `check-contrato.mjs`, regla `casos-sin-rotulo`; P03 del gate |
+| **Todo caso acaba en una persona que decide.** El clon no envía, no firma, no publica y no reserva. | `copia-casos.test.mjs` |
+| **Solo entran los canales que el clon ingiere hoy** (correo, mensajería, llamadas, agenda, reuniones grabadas, documentos, notas de voz). Prensa y redes, solo si llegan reenviadas por uno de ellos. | `build-copia-casos.mjs`, lista cerrada `CANALES` |
+| **Ningún caso promete un resultado**: ni ahorro, ni garantía, ni certificación. Los límites sí pueden nombrar lo que NO se acredita. | `build-copia-casos.mjs`, lista `VETADAS` |
+| **Nada sobre dónde están los datos que no sea cierto.** El clon usa modelos propios y servicios externos; no se escribe «tus datos no salen». | revisión manual al tocar `exporter/casos.md` |
+| **El texto vive en `exporter/casos.md`, no en React.** Añadir un cargo es añadir un bloque `caso-<clave>` y su clave en `cargos.orden`. | `check-contrato.mjs`, reglas `casos-en-codigo` y `casos-horneados-desfasados` |
+| **Cada caso tiene dirección propia** (`…/#caso-alcaldia`) y cada página del sistema lleva su bloque «Si diriges una institución». | `test-casos.mjs` |
+| **Una exención de `check-hardcode` por frase o por fichero no vuelve**: el guion sintético ya no vive en las raíces de copy. | `check-hardcode.test.mjs` |
+
 ## 6 · Cómo se publica
 
-1. `npx yarn@1.22.22 gate` **entero y en verde** (12 comprobaciones). El modo `--rapido` es
+1. `npx yarn@1.22.22 gate` **entero y en verde** (el número de comprobaciones crece con cada ronda; el propio gate lo imprime). El modo `--rapido` es
    solo para el bucle de bugfixing: no sirve para publicar.
 2. Si algo falla: arreglar y **volver a pasar el gate entero** (un arreglo rompe otra cosa).
    Tres vueltas sin verde → revertir la entrega.

@@ -10,6 +10,7 @@ import Alert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
 import LinearProgress from '@mui/material/LinearProgress'
 
+import ParaQuienDecide from '@/components/dashboard/ParaQuienDecide'
 import { useLang } from '@/lib/i18n'
 import { usePublishedHardware } from '@/lib/usePublishedHardware'
 import { HARDWARE_INVENTORY, HARDWARE_VERIFIED_AT, HARDWARE_BENCHMARK, FP4_PFLOPS } from '@/lib/hardware-public.mjs'
@@ -63,6 +64,9 @@ export default function HardwarePage() {
           {busy ? es('Consultando…', 'Reading…') : es('Actualizar muestra publicada', 'Refresh published sample')}
         </Button>
       </Box>
+    </Grid>
+    <Grid size={12}>
+      <ParaQuienDecide pagina='hardware' />
     </Grid>
     <Grid size={12}>
       <Alert severity='info'>{es('Al entrar y al pulsar el botón se consulta la última publicación del portal. No se vuelve a medir el hardware ni se actualiza en segundo plano. La fecha de cada equipo indica cuándo se midió.', 'Entering this page or pressing the button reads the portal’s latest publication. It does not measure the hardware again or refresh in the background. Each machine shows when it was measured.')}</Alert>

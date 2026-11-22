@@ -19,6 +19,7 @@ import { join } from 'node:path'
 import { generar } from './build-historia.mjs'
 import { generar as generarCopia } from './build-copia-publica.mjs'
 import { generar as generarRetos, titulosPublicosHorneados } from './build-copia-retos.mjs'
+import { generar as generarCasos } from './build-copia-casos.mjs'
 
 const COLORES_VALIDOS = ['primary', 'success', 'info', 'warning', 'error', 'secondary']
 const RE_ICONO = /^ri-[a-z0-9-]+$/
@@ -460,6 +461,64 @@ export function comprobarContrato(base = process.cwd()) {
     }
 
     notas.push(`copia de retos ${Object.keys(retos.bloques).length} bloques`)
+  }
+
+  // ── 6 · los casos «para quien decide» (arco del 22/11/2026) ─────────────────
+  // La portada explica el clon a quien dirige una institución con casos por cargo
+  // INVENTADOS. Tres cosas no se pueden romper, y las tres se rompen en silencio:
+  //  a) el contenido: la fuente cumple sus reglas (cuatro etapas, canales que el
+  //     clon ingiere de verdad, ES y EN, ninguna promesa de resultado) y lo
+  //     horneado es exactamente lo que dice la fuente;
+  //  b) el rótulo: un caso inventado sin «Caso ilustrativo» a la vista parece un
+  //     cliente, y eso en una web pública es publicidad engañosa;
+  //  c) el sitio: los casos viven en exporter/casos.md, no escritos en React, que
+  //     es donde antes necesitaban una exención literal en check-hardcode.
+  let casos = null
+
+  try {
+    casos = generarCasos()
+  } catch (e) {
+    falla('casos-md-ilegible', `no se pudo leer exporter/casos.md: ${e.message}`)
+  }
+
+  if (casos) {
+    casos.avisos.forEach(a => falla('casos-fuente', `exporter/casos.md · ${a}`))
+
+    if (leerSiExiste(join(base, 'src/lib/copia-casos.ts')) !== casos.cuerpo) {
+      falla('casos-horneados-desfasados',
+        'src/lib/copia-casos.ts no coincide con exporter/casos.md — regenera con `node scripts/build-copia-casos.mjs`')
+    }
+
+    const componente = leerSiExiste(join(base, 'src/components/dashboard/CasosPorCargo.tsx'))
+
+    if (componente === null) {
+      falla('casos-sin-componente', 'falta src/components/dashboard/CasosPorCargo.tsx: los casos horneados no se pintan en ningún sitio')
+    } else {
+      const iRotulo = componente.indexOf('data-demo-sintetica')
+      const iPaneles = componente.indexOf("role='tabpanel'")
+
+      if (iRotulo === -1 || !componente.includes("tx('rotulo').titulo") || !componente.includes("tx('rotulo').texto")) {
+        falla('casos-sin-rotulo',
+          'CasosPorCargo.tsx tiene que pintar el rótulo «Caso ilustrativo» (data-demo-sintetica, bloque «rotulo»): ' +
+          'un caso inventado sin rótulo parece un cliente')
+      } else if (iPaneles !== -1 && iRotulo > iPaneles) {
+        falla('casos-rotulo-despues',
+          'el rótulo «Caso ilustrativo» tiene que ir ANTES de los casos, no detrás: quien lee el primero ya tiene que saberlo')
+      }
+
+      if (!componente.includes('casosPorCargo(')) {
+        falla('casos-fuera-de-la-fuente', 'CasosPorCargo.tsx ya no lee los casos de la fuente horneada (casosPorCargo)')
+      }
+    }
+
+    const portada = leerSiExiste(join(base, 'src/components/dashboard/EscaparateClon.tsx')) ?? ''
+
+    if (/const COPY\s*=/.test(portada)) {
+      falla('casos-en-codigo',
+        'EscaparateClon.tsx vuelve a declarar COPY: el texto de la portada va en exporter/casos.md, no escrito en React')
+    }
+
+    notas.push(`${casos.orden.length} casos por cargo · ${Object.keys(casos.textos).length} bloques «para quien decide»`)
   }
 
   return { fallos, avisos, notas }

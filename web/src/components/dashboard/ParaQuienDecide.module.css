@@ -1,0 +1,540 @@
+/* Piezas «para quien decide» del escaparate (22/11/2026).
+
+   Identidad: todo color sale de las variables del tema Materialize
+   (`--mui-palette-*`), así que claro, oscuro y alto contraste los resuelve el
+   tema y aquí no hay ni un tono fijo. El color de marca rellena y bordea; el
+   texto va siempre con la tinta del tema.
+
+   Técnica (Modern Web Guidance, guías `size-aware-styling` y `card`): cada pieza
+   se adapta al ancho de SU contenedor, no al de la ventana — el menú lateral
+   cambia el ancho útil sin que cambie la ventana. Sin animaciones propias. */
+
+/* ── El recorrido: lo que llega → lo que hace el clon → lo que tienes en la mesa ── */
+
+.recorrido {
+  container-type: inline-size;
+}
+
+.rejilla {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+
+.columna {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-block: 20px;
+  padding-inline: 20px;
+  border: 1px solid var(--mui-palette-divider);
+  border-radius: var(--mui-shape-customBorderRadius-lg, 10px);
+  background: var(--mui-palette-background-paper);
+  min-inline-size: 0;
+}
+
+.centro {
+  border-color: var(--mui-palette-primary-main);
+  background:
+    linear-gradient(var(--mui-palette-primary-lighterOpacity), var(--mui-palette-primary-lighterOpacity)),
+    var(--mui-palette-background-paper);
+}
+
+.cabeceraColumna {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.numero {
+  flex: none;
+  display: grid;
+  place-items: center;
+  inline-size: 32px;
+  block-size: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--mui-palette-divider);
+  color: var(--mui-palette-text-primary);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.centro .numero {
+  border-color: var(--mui-palette-primary-main);
+}
+
+.lista {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.icono {
+  display: grid;
+  place-items: center;
+  inline-size: 36px;
+  block-size: 36px;
+  border-radius: 8px;
+  background: var(--mui-palette-action-hover);
+  color: var(--mui-palette-text-primary);
+  font-size: 18px;
+}
+
+.centro .icono {
+  background: var(--mui-palette-primary-lightOpacity);
+}
+
+.pieColumna {
+  margin-block-start: auto;
+}
+
+.flecha {
+  display: grid;
+  place-items: center;
+  color: var(--mui-palette-text-secondary);
+  font-size: 22px;
+}
+
+/* Apilado, la flecha mira hacia abajo; en fila, hacia la derecha. */
+.flecha i {
+  transform: rotate(90deg);
+}
+
+@container (min-width: 60rem) {
+  .rejilla {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .flecha i {
+    transform: none;
+  }
+}
+
+/* ── Las cifras vivas del clon de MAD ── */
+
+.cifras {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: 16px;
+  margin: 0;
+}
+
+.cifra {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+  min-inline-size: 0;
+}
+
+.cifra dt {
+  color: var(--mui-palette-text-secondary);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.cifra dd {
+  margin: 0;
+  color: var(--mui-palette-text-primary);
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.cifraVacia dd {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* Hueco con el mismo alto que una cifra: mientras carga, nada salta. */
+.cifraHueco {
+  display: block;
+  inline-size: 3.5rem;
+  block-size: 2.1rem;
+  border-radius: 6px;
+  background: var(--mui-palette-action-hover);
+}
+
+/* ── Los casos por cargo ── */
+
+.casos {
+  container-type: inline-size;
+}
+
+/* Los paneles NO llevan relleno, borde ni fondo, y su contenedor no lleva `gap`:
+   un panel con `hidden="until-found"` no desaparece del flujo, solo esconde su
+   contenido, así que cualquier caja propia dejaría una franja vacía. */
+.paneles {
+  display: block;
+}
+
+.panel {
+  display: grid;
+  gap: 20px;
+  padding-block-start: 20px;
+}
+
+.cabeceraCaso {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.etapas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+@container (min-width: 52rem) {
+  .etapas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.etapa {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-block: 20px;
+  padding-inline: 20px;
+  border: 1px solid var(--mui-palette-divider);
+  border-radius: var(--mui-shape-customBorderRadius-lg, 10px);
+  background: var(--mui-palette-background-paper);
+  min-inline-size: 0;
+}
+
+.entrada {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  overflow-wrap: anywhere;
+}
+
+.canal {
+  display: block;
+  color: var(--mui-palette-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.cruces {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: cruce;
+}
+
+.cruce {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  counter-increment: cruce;
+}
+
+.cruce::before {
+  content: counter(cruce);
+  display: grid;
+  place-items: center;
+  inline-size: 28px;
+  block-size: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--mui-palette-primary-main);
+  color: var(--mui-palette-text-primary);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.grupoMesa {
+  display: grid;
+  gap: 8px;
+}
+
+.puntos {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.punto {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  overflow-wrap: anywhere;
+}
+
+.punto i {
+  margin-block-start: 2px;
+  font-size: 18px;
+  color: var(--mui-palette-text-secondary);
+}
+
+.aviso {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding-block: 12px;
+  padding-inline: 12px;
+  border-inline-start: 3px solid var(--mui-palette-warning-main);
+  border-radius: 6px;
+  background: var(--mui-palette-action-hover);
+}
+
+.aviso i {
+  margin-block-start: 2px;
+  font-size: 18px;
+}
+
+.cambia {
+  padding-block: 16px;
+  padding-inline: 16px;
+  border-inline-start: 3px solid var(--mui-palette-primary-main);
+  border-radius: 6px;
+  background: var(--mui-palette-action-hover);
+}
+
+/* ── Los niveles de control ── */
+
+.niveles {
+  container-type: inline-size;
+}
+
+.escalera {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.peldano {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-block: 16px;
+  padding-inline: 16px;
+  border: 1px solid var(--mui-palette-divider);
+  border-radius: var(--mui-shape-customBorderRadius-lg, 10px);
+  background: var(--mui-palette-background-paper);
+  min-inline-size: 0;
+}
+
+.partida {
+  border-style: dashed;
+  background: transparent;
+}
+
+.gradoNivel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--mui-palette-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.enlaceNivel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-block-size: 44px;
+  margin-block-start: auto;
+  color: var(--mui-palette-text-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.enlaceNivel:focus-visible {
+  outline: 3px solid var(--mui-palette-primary-main);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* A media anchura la escalera baja en diagonal: cada nivel entra un poco más. */
+@container (min-width: 36rem) {
+  .peldano {
+    margin-inline-start: calc(var(--altura, 0) * 1.5rem);
+    border-inline-start: 3px solid var(--mui-palette-primary-main);
+  }
+
+  .partida {
+    border-inline-start: 1px dashed var(--mui-palette-divider);
+  }
+}
+
+/* En ancho, cinco peldaños que suben hacia la derecha: el escalón ES el dato. */
+@container (min-width: 64rem) {
+  .escalera {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: end;
+  }
+
+  .peldano {
+    margin-inline-start: 0;
+    min-block-size: calc(11rem + var(--altura, 0) * 1.75rem);
+    border-inline-start: 1px solid var(--mui-palette-divider);
+    border-block-start: 3px solid var(--mui-palette-primary-main);
+  }
+
+  .partida {
+    border-inline-start: 1px dashed var(--mui-palette-divider);
+    border-block-start: 1px dashed var(--mui-palette-divider);
+  }
+}
+
+/* ── La lectura de cada página para quien dirige una institución ── */
+
+.lectura {
+  container-type: inline-size;
+  display: grid;
+  gap: 16px;
+  padding-block: 20px;
+  padding-inline: 20px;
+  border: 1px solid var(--mui-palette-divider);
+  border-inline-start: 3px solid var(--mui-palette-primary-main);
+  border-radius: var(--mui-shape-customBorderRadius-lg, 10px);
+  background: var(--mui-palette-background-paper);
+}
+
+.lecturaCabecera {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+/* En un contenedor estrecho el icono se va: cada píxel es para el texto. */
+@container (max-width: 26rem) {
+  .lecturaCabecera {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lecturaCabecera > .icono {
+    display: none;
+  }
+}
+
+.ejemplos {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@container (min-width: 40rem) {
+  .ejemplos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 72rem) {
+  .ejemplos {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.ejemplos > li {
+  display: grid;
+  min-inline-size: 0;
+}
+
+.ejemplo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-block: 16px;
+  padding-inline: 16px;
+  border: 1px solid var(--mui-palette-divider);
+  border-radius: 8px;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+.ejemploCargo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--mui-palette-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.definiciones {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.definiciones dt {
+  color: var(--mui-palette-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.definiciones dd {
+  margin: 0;
+}
+
+/* En un reparto de oficios manda el nombre del oficio, no su descripción. */
+.oficios dt {
+  color: var(--mui-palette-text-primary);
+  font-size: 0.9375rem;
+}
+
+.oficios dd {
+  color: var(--mui-palette-text-secondary);
+  font-size: 0.875rem;
+}
+
+.traducciones {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  margin: 0;
+}
+
+@container (min-width: 44rem) {
+  .traducciones {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.traducciones dt {
+  font-weight: 600;
+}
+
+.traducciones dd {
+  margin: 0;
+  color: var(--mui-palette-text-secondary);
+}

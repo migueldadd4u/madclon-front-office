@@ -32,14 +32,21 @@ export type Overview = {
     }
   }
   personas: { fichas_curadas: number | null; staged: number | null }
+
+  /**
+   * Todos los campos son opcionales A PROPÓSITO. El bloque sale de una línea de texto
+   * de una vista del sistema, y cuando esa línea cambia de forma llega vacío o sin
+   * algún campo (22/11/2026: dejó de traer «pendientes» y se publicó «undefined»).
+   * Quien lo pinta comprueba cada cifra y dice «sin dato» si falta.
+   */
   automejora: {
-    hechas: number
-    bloqueadas: number
-    aparcadas: number
-    pendientes: number
-    llamadas: number | null
-    metered: number
-    top: string
+    hechas?: number | null
+    bloqueadas?: number | null
+    aparcadas?: number | null
+    pendientes?: number | null
+    llamadas?: number | null
+    metered?: number | null
+    top?: string | null
   }
   crons: Cron[]
   crons_en_error: number

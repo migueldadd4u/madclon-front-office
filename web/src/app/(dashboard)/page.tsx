@@ -16,7 +16,7 @@ import AccordionDetails from '@mui/material/AccordionDetails'
 import { BarChart, Bar, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
 // Component Imports
-import DataGate from '@/components/dashboard/DataGate'
+import { DataGateVista } from '@/components/dashboard/DataGate'
 import StatCard from '@/components/dashboard/StatCard'
 import HeroClon from '@/components/dashboard/HeroClon'
 import EscaparateClon from '@/components/dashboard/EscaparateClon'
@@ -34,7 +34,7 @@ import { useLang } from '@/lib/i18n'
 import type { Lang, StrKey } from '@/lib/i18n'
 
 // Data Imports
-import { fmt, fmtCorto, fmtFecha } from '@/lib/data'
+import { fmt, fmtCorto, fmtFecha, usePanelData } from '@/lib/data'
 import type { PanelData } from '@/lib/data'
 import { mediaTokensSerie } from '@/lib/serie-publica.mjs'
 
@@ -75,12 +75,16 @@ const InicioPage = () => {
   const { lang, t } = useLang()
   const [diaSel, setDiaSel] = useState<number | null>(null)
 
+  // Una sola lectura de los documentos para toda la portada: la usan las cifras
+  // vivas del recorrido (arriba) y el sistema por dentro (abajo).
+  const carga = usePanelData()
+
   return (
     <div className='flex flex-col gap-8'>
       <HeroClon />
-      <EscaparateClon />
+      <EscaparateClon carga={carga} />
       <section aria-label={t('home_sistema')}>
-    <DataGate necesita={['overview', 'tokens', 'clones', 'manifest', 'serie']} fallback={partial => <HardwareOverview hardware={partial.overview?.hardware} />}>
+    <DataGateVista carga={carga} necesita={['overview', 'tokens', 'clones', 'manifest', 'serie']} fallback={partial => <HardwareOverview hardware={partial.overview?.hardware} />}>
       {data => {
         const { overview, tokens, clones, manifest } = data
         const saludOk = (overview.salud_global ?? '').includes('🟢')
@@ -364,7 +368,7 @@ const InicioPage = () => {
           </>
         )
       }}
-    </DataGate>
+    </DataGateVista>
       </section>
     </div>
   )

@@ -4,8 +4,8 @@
   "license": "Commercial",
   "private": true,
   "scripts": {
-    "predev": "node scripts/build-historia.mjs && node scripts/build-copia-publica.mjs && node scripts/build-copia-retos.mjs && node scripts/build-stamp.mjs",
-    "prebuild": "node scripts/public-safety.mjs --source && node scripts/build-historia.mjs && node scripts/build-copia-publica.mjs && node scripts/build-copia-retos.mjs && node scripts/build-stamp.mjs",
+    "predev": "node scripts/build-historia.mjs && node scripts/build-copia-publica.mjs && node scripts/build-copia-retos.mjs && node scripts/build-copia-casos.mjs && node scripts/build-stamp.mjs",
+    "prebuild": "node scripts/public-safety.mjs --source && node scripts/build-historia.mjs && node scripts/build-copia-publica.mjs && node scripts/build-copia-retos.mjs && node scripts/build-copia-casos.mjs && node scripts/build-stamp.mjs",
     "dev": "next dev --turbopack",
     "build": "next build --webpack",
     "postbuild": "node scripts/public-safety.mjs --out",
@@ -22,7 +22,7 @@
     "check:public-safety": "node scripts/public-safety.mjs --source",
     "check:public-safety:out": "node scripts/public-safety.mjs --out",
     "test:public-safety": "node --test scripts/public-safety.test.mjs scripts/hardware-public.test.mjs scripts/check-contrato-retos.test.mjs scripts/sw-datos.test.mjs",
-    "test": "node --test scripts/check-contrato-retos.test.mjs scripts/check-hardcode.test.mjs scripts/errores-ui.test.mjs scripts/hardware-public.test.mjs scripts/lockfile-unico.test.mjs scripts/modos-color.test.mjs scripts/playwright-home.test.mjs scripts/public-safety.test.mjs scripts/serie-publica.test.mjs scripts/suite-ci.test.mjs scripts/sw-datos.test.mjs scripts/tema-claro.test.mjs"
+    "test": "node --test scripts/check-contrato-retos.test.mjs scripts/check-hardcode.test.mjs scripts/copia-casos.test.mjs scripts/errores-ui.test.mjs scripts/hardware-public.test.mjs scripts/lockfile-unico.test.mjs scripts/modos-color.test.mjs scripts/playwright-home.test.mjs scripts/public-safety.test.mjs scripts/serie-publica.test.mjs scripts/suite-ci.test.mjs scripts/sw-datos.test.mjs scripts/tema-claro.test.mjs"
   },
   "dependencies": {
     "@emotion/cache": "11.14.0",
