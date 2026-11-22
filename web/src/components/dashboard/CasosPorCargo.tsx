@@ -168,7 +168,9 @@ const CasosPorCargo = ({ children }: Props) => {
             // fondos desaparecen y la pestaña elegida se quedaría sin marca.
             '& .MuiTabs-indicator': { backgroundColor: 'transparent', blockSize: 0, borderBlockEnd: '3px solid', borderColor: 'primary.main' },
             '& .MuiTab-root': { minBlockSize: 48, textTransform: 'none', fontSize: '0.9375rem' },
-            '& .MuiTab-root.Mui-selected': { color: 'text.primary', fontWeight: 700 },
+
+            // La elegida no cambia de tamaño (ni peso ni relleno): si lo hiciera, las demás saltarían.
+            '& .MuiTab-root.Mui-selected': { color: 'text.primary' },
             '& .MuiTab-root.Mui-focusVisible': { outline: '3px solid', outlineColor: 'primary.main', outlineOffset: -3 },
             '& .MuiTabScrollButton-root': { inlineSize: 44, minBlockSize: 44 }
           }}

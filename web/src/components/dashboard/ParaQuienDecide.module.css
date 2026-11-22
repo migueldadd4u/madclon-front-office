@@ -430,6 +430,17 @@
   align-items: start;
 }
 
+/* En un contenedor estrecho el icono se va: cada píxel es para el texto. */
+@container (max-width: 26rem) {
+  .lecturaCabecera {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lecturaCabecera > .icono {
+    display: none;
+  }
+}
+
 .ejemplos {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -449,6 +460,11 @@
   .ejemplos {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
+}
+
+.ejemplos > li {
+  display: grid;
+  min-inline-size: 0;
 }
 
 .ejemplo {

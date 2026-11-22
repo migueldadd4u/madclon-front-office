@@ -20,7 +20,7 @@ import assert from 'node:assert/strict'
 import { createRequire } from 'node:module'
 import { join } from 'node:path'
 
-import { esperarDomAsentado, esperarQuietudDeMovimiento } from './esperas.mjs'
+import { esperarDomAsentado, esperarMenuEnSuModo, esperarQuietudDeMovimiento } from './esperas.mjs'
 import { resolverPlaywrightHome } from './playwright-home.mjs'
 
 const { directorio } = resolverPlaywrightHome()
@@ -164,5 +164,60 @@ test('un DOM que nunca para devuelve false, no una promesa colgada', async () =>
   `)
 
   assert.equal(await esperarDomAsentado(pg, { ventana: 300, timeout: 1500 }), false)
+  await pg.close()
+})
+
+// ── esperarMenuEnSuModo (22/11/2026) ─────────────────────────────────────────────
+// El check 7 medía el desborde 320 ms después de estrechar la ventana, y el menú
+// lateral se recoge por JavaScript: con la máquina cargada el reloj llegaba antes
+// que el cambio y salía `+170px` en páginas que no desbordan. Estas pruebas fijan
+// que la espera sigue a la SEÑAL del menú y que un menú que no cambia no da verde.
+
+const MENU = clase => `<aside class="ts-vertical-nav-root ${clase}" style="inline-size:260px">menú</aside><main>contenido</main>`
+
+test('el menú que tarda en cambiar de modo se espera: la señal, no el reloj', async () => {
+  const pg = await pagina(MENU(''))
+
+  // Ventana de 375 px: el corte (1200) está alcanzado, pero la clase llega tarde,
+  // como bajo carga. Un reloj de 320 ms habría medido antes.
+  await pg.evaluate(() => setTimeout(() => document.querySelector('aside').classList.add('ts-breakpoint-reached'), 600))
+  const antes = Date.now()
+
+  assert.equal(await esperarMenuEnSuModo(pg), true)
+  assert.ok(Date.now() - antes >= 500, 'esperó a la clase, no devolvió antes')
+  assert.equal(await pg.evaluate(() => document.querySelector('aside').classList.contains('ts-breakpoint-reached')), true)
+  await pg.close()
+})
+
+test('un menú que ya está en su modo no hace esperar', async () => {
+  const pg = await pagina(MENU('ts-breakpoint-reached'))
+  const antes = Date.now()
+
+  assert.equal(await esperarMenuEnSuModo(pg), true)
+  assert.ok(Date.now() - antes < 400, 'sin espera de más')
+  await pg.close()
+})
+
+test('un menú que NUNCA cambia de modo devuelve false, no un verde', async () => {
+  const pg = await pagina(MENU(''))
+
+  assert.equal(await esperarMenuEnSuModo(pg, { timeout: 700 }), false)
+  await pg.close()
+})
+
+test('por encima del corte, el modo correcto es SIN la clase', async () => {
+  const pg = await pagina(MENU('ts-breakpoint-reached'))
+
+  // Con un corte más bajo que la ventana (375), la clase sobra: no está en su modo.
+  assert.equal(await esperarMenuEnSuModo(pg, { corte: 300, timeout: 700 }), false)
+  await pg.evaluate(() => document.querySelector('aside').classList.remove('ts-breakpoint-reached'))
+  assert.equal(await esperarMenuEnSuModo(pg, { corte: 300, timeout: 700 }), true)
+  await pg.close()
+})
+
+test('una página sin menú lateral no se queda esperando', async () => {
+  const pg = await pagina('<main>sin menú</main>')
+
+  assert.equal(await esperarMenuEnSuModo(pg, { timeout: 700 }), true)
   await pg.close()
 })

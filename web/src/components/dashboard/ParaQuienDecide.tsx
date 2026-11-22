@@ -73,7 +73,8 @@ const ParaQuienDecide = ({ pagina, dato }: Props) => {
           <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>{tx('retos-ejemplo').texto}</Typography>
           <ul className={styles.ejemplos}>
             {casos.map(caso => (
-              <li key={caso.clave} className={styles.ejemplo}>
+              <li key={caso.clave}>
+                <article className={styles.ejemplo}>
                 <span className={styles.ejemploCargo}>
                   <i className={caso.icono} aria-hidden='true' />
                   {`${caso.cargo} · ${RETOS_BUILD[BLOQUE_ALTURA[caso.reto.altura]]?.[`${lang}_titulo`] ?? ''}`}
@@ -90,6 +91,7 @@ const ParaQuienDecide = ({ pagina, dato }: Props) => {
                   </div>
                 </dl>
                 {enlaceCaso(caso.clave, caso.cargo)}
+                </article>
               </li>
             ))}
           </ul>
@@ -102,7 +104,8 @@ const ParaQuienDecide = ({ pagina, dato }: Props) => {
           <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>{tx('equipo-ejemplo').texto}</Typography>
           <ul className={styles.ejemplos}>
             {casos.map(caso => (
-              <li key={caso.clave} className={styles.ejemplo}>
+              <li key={caso.clave}>
+                <article className={styles.ejemplo}>
                 <span className={styles.ejemploCargo}>
                   <i className={caso.icono} aria-hidden='true' />
                   {caso.cargo}
@@ -116,6 +119,7 @@ const ParaQuienDecide = ({ pagina, dato }: Props) => {
                   ))}
                 </dl>
                 {enlaceCaso(caso.clave, caso.cargo)}
+                </article>
               </li>
             ))}
           </ul>

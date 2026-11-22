@@ -11,6 +11,7 @@
 import assert from 'node:assert/strict'
 import { createRequire } from 'node:module'
 import { join } from 'node:path'
+
 import { resolverPlaywrightHome } from './playwright-home.mjs'
 import { esperarDomAsentado, esperarQuietudDeMovimiento } from './esperas.mjs'
 

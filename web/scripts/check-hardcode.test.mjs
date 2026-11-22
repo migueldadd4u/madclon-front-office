@@ -9,6 +9,7 @@ import assert from 'node:assert/strict'
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
+
 import { comprobarHardcode } from './check-hardcode.mjs'
 
 const PIEZAS = [

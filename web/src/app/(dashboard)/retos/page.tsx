@@ -32,9 +32,12 @@ import ParaQuienDecide from '@/components/dashboard/ParaQuienDecide'
 // Data Imports
 import { RETOS_BUILD } from '@/lib/copia-retos'
 
+// Encabezados (22/11/2026): cada tarjeta de la página es un `h2` con el aspecto de siempre
+// (`variant='h5'`). Antes salían como `h5` reales y el orden saltaba de h1 a h5.
+
 /** Las cuatro alturas, de lo general a lo concreto, con su icono y su color. */
 const ALTURAS = [
-  { clave: 'altura-horizonte', icono: 'ri-mountain-line', color: 'primary' as const },
+  { clave: 'altura-horizonte', icono: 'ri-landscape-line', color: 'primary' as const },
   { clave: 'altura-frente', icono: 'ri-flag-line', color: 'info' as const },
   { clave: 'altura-reto', icono: 'ri-focus-3-line', color: 'success' as const },
   { clave: 'altura-empujon', icono: 'ri-flashlight-line', color: 'warning' as const }
@@ -187,7 +190,7 @@ const RetosPage = () => {
       <Grid size={{ xs: 12, lg: 7 }}>
         <Card className='bs-full'>
           <CardContent className='flex flex-col gap-4'>
-            <Typography variant='h5'>{titulo('metodo')}</Typography>
+            <Typography variant='h5' component='h2'>{titulo('metodo')}</Typography>
             <Typography color='text.secondary'>{texto('metodo')}</Typography>
           </CardContent>
         </Card>
@@ -196,7 +199,7 @@ const RetosPage = () => {
       <Grid size={{ xs: 12, lg: 5 }}>
         <Card className='bs-full'>
           <CardContent className='flex flex-col gap-4'>
-            <Typography variant='h5'>{titulo('su-momento')}</Typography>
+            <Typography variant='h5' component='h2'>{titulo('su-momento')}</Typography>
             <Typography color='text.secondary'>{texto('su-momento')}</Typography>
           </CardContent>
         </Card>
@@ -205,7 +208,7 @@ const RetosPage = () => {
       <Grid size={12}>
         <Card>
           <CardContent className='flex flex-col gap-4'>
-            <Typography variant='h5'>{lang === 'es' ? 'Las alturas de un reto' : 'The heights of a challenge'}</Typography>
+            <Typography variant='h5' component='h2'>{lang === 'es' ? 'Las alturas de un reto' : 'The heights of a challenge'}</Typography>
             <div data-alturas>
               {ALTURAS.map((a, i) => (
                 <Accordion key={a.clave} defaultExpanded={i === 0}>
@@ -229,7 +232,7 @@ const RetosPage = () => {
       <Grid size={12}>
         <Card data-como-propone>
           <CardContent className='flex flex-col gap-4'>
-            <Typography variant='h5'>{titulo('como-propone')}</Typography>
+            <Typography variant='h5' component='h2'>{titulo('como-propone')}</Typography>
             <Typography color='text.secondary' className='max-is-3xl'>
               {texto('como-propone')}
             </Typography>
@@ -238,7 +241,7 @@ const RetosPage = () => {
               <Typography variant='body2'>{texto('limite')}</Typography>
             </Alert>
             <div data-no-hace>
-              <Typography variant='h6' className='mbe-2'>
+              <Typography variant='h6' component='h3' className='mbe-2'>
                 {lang === 'es' ? 'Lo que el clon no hace' : 'What the clone does not do'}
               </Typography>
               <Grid container spacing={4}>
@@ -264,7 +267,7 @@ const RetosPage = () => {
       <Grid size={{ xs: 12, lg: 7 }}>
         <Card className='bs-full'>
           <CardContent className='flex flex-col gap-4'>
-            <Typography variant='h5'>{titulo('panel-privado')}</Typography>
+            <Typography variant='h5' component='h2'>{titulo('panel-privado')}</Typography>
             <Typography color='text.secondary'>{texto('panel-privado')}</Typography>
             <Typography variant='body2'>
               {/* Objetivo táctil ≥ 44 px (check 8 del gate). */}
@@ -281,7 +284,7 @@ const RetosPage = () => {
         <Grid size={{ xs: 12, lg: 5 }}>
           <Card className='bs-full' data-sin-cifras>
             <CardContent className='flex flex-col gap-4'>
-              <Typography variant='h5'>{titulo('sin-cifras')}</Typography>
+              <Typography variant='h5' component='h2'>{titulo('sin-cifras')}</Typography>
               <Typography color='text.secondary'>{texto('sin-cifras')}</Typography>
             </CardContent>
           </Card>

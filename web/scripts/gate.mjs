@@ -27,7 +27,7 @@ import { join, extname, resolve } from 'node:path'
 import { comprobarContrato } from './check-contrato.mjs'
 import { comprobarCopy } from './check-copy.mjs'
 import { comprobarHardcode } from './check-hardcode.mjs'
-import { esperarDomAsentado, esperarQuietudDeMovimiento } from './esperas.mjs'
+import { esperarDomAsentado, esperarMenuEnSuModo, esperarQuietudDeMovimiento } from './esperas.mjs'
 import { modosAxe } from './modos-color.mjs'
 import { resolverPlaywrightHome } from './playwright-home.mjs'
 import { auditPublicSafety, formatFinding } from './public-safety.mjs'
@@ -138,8 +138,8 @@ const SECCIONES = {
 }
 
 const TITULOS_PORTADA = {
-  es: 'De información dispersa a un siguiente paso claro',
-  en: 'From scattered information to a clear next step'
+  es: 'Todo lo que te llega, convertido en un siguiente paso claro',
+  en: 'Everything that reaches you, turned into a clear next step'
 }
 
 // El titular del informativo del 404 (views/NotFound.tsx): es el h1 de la página.
@@ -910,14 +910,38 @@ async function navegador() {
       // del check 7; el otro solo visita los suyos de axe.
       for (const w of modo.referencia ? ANCHOS_OVERFLOW : modo.anchos) {
         await pg.setViewportSize({ width: w, height: 900 })
+
+        // Primero el ESTADO y luego el suelo de tiempo. El menú lateral se recoge por
+        // JavaScript; con la máquina cargada el reloj de 320 ms llegaba antes que ese
+        // cambio y el check 7 cantaba `+170px` en páginas que no desbordan (22/11/2026,
+        // dos de cuatro pasadas; el código de producción da el mismo +170 a 0 ms). Ver
+        // `esperarMenuEnSuModo` en esperas.mjs. Los 320 ms que siguen cubren la
+        // transición de ancho del propio menú (300 ms), que empieza con el cambio.
+        const menuEnSuModo = await esperarMenuEnSuModo(pg)
+
         await pg.waitForTimeout(320)
 
         if (modo.referencia) {
-          const desborde = await pg.evaluate(
-            () => document.documentElement.scrollWidth - window.innerWidth
-          )
+          // Un desborde dice QUIÉN desborda: sin el culpable, un rojo obliga a adivinar.
+          const { desborde, culpable } = await pg.evaluate(() => {
+            const ancho = window.innerWidth
+            const fuera = [...document.querySelectorAll('body *')].filter(e => {
+              const r = e.getBoundingClientRect()
 
-          if (desborde > 1) overflow.push(`${p || 'portada'} @${w} +${desborde}px (${lang})`)
+              return r.width > 0 && r.right > ancho + 1
+            })
+
+            const raiz = fuera.find(e => !fuera.includes(e.parentElement))
+            const clase = raiz && typeof raiz.className === 'string' ? raiz.className.trim().split(/\s+/)[0] : ''
+
+            return {
+              desborde: document.documentElement.scrollWidth - ancho,
+              culpable: raiz ? `${raiz.tagName.toLowerCase()}${clase ? `.${clase}` : ''}` : ''
+            }
+          })
+
+          if (!menuEnSuModo) overflow.push(`${p || 'portada'} @${w} (${lang}): el menú lateral no cambió de modo en 15 s`)
+          else if (desborde > 1) overflow.push(`${p || 'portada'} @${w} +${desborde}px (${lang})${culpable ? ` por ${culpable}` : ''}`)
         }
 
         if (modo.anchos.includes(w)) {
@@ -1758,9 +1782,13 @@ async function navegador() {
         // ni usa la vieja alarma de fallo cerrado («no están disponibles»).
         // Ojo: DatoRancio usa MUI Alert (role='alert') de forma legítima,
         // así que la alarma se detecta por su texto, no por el rol.
+        // Puede confesar MÁS de una sección: desde el 22/11/2026 la portada lee los
+        // documentos una vez y los reparten las cifras vivas del recorrido y el sistema
+        // por dentro; si cae un documento que usan las dos, las dos lo dicen. Lo que se
+        // exige es que haya confesión, no que sea única.
         const confesion = paginaCaso.getByRole('status').filter({ hasText: /revisión|review/i })
 
-        await confesion.waitFor({ timeout: 15000 })
+        await confesion.first().waitFor({ timeout: 15000 })
 
         const textoAlarma = (await paginaCaso.locator('body').textContent()) || ''
 

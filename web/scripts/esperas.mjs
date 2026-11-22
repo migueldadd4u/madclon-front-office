@@ -208,3 +208,50 @@ export async function esperarQuietudDeMovimiento(pg, { ventana = 300, timeout = 
     return { estado: 'no-para', movimiento: pendiente.length ? pendiente : ['movimiento sin identificar'] }
   }
 }
+
+/**
+ * Espera a que el menú lateral haya cambiado de MODO tras un cambio de ancho.
+ *
+ * POR QUÉ EXISTE (22/11/2026). El check 7 mide el desborde horizontal justo después
+ * de `setViewportSize`, y esperaba un reloj fijo de 320 ms. El menú lateral no se
+ * recoge con CSS: lo decide un `matchMedia` leído en un `resize` de React (corte en
+ * 1200 px) y hasta que ese cambio se pinta el menú sigue ocupando sus 260 px. En ese
+ * instante una página cuyo contenido no encoge por debajo de 230 px mide 490 px de
+ * ancho: **+170 px de desborde a 320**, exactos. Se cazó dos veces en cuatro pasadas
+ * con la máquina cargada (tres gates a la vez, carga 20-27) —`tokens @320 +170px` y
+ * `salud @320 +170px`—, y NO era del cambio en curso: el código de producción da el
+ * mismo +170 en /salud en la muestra a 0 ms y +0 a los 60 ms.
+ *
+ *     producción /salud/   0 ms: +170  menú=260@0     ← lo que a veces medía el gate
+ *                         60 ms: +0    menú=260@-260
+ *
+ * Es la misma familia que el check 13 (ver arriba): un reloj no sigue al punto en que
+ * la página se asienta. Aquí la señal es explícita y no hace falta adivinar: la raíz
+ * del menú lleva `ts-breakpoint-reached` cuando su `matchMedia` ya se aplicó.
+ *
+ * NO baja el listón: un desborde de verdad sigue estando ahí después de que el menú
+ * se recoja, y se sigue midiendo. Y si el menú no cambia de modo en `timeout`, se
+ * devuelve `false` para que quien llama lo cante como fallo, nunca como verde.
+ *
+ * @returns {Promise<boolean>} true si el menú está en el modo que pide el ancho.
+ */
+export async function esperarMenuEnSuModo(pg, { corte = 1200, timeout = 15000 } = {}) {
+  try {
+    await pg.waitForFunction(
+      c => {
+        const menu = document.querySelector('.ts-vertical-nav-root')
+
+        // Sin menú lateral (página en blanco, 404 propio…) no hay nada que esperar.
+        if (!menu) return true
+
+        return menu.classList.contains('ts-breakpoint-reached') === window.matchMedia(`(max-width: ${c}px)`).matches
+      },
+      corte,
+      { timeout, polling: 50 }
+    )
+
+    return true
+  } catch {
+    return false
+  }
+}
